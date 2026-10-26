@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { EDUCATION_LEVELS, EducationLevel } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
@@ -7,93 +7,124 @@ import { colors, layout, shadows, typography } from '../theme/tokens';
 interface BookshelfProps {
   selectedLevel: string | null;
   onSelectLevel: (levelId: string | null) => void;
+  booksCountByLevel?: Record<string, number>;
 }
 
-export const Bookshelf: React.FC<BookshelfProps> = ({ selectedLevel, onSelectLevel }) => {
+export const Bookshelf: React.FC<BookshelfProps> = ({
+  selectedLevel,
+  onSelectLevel,
+  booksCountByLevel = {},
+}) => {
   const { language, isRTL, t } = useLanguage();
 
   return (
-    <View style={styles.shelfContainer}>
-      <Text style={[styles.shelfTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-        📚 {t('app.allLevels')}
-      </Text>
+    <View style={styles.libraryMenuContainer}>
+      <View style={[styles.menuHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+        <Text style={styles.menuHeaderIcon}>📚</Text>
+        <Text style={[styles.menuTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+          {t('app.allLevels')}
+        </Text>
+      </View>
 
-      {/* Reset / All Levels Option */}
-      <TouchableOpacity
-        style={[
-          styles.spineCard,
-          selectedLevel === null && styles.spineCardSelected,
-          { backgroundColor: colors.primaryDark },
-        ]}
-        onPress={() => onSelectLevel(null)}
-        activeOpacity={0.85}
-      >
-        <View style={styles.spineRibbon} />
-        <Text style={styles.spineText}>{t('app.allLevels')}</Text>
-      </TouchableOpacity>
+      {/* Stacked Level Books / Volume Spines */}
+      <View style={styles.shelfStack}>
+        {/* All Levels Option */}
+        <TouchableOpacity
+          style={[
+            styles.bookVolumeCard,
+            selectedLevel === null && styles.bookVolumeSelected,
+            { backgroundColor: colors.primary },
+          ]}
+          onPress={() => onSelectLevel(null)}
+          activeOpacity={0.85}
+        >
+          <View style={styles.spineRibbon} />
+          <View style={styles.volumeContent}>
+            <Text style={styles.volumeTitle}>{t('app.allLevels')}</Text>
+            <Text style={styles.volumeSub}>جميع المستويات التعليمية</Text>
+          </View>
+          {selectedLevel === null && (
+            <View style={styles.openTag}>
+              <Text style={styles.openTagText}>مفتوح</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
-      {/* Shelf Levels list as 3D-styled Book Spines */}
-      <ScrollView showsVerticalScrollIndicator={false}>
         {EDUCATION_LEVELS.map((level) => {
           const title = level.title[language] || level.title.ar;
           const subtitle = level.subTitle[language] || level.subTitle.ar;
           const isSelected = selectedLevel === level.id;
+          const count = booksCountByLevel[level.id] || 0;
 
           return (
             <TouchableOpacity
               key={level.id}
               style={[
-                styles.spineCard,
-                isSelected && styles.spineCardSelected,
+                styles.bookVolumeCard,
+                isSelected && styles.bookVolumeSelected,
                 { backgroundColor: level.spineColor },
               ]}
               onPress={() => onSelectLevel(level.id)}
               activeOpacity={0.85}
             >
-              <View style={styles.spineGoldAccent} />
-              <View style={styles.spineContent}>
-                <Text style={styles.spineText}>{title}</Text>
-                <Text style={styles.spineSubText}>{subtitle}</Text>
+              {/* Gold Spine Trim */}
+              <View style={styles.goldSpineBand} />
+              <View style={styles.volumeContent}>
+                <View style={[styles.titleRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <Text style={styles.volumeTitle}>{title}</Text>
+                  {count > 0 && (
+                    <Text style={styles.bookCountBadge}>{count} كتب</Text>
+                  )}
+                </View>
+                <Text style={styles.volumeSub}>{subtitle}</Text>
               </View>
-              {isSelected && <Text style={styles.activeIndicator}>▶</Text>}
+
+              {isSelected && (
+                <View style={styles.openTag}>
+                  <Text style={styles.openTagText}>📖 مفتوح</Text>
+                </View>
+              )}
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
-
-      {/* Wooden Shelf Base Visual Effect */}
-      <View style={styles.woodenBase}>
-        <View style={styles.woodenGrain} />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  shelfContainer: {
-    width: 260,
-    backgroundColor: '#3E2723', // Deep rich walnut wood color
+  libraryMenuContainer: {
+    width: '100%',
+    backgroundColor: '#27170B', // Dark rich oak wood finish
     borderRadius: layout.borderRadius.xl,
     padding: 16,
     ...shadows.lg,
-    alignSelf: 'flex-start',
     borderWidth: 2,
-    borderColor: '#5D4037',
+    borderColor: colors.secondary,
   },
-  shelfTitle: {
-    color: '#D7CCC8',
+  menuHeader: {
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  menuHeaderIcon: {
+    fontSize: 20,
+  },
+  menuTitle: {
+    color: '#F0E6D2',
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    marginBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#5D4037',
-    paddingBottom: 8,
   },
-  spineCard: {
+  shelfStack: {
+    gap: 10,
+  },
+  bookVolumeCard: {
     borderRadius: layout.borderRadius.md,
     paddingVertical: 14,
     paddingHorizontal: 16,
-    marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -103,19 +134,19 @@ const styles = StyleSheet.create({
     borderLeftColor: 'rgba(255, 255, 255, 0.4)',
     ...shadows.md,
   },
-  spineCardSelected: {
-    transform: [{ scale: 1.03 }],
+  bookVolumeSelected: {
     borderLeftColor: colors.accent,
     borderWidth: 2,
-    borderColor: colors.accentLight,
+    borderColor: colors.accent,
+    transform: [{ scale: 1.02 }],
   },
-  spineGoldAccent: {
+  goldSpineBand: {
     position: 'absolute',
     top: 0,
     bottom: 0,
-    right: 8,
-    width: 3,
-    backgroundColor: 'rgba(255, 215, 0, 0.3)',
+    right: 10,
+    width: 4,
+    backgroundColor: 'rgba(212, 175, 55, 0.4)',
   },
   spineRibbon: {
     position: 'absolute',
@@ -125,33 +156,42 @@ const styles = StyleSheet.create({
     width: 4,
     backgroundColor: colors.accent,
   },
-  spineContent: {
+  volumeContent: {
     flex: 1,
   },
-  spineText: {
+  titleRow: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  volumeTitle: {
     color: colors.textLight,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
   },
-  spineSubText: {
-    color: 'rgba(255, 255, 255, 0.75)',
+  volumeSub: {
+    color: 'rgba(255, 255, 255, 0.8)',
     fontSize: typography.fontSize.xs,
     marginTop: 2,
   },
-  activeIndicator: {
-    color: colors.accent,
-    fontSize: 14,
-    marginLeft: 6,
+  bookCountBadge: {
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    color: colors.accentLight,
+    fontSize: 10,
+    fontWeight: typography.fontWeight.bold,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: layout.borderRadius.full,
   },
-  woodenBase: {
-    height: 12,
-    backgroundColor: '#27170B',
+  openTag: {
+    backgroundColor: colors.accent,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: layout.borderRadius.sm,
-    marginTop: 8,
+    marginLeft: 8,
   },
-  woodenGrain: {
-    height: 2,
-    backgroundColor: '#1A0E07',
-    marginTop: 5,
+  openTagText: {
+    color: colors.primaryDark,
+    fontSize: 11,
+    fontWeight: typography.fontWeight.bold,
   },
 });

@@ -1,40 +1,41 @@
 export const colors = {
-  primary: '#123B2B', // Deep Emerald Green
+  primary: '#0F382C', // Modern Deep Emerald
   primaryLight: '#1B543E',
-  primaryDark: '#0A2319',
-  secondary: '#8B5A2B', // Natural Oak / Walnut
-  secondaryLight: '#A6703B',
-  accent: '#C29B38', // Muted Gold
-  accentLight: '#E5C158',
-  background: '#FAF8F5', // Warm Ivory / Cream
+  primaryDark: '#072119',
+  secondary: '#5C3A21', // Rich Oak / Leather
+  secondaryLight: '#8C5B36',
+  accent: '#D4AF37', // Muted Gold Accent
+  accentLight: '#F3E5AB',
+  background: '#FDFBF7', // Warm Cream / Ivory Paper
   cardBg: '#FFFFFF',
-  shelfBg: '#4A2E18', // Deep wood shelf
-  textPrimary: '#1E2923',
-  textSecondary: '#5A6B62',
-  textMuted: '#8A9A90',
+  shelfBg: '#2C1A11', // Deep Walnut Shelf
+  pageBg: '#FAF7F0', // Opened book page color
+  textPrimary: '#1A2E26',
+  textSecondary: '#4A5D55',
+  textMuted: '#7A8C84',
   textLight: '#FFFFFF',
-  border: '#E2DDD5',
-  borderDark: '#C8C2B7',
-  error: '#D32F2F',
+  border: '#E8E2D8',
+  borderDark: '#D0C8B8',
+  error: '#C62828',
   success: '#2E7D32',
-  warning: '#ED6C02',
-  badgePack: '#7B1FA2', // Purple accent for packs
-  badgeDiscount: '#D32F2F',
-  badgeNew: '#0288D1',
-  shadow: 'rgba(18, 59, 43, 0.08)',
+  warning: '#EF6C00',
+  badgePack: '#6A1B9A', // Purple accent for packs
+  badgeDiscount: '#C62828',
+  badgeNew: '#1565C0',
+  shadow: 'rgba(15, 56, 44, 0.08)',
 };
 
 export const typography = {
-  fontFamilyArabic: 'Noto Sans Arabic, system-ui, -apple-system, sans-serif',
+  fontFamilyArabic: 'Noto Sans Arabic, Cairo, system-ui, -apple-system, sans-serif',
   fontFamilyLatin: 'System, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontSize: {
     xs: 12,
     sm: 14,
     md: 16,
     lg: 18,
-    xl: 20,
-    xxl: 24,
-    hero: 32,
+    xl: 22,
+    xxl: 26,
+    hero: 34,
   },
   fontWeight: {
     regular: '400' as const,
@@ -54,12 +55,12 @@ export const spacing = {
 };
 
 export const layout = {
-  a4AspectRatio: 1.414, // Height / Width ratio (e.g., width x 1.414 = height)
+  a4AspectRatio: 1.414, // Height / Width ratio (A4 portrait format)
   borderRadius: {
-    sm: 4,
-    md: 8,
-    lg: 12,
-    xl: 16,
+    sm: 6,
+    md: 10,
+    lg: 14,
+    xl: 18,
     full: 9999,
   },
   maxWidth: 1280,
@@ -67,24 +68,24 @@ export const layout = {
 
 export const shadows = {
   sm: {
-    shadowColor: '#123B2B',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
+    shadowColor: '#0F382C',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
     elevation: 2,
   },
   md: {
-    shadowColor: '#123B2B',
+    shadowColor: '#0F382C',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
     elevation: 4,
   },
   lg: {
-    shadowColor: '#123B2B',
+    shadowColor: '#0F382C',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
     elevation: 8,
   },
 };
