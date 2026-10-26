@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { registerRootComponent } from 'expo';
 import {
   StyleSheet,
   Text,
@@ -217,6 +218,8 @@ export default function App() {
     </LanguageProvider>
   );
 }
+
+registerRootComponent(App);
 
 const styles = StyleSheet.create({
   appContainer: {
