@@ -1,0 +1,197 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum EducationLevelCategory {
+  primary
+  middle
+  secondary
+  other
+}
+
+enum Quarter {
+  Q1
+  Q2
+  Q3
+  ALL_YEAR
+}
+
+enum OrderStatus {
+  pending
+  in_progress
+  delivered
+  rejected
+}
+
+enum PaymentMethod {
+  cash_on_delivery
+  manual_confirmation
+}
+
+enum PaymentStatus {
+  unpaid
+  paid
+}
+
+enum UserRole {
+  admin
+  customer
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  role         UserRole @default(customer)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model EducationLevel {
+  id           String                 @id @default(uuid())
+  code         String                 @unique
+  nameAr       String
+  nameFr       String?
+  nameEn       String?
+  category     EducationLevelCategory
+  displayOrder Int                    @default(0)
+  active       Boolean                @default(true)
+  articles     Article[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+}
+
+model Article {
+  id               String         @id @default(uuid())
+  sku              String         @unique
+  nameAr           String
+  nameFr           String?
+  nameEn           String?
+  descAr           String?
+  descFr           String?
+  descEn           String?
+  price            Decimal        @db.Decimal(10, 3)
+  discountPrice    Decimal?       @db.Decimal(10, 3)
+  stock            Int?
+  educationLevelId String
+  educationLevel   EducationLevel @relation(fields: [educationLevelId], references: [id])
+  quarter          Quarter?
+  posterUrl        String?
+  samplePdfUrl     String?
+  author           String?
+  publisher        String?
+  active           Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  packItems        PackItem[]
+  reviews          Review[]
+}
+
+model Pack {
+  id            String     @id @default(uuid())
+  sku           String     @unique
+  nameAr        String
+  nameFr        String?
+  nameEn        String?
+  descAr        String?
+  descFr        String?
+  descEn        String?
+  price         Decimal    @db.Decimal(10, 3)
+  discountPrice Decimal?   @db.Decimal(10, 3)
+  posterUrl     String?
+  active        Boolean    @default(true)
+  items         PackItem[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model PackItem {
+  id        String  @id @default(uuid())
+  packId    String
+  pack      Pack    @relation(fields: [packId], references: [id], onDelete: Cascade)
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id])
+  quantity  Int     @default(1)
+
+  @@unique([packId, articleId])
+}
+
+model DeliveryRule {
+  id          String   @id @default(uuid())
+  nameAr      String
+  nameFr      String?
+  nameEn      String?
+  minSubtotal Decimal  @db.Decimal(10, 3)
+  maxSubtotal Decimal? @db.Decimal(10, 3)
+  fee         Decimal  @db.Decimal(10, 3)
+  isFree      Boolean  @default(false)
+  active      Boolean  @default(true)
+  priority    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Order {
+  id                    String        @id @default(uuid())
+  reference             String        @unique
+  customerFullName      String
+  customerEmail         String
+  customerPhone         String
+  customerCity          String
+  customerAddress       String
+  customerInstructions  String?
+  subtotal              Decimal       @db.Decimal(10, 3)
+  deliveryFee           Decimal       @db.Decimal(10, 3)
+  appliedDeliveryRuleId String?
+  total                 Decimal       @db.Decimal(10, 3)
+  status                OrderStatus   @default(pending)
+  rejectionReason       String?
+  paymentMethod         PaymentMethod @default(cash_on_delivery)
+  paymentStatus         PaymentStatus @default(unpaid)
+  items                 OrderItem[]
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+}
+
+model OrderItem {
+  id            String   @id @default(uuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type          String
+  itemId        String
+  nameAr        String
+  nameFr        String?
+  nameEn        String?
+  unitPrice     Decimal  @db.Decimal(10, 3)
+  discountPrice Decimal? @db.Decimal(10, 3)
+  quantity      Int
+  subtotal      Decimal  @db.Decimal(10, 3)
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  articleId  String?
+  article    Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  rating     Int
+  authorName String
+  comment    String
+  published  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
