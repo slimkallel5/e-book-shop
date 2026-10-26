@@ -1,0 +1,19 @@
+{
+  "name": "e-book-shop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Arabic-First 3D Educational Bookstore for Tunisia",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "web": "npm --workspace=apps/web run start",
+    "api": "npm --workspace=apps/api run start:dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
