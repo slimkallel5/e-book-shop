@@ -27,7 +27,7 @@ export class PostgresEducationLevelRepository implements IEducationLevelReposito
     const items = await this.prisma.educationLevel.findMany({
       orderBy: { displayOrder: 'asc' },
     });
-    return items.map((item) => ({
+    return items.map((item: any) => ({
       id: item.id,
       code: item.code,
       name: { ar: item.nameAr, fr: item.nameFr || undefined, en: item.nameEn || undefined },
@@ -96,7 +96,7 @@ export class PostgresArticleRepository implements IArticleRepository {
       ];
     }
     const items = await this.prisma.article.findMany({ where });
-    return items.map((item) => ({
+    return items.map((item: any) => ({
       id: item.id,
       sku: item.sku,
       name: { ar: item.nameAr, fr: item.nameFr || undefined, en: item.nameEn || undefined },
@@ -220,7 +220,7 @@ export class PostgresPackRepository implements IPackRepository {
       ];
     }
     const items = await this.prisma.pack.findMany({ where, include: { items: true } });
-    return items.map((item) => ({
+    return items.map((item: any) => ({
       id: item.id,
       sku: item.sku,
       name: { ar: item.nameAr, fr: item.nameFr || undefined, en: item.nameEn || undefined },
@@ -229,7 +229,7 @@ export class PostgresPackRepository implements IPackRepository {
         : undefined,
       price: Number(item.price),
       discountPrice: item.discountPrice ? Number(item.discountPrice) : undefined,
-      items: item.items.map((i) => ({ articleId: i.articleId, quantity: i.quantity })),
+      items: item.items.map((i: any) => ({ articleId: i.articleId, quantity: i.quantity })),
       posterUrl: item.posterUrl || undefined,
       active: item.active,
       createdAt: item.createdAt.toISOString(),
@@ -249,7 +249,7 @@ export class PostgresPackRepository implements IPackRepository {
         : undefined,
       price: Number(item.price),
       discountPrice: item.discountPrice ? Number(item.discountPrice) : undefined,
-      items: item.items.map((i) => ({ articleId: i.articleId, quantity: i.quantity })),
+      items: item.items.map((i: any) => ({ articleId: i.articleId, quantity: i.quantity })),
       posterUrl: item.posterUrl || undefined,
       active: item.active,
       createdAt: item.createdAt.toISOString(),
@@ -326,7 +326,7 @@ export class PostgresDeliveryRuleRepository implements IDeliveryRuleRepository {
     const where: any = {};
     if (activeOnly) where.active = true;
     const items = await this.prisma.deliveryRule.findMany({ where, orderBy: { priority: 'asc' } });
-    return items.map((item) => ({
+    return items.map((item: any) => ({
       id: item.id,
       name: { ar: item.nameAr, fr: item.nameFr || undefined, en: item.nameEn || undefined },
       minSubtotal: Number(item.minSubtotal),
@@ -412,7 +412,7 @@ export class PostgresOrderRepository implements IOrderRepository {
       include: { items: true },
       orderBy: { createdAt: 'desc' },
     });
-    return items.map((item) => ({
+    return items.map((item: any) => ({
       id: item.id,
       reference: item.reference,
       customer: {
@@ -423,7 +423,7 @@ export class PostgresOrderRepository implements IOrderRepository {
         address: item.customerAddress,
         instructions: item.customerInstructions || undefined,
       },
-      items: item.items.map((i) => ({
+      items: item.items.map((i: any) => ({
         type: i.type as any,
         itemId: i.itemId,
         name: { ar: i.nameAr, fr: i.nameFr || undefined, en: i.nameEn || undefined },
@@ -459,7 +459,7 @@ export class PostgresOrderRepository implements IOrderRepository {
         address: item.customerAddress,
         instructions: item.customerInstructions || undefined,
       },
-      items: item.items.map((i) => ({
+      items: item.items.map((i: any) => ({
         type: i.type as any,
         itemId: i.itemId,
         name: { ar: i.nameAr, fr: i.nameFr || undefined, en: i.nameEn || undefined },
@@ -547,7 +547,7 @@ export class PostgresReviewRepository implements IReviewRepository {
     if (filters?.articleId !== undefined) where.articleId = filters.articleId;
 
     const items = await this.prisma.review.findMany({ where, orderBy: { createdAt: 'desc' } });
-    return items.map((item) => ({
+    return items.map((item: any) => ({
       id: item.id,
       articleId: item.articleId || undefined,
       rating: item.rating,
@@ -599,7 +599,7 @@ export class PostgresContactRepository implements IContactRepository {
 
   async findAll(): Promise<ContactMessage[]> {
     const items = await this.prisma.contactMessage.findMany({ orderBy: { createdAt: 'desc' } });
-    return items.map((item) => ({
+    return items.map((item: any) => ({
       id: item.id,
       name: item.name,
       email: item.email,

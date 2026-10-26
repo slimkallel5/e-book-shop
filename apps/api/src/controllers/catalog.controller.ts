@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Inject, NotFoundException, Param, Post, Put, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Inject, NotFoundException, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateArticleDto, CreatePackDto } from '../common/dto/domain.dto';
 import {
@@ -63,6 +63,18 @@ export class ArticlesController {
 
   @Post()
   async create(@Body() dto: CreateArticleDto) {
+    if (dto.price < 0) {
+      throw new BadRequestException('Base price cannot be negative');
+    }
+    if (dto.discountPrice !== undefined && dto.discountPrice !== null) {
+      if (dto.discountPrice < 0) {
+        throw new BadRequestException('Discount price cannot be negative');
+      }
+      if (dto.discountPrice >= dto.price) {
+        throw new BadRequestException('Discount price must be less than base price');
+      }
+    }
+
     return this.articleRepo.create({
       sku: dto.sku,
       name: dto.name,
@@ -82,8 +94,25 @@ export class ArticlesController {
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() dto: Partial<CreateArticleDto>) {
+    const existing = await this.articleRepo.findById(id);
+    if (!existing) throw new NotFoundException('Article not found');
+
+    const effectivePrice = dto.price !== undefined ? dto.price : existing.price;
+    const effectiveDiscount = dto.discountPrice !== undefined ? dto.discountPrice : existing.discountPrice;
+
+    if (effectivePrice < 0) {
+      throw new BadRequestException('Base price cannot be negative');
+    }
+    if (effectiveDiscount !== undefined && effectiveDiscount !== null) {
+      if (effectiveDiscount < 0) {
+        throw new BadRequestException('Discount price cannot be negative');
+      }
+      if (effectiveDiscount >= effectivePrice) {
+        throw new BadRequestException('Discount price must be less than base price');
+      }
+    }
+
     const updated = await this.articleRepo.update(id, dto);
-    if (!updated) throw new NotFoundException('Article not found');
     return updated;
   }
 
@@ -123,6 +152,26 @@ export class PacksController {
 
   @Post()
   async create(@Body() dto: CreatePackDto) {
+    if (dto.price < 0) {
+      throw new BadRequestException('Pack price cannot be negative');
+    }
+    if (dto.discountPrice !== undefined && dto.discountPrice !== null) {
+      if (dto.discountPrice < 0) {
+        throw new BadRequestException('Discount price cannot be negative');
+      }
+      if (dto.discountPrice >= dto.price) {
+        throw new BadRequestException('Discount price must be less than base price');
+      }
+    }
+    if (!dto.items || dto.items.length === 0) {
+      throw new BadRequestException('Pack must contain at least one item');
+    }
+
+    const articleIds = dto.items.map((i) => i.articleId);
+    if (new Set(articleIds).size !== articleIds.length) {
+      throw new BadRequestException('Pack items cannot contain duplicate articles');
+    }
+
     return this.packRepo.create({
       sku: dto.sku,
       name: dto.name,
@@ -137,8 +186,35 @@ export class PacksController {
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() dto: Partial<CreatePackDto>) {
+    const existing = await this.packRepo.findById(id);
+    if (!existing) throw new NotFoundException('Pack not found');
+
+    const effectivePrice = dto.price !== undefined ? dto.price : existing.price;
+    const effectiveDiscount = dto.discountPrice !== undefined ? dto.discountPrice : existing.discountPrice;
+
+    if (effectivePrice < 0) {
+      throw new BadRequestException('Pack price cannot be negative');
+    }
+    if (effectiveDiscount !== undefined && effectiveDiscount !== null) {
+      if (effectiveDiscount < 0) {
+        throw new BadRequestException('Discount price cannot be negative');
+      }
+      if (effectiveDiscount >= effectivePrice) {
+        throw new BadRequestException('Discount price must be less than base price');
+      }
+    }
+
+    if (dto.items) {
+      if (dto.items.length === 0) {
+        throw new BadRequestException('Pack must contain at least one item');
+      }
+      const articleIds = dto.items.map((i) => i.articleId);
+      if (new Set(articleIds).size !== articleIds.length) {
+        throw new BadRequestException('Pack items cannot contain duplicate articles');
+      }
+    }
+
     const updated = await this.packRepo.update(id, dto);
-    if (!updated) throw new NotFoundException('Pack not found');
     return updated;
   }
 

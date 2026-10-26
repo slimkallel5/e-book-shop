@@ -17,6 +17,8 @@ interface HeaderProps {
   onOpenFavourites?: () => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
+  isAdminMode?: boolean;
+  onToggleAdminMode?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -26,6 +28,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenFavourites,
   searchQuery = '',
   onSearchChange,
+  isAdminMode = false,
+  onToggleAdminMode,
 }) => {
   const { language, setLanguage, isRTL, t } = useLanguage();
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -75,6 +79,22 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Action Controls & Language Selector */}
         <View style={[styles.actionsRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          {/* Admin Toggle Button */}
+          {onToggleAdminMode && (
+            <TouchableOpacity
+              style={[
+                styles.actionBtn,
+                isAdminMode ? styles.adminActiveBtn : styles.adminBtn,
+              ]}
+              onPress={onToggleAdminMode}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.actionIcon}>⚙️</Text>
+              <Text style={[styles.cartLabel, isAdminMode && { color: colors.textLight }]}>
+                {isAdminMode ? 'المتجر' : 'الإدارة'}
+              </Text>
+            </TouchableOpacity>
+          )}
           {/* Favourites Button */}
           <TouchableOpacity
             style={styles.actionBtn}
@@ -283,6 +303,20 @@ const styles = StyleSheet.create({
     position: 'relative',
     top: 0,
     right: 0,
+  },
+  adminBtn: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    gap: 4,
+  },
+  adminActiveBtn: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    backgroundColor: colors.primaryDark,
+    borderColor: colors.accent,
+    borderWidth: 1,
+    gap: 4,
   },
   badgeCountText: {
     color: colors.textLight,
