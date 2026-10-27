@@ -10,29 +10,12 @@ export const ImmersiveBackground: React.FC<{ children?: React.ReactNode }> = ({ 
     <View style={styles.outerWrapper}>
       {/* Fixed Ambient 3D Depth Canvas Layer */}
       <View style={styles.backgroundCanvas} pointerEvents="none">
-        {/* Layer 1: 3D Rendered Background Asset */}
+        {/* Layer 1: 3D Rendered Background Asset as-is */}
         <Image
           source={backgroundImageAsset}
           style={styles.backgroundImage}
           resizeMode="cover"
         />
-
-        {/* Layer 2: Atmospheric Warm Paper Gradient Overlay for Readability */}
-        <View style={styles.gradientOverlay} />
-
-        {/* Layer 3: 3D Perspective Floating Book & Paper Silhouettes */}
-        <View style={styles.floatingLayer1}>
-          <View style={[styles.floatingShape, styles.shapeBook1]} />
-          <View style={[styles.floatingShape, styles.shapeBook2]} />
-          <View style={[styles.floatingShape, styles.shapeParchment1]} />
-        </View>
-
-        {/* Layer 4: Depth Floating Orbs / Ambient Soft Spotlights */}
-        <View style={styles.floatingLayer2}>
-          <View style={[styles.glowOrb, styles.orbGold]} />
-          <View style={[styles.glowOrb, styles.orbEmerald]} />
-          <View style={[styles.glowOrb, styles.orbCobalt]} />
-        </View>
       </View>
 
       {/* Main Foreground Content */}
@@ -45,7 +28,7 @@ const styles = StyleSheet.create({
   outerWrapper: {
     flex: 1,
     position: 'relative',
-    backgroundColor: colors.background,
+    backgroundColor: '#0F251C',
     width: '100%',
     minHeight: '100%',
   },
@@ -62,11 +45,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
-  },
-  gradientOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.background,
-    opacity: 0.82,
   },
   floatingLayer1: {
     ...StyleSheet.absoluteFillObject,

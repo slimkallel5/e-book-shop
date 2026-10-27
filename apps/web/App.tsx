@@ -299,9 +299,8 @@ const styles = StyleSheet.create({
     ...shadows.md,
   },
   heroContent: {
-    maxWidth: layout.maxWidth,
     width: '100%',
-    alignSelf: 'center',
+    alignSelf: 'stretch',
   },
   heroTitle: {
     color: colors.textLight,
@@ -318,9 +317,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   storeLayoutWrapper: {
-    maxWidth: layout.maxWidth,
     width: '100%',
-    alignSelf: 'center',
+    alignSelf: 'stretch',
   },
   mobileMenuTrigger: {
     backgroundColor: colors.primary,
@@ -363,11 +361,18 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     flexWrap: 'wrap',
     gap: 12,
+    backgroundColor: 'rgba(18, 59, 43, 0.85)',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: layout.borderRadius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
+    ...shadows.md,
   },
   catalogTitle: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primaryDark,
+    color: colors.textLight,
   },
   filterBar: {
     alignItems: 'center',
@@ -375,23 +380,23 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   pillBtn: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: layout.borderRadius.full,
-    backgroundColor: colors.cardBg,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   pillBtnActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.accent,
+    borderColor: colors.accentLight,
   },
   pillText: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: colors.textLight,
   },
   pillTextActive: {
-    color: colors.textLight,
+    color: colors.primaryDark,
     fontWeight: typography.fontWeight.bold,
   },
   booksGrid: {

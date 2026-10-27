@@ -65,7 +65,7 @@ export const layout = {
     xl: 16,
     full: 9999,
   },
-  maxWidth: 1280,
+  maxWidth: '100%',
 };
 
 export const shadows = {
