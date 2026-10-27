@@ -15,6 +15,7 @@ import { Bookshelf, NavCategory } from './src/components/Bookshelf';
 import { ProductCard } from './src/components/ProductCard';
 import { BookViewer } from './src/components/BookViewer';
 import { BookLookbookGallery } from './src/components/BookLookbookGallery';
+import { ArticleLookbookGallery } from './src/components/ArticleLookbookGallery';
 import { ImmersiveBackground } from './src/components/ImmersiveBackground';
 import { Modal } from './src/components/ui/Modal';
 import { Button } from './src/components/ui/Button';
@@ -122,60 +123,74 @@ function StorefrontContent() {
                 </View>
               )}
 
-              {/* Center Catalog Grid & 3D Lookbook Section */}
+              {/* Center Catalog / Showcase Section */}
               <View style={styles.catalogCol}>
-                <View style={[styles.catalogHeaderRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  <Text style={styles.catalogTitle}>{t('app.catalogTitle')}</Text>
+                {/* Educational Articles Showcase Mode */}
+                {selectedCategory === 'articles' ? (
+                  <ArticleLookbookGallery />
+                ) : (
+                  <>
+                    <View style={[styles.catalogHeaderRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                      <Text style={styles.catalogTitle}>{t('app.catalogTitle')}</Text>
 
-                  {/* Quarter Filter Pills */}
-                  <View style={[styles.filterBar, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                    {['all', 'q1', 'q2', 'q3'].map((q) => (
-                      <TouchableOpacity
-                        key={q}
-                        style={[
-                          styles.pillBtn,
-                          selectedQuarter === q && styles.pillBtnActive,
-                        ]}
-                        onPress={() => setSelectedQuarter(q)}
-                        activeOpacity={0.8}
-                      >
-                        <Text
-                          style={[
-                            styles.pillText,
-                            selectedQuarter === q && styles.pillTextActive,
-                          ]}
-                        >
-                          {q === 'all' ? t('app.allQuarters') : t(`app.${q}`)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                {/* Interactive 3D Motion UI Lookbook Reveal Book Showcase */}
-                {filteredBooks.length > 0 && (
-                  <BookLookbookGallery
-                    books={filteredBooks}
-                    onPreviewBook={(b) => setPreviewBook(b)}
-                  />
-                )}
-
-                {/* Responsive Books Grid */}
-                <View style={[styles.booksGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  {filteredBooks.length > 0 ? (
-                    filteredBooks.map((book) => (
-                      <ProductCard
-                        key={book.id}
-                        book={book}
-                        onPreview={(b) => setPreviewBook(b)}
-                      />
-                    ))
-                  ) : (
-                    <View style={styles.emptyGrid}>
-                      <Text style={styles.emptyGridText}>لا توجد كتب مطابقة لبحثك</Text>
+                      {/* Quarter Filter Pills */}
+                      <View style={[styles.filterBar, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                        {['all', 'q1', 'q2', 'q3'].map((q) => (
+                          <TouchableOpacity
+                            key={q}
+                            style={[
+                              styles.pillBtn,
+                              selectedQuarter === q && styles.pillBtnActive,
+                            ]}
+                            onPress={() => setSelectedQuarter(q)}
+                            activeOpacity={0.8}
+                          >
+                            <Text
+                              style={[
+                                styles.pillText,
+                                selectedQuarter === q && styles.pillTextActive,
+                              ]}
+                            >
+                              {q === 'all' ? t('app.allQuarters') : t(`app.${q}`)}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
                     </View>
-                  )}
-                </View>
+
+                    {/* Interactive 3D Motion UI Lookbook Reveal Book Showcase */}
+                    {filteredBooks.length > 0 && (
+                      <BookLookbookGallery
+                        books={filteredBooks}
+                        onPreviewBook={(b) => setPreviewBook(b)}
+                      />
+                    )}
+
+                    {/* Responsive Books Grid */}
+                    <View style={[styles.booksGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                      {filteredBooks.length > 0 ? (
+                        filteredBooks.map((book) => (
+                          <ProductCard
+                            key={book.id}
+                            book={book}
+                            onPreview={(b) => setPreviewBook(b)}
+                          />
+                        ))
+                      ) : (
+                        <View style={styles.emptyGrid}>
+                          <Text style={styles.emptyGridText}>لا توجد كتب مطابقة لبحثك</Text>
+                        </View>
+                      )}
+                    </View>
+
+                    {/* Educational Articles Lookbook Section under general catalog */}
+                    {selectedCategory === 'all' && (
+                      <View style={styles.articlesSectionWrapper}>
+                        <ArticleLookbookGallery />
+                      </View>
+                    )}
+                  </>
+                )}
               </View>
             </View>
           </View>
@@ -389,6 +404,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 12,
     marginTop: 16,
+  },
+  articlesSectionWrapper: {
+    marginTop: 32,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
   emptyGrid: {
     padding: 32,
