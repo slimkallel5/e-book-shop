@@ -14,11 +14,11 @@ import { Header, Footer } from './src/components/Header';
 import { Bookshelf, NavCategory } from './src/components/Bookshelf';
 import { ProductCard } from './src/components/ProductCard';
 import { BookViewer } from './src/components/BookViewer';
-import { ArticleAdmin } from './src/components/ArticleAdmin';
-import { PackAdmin } from './src/components/PackAdmin';
 import { BookLookbookGallery } from './src/components/BookLookbookGallery';
 import { ArticleLookbookGallery } from './src/components/ArticleLookbookGallery';
 import { ImmersiveBackground } from './src/components/ImmersiveBackground';
+import { ArticleAdmin } from './src/components/ArticleAdmin';
+import { PackAdmin } from './src/components/PackAdmin';
 import { Modal } from './src/components/ui/Modal';
 import { Button } from './src/components/ui/Button';
 import { MOCK_BOOKS, Book } from './src/mock/data';
@@ -75,7 +75,7 @@ function StorefrontContent() {
           onToggleAdminMode={() => setIsAdminView(!isAdminView)}
         />
 
-        {/* Main Scroll Content: Admin View or Storefront View */}
+        {/* Main Scroll Content */}
         {isAdminView ? (
           <ScrollView contentContainerStyle={styles.mainScrollContent}>
             <View style={styles.adminContainer}>
