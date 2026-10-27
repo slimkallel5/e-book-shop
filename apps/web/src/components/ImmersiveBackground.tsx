@@ -1,31 +1,38 @@
 import React from 'react';
-import { StyleSheet, View, Platform } from 'react-native';
+import { StyleSheet, View, Image, Platform } from 'react-native';
 import { colors } from '../theme/tokens';
+
+// Require local 3D rendering background asset
+const backgroundImageAsset = require('../../assets/back-to-school-3d.jpg');
 
 export const ImmersiveBackground: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   return (
     <View style={styles.outerWrapper}>
       {/* Fixed Ambient 3D Depth Canvas Layer */}
       <View style={styles.backgroundCanvas} pointerEvents="none">
-        {/* Layer 1: Atmospheric Library Gradient Base */}
-        <View style={styles.gradientBase} />
+        {/* Layer 1: 3D Rendered Background Asset */}
+        <Image
+          source={backgroundImageAsset}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        />
 
-        {/* Layer 2: 3D Perspective Floating Book & Paper Silhouettes */}
+        {/* Layer 2: Atmospheric Warm Paper Gradient Overlay for Readability */}
+        <View style={styles.gradientOverlay} />
+
+        {/* Layer 3: 3D Perspective Floating Book & Paper Silhouettes */}
         <View style={styles.floatingLayer1}>
           <View style={[styles.floatingShape, styles.shapeBook1]} />
           <View style={[styles.floatingShape, styles.shapeBook2]} />
           <View style={[styles.floatingShape, styles.shapeParchment1]} />
         </View>
 
-        {/* Layer 3: Depth Floating Orbs / Ambient Soft Spotlights */}
+        {/* Layer 4: Depth Floating Orbs / Ambient Soft Spotlights */}
         <View style={styles.floatingLayer2}>
           <View style={[styles.glowOrb, styles.orbGold]} />
           <View style={[styles.glowOrb, styles.orbEmerald]} />
           <View style={[styles.glowOrb, styles.orbCobalt]} />
         </View>
-
-        {/* Layer 4: Subtle Architectural Library Grid Overlay */}
-        <View style={styles.libraryGridOverlay} />
       </View>
 
       {/* Main Foreground Content */}
@@ -51,10 +58,15 @@ const styles = StyleSheet.create({
     zIndex: 0,
     overflow: 'hidden',
   },
-  gradientBase: {
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+  },
+  gradientOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.background,
-    opacity: 0.96,
+    opacity: 0.82,
   },
   floatingLayer1: {
     ...StyleSheet.absoluteFillObject,
