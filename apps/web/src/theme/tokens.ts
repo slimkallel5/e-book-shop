@@ -22,6 +22,9 @@ export const colors = {
   badgeDiscount: '#D32F2F',
   badgeNew: '#0288D1',
   shadow: 'rgba(18, 59, 43, 0.08)',
+  glassBg: 'rgba(255, 255, 255, 0.82)',
+  glassBorder: 'rgba(255, 255, 255, 0.4)',
+  ambientGlow: 'rgba(194, 155, 56, 0.15)',
 };
 
 export const typography = {
