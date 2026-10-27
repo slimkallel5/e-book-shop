@@ -14,7 +14,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => {
   const { language, isRTL, t } = useLanguage();
-  const { addToCart, toggleFavourite, isFavourite } = useStore();
+  const { addToCart, favourites, toggleFavourite, isFavourite } = useStore();
 
   const title = book.title[language] || book.title.ar;
   const levelName = book.levelName[language] || book.levelName.ar;
@@ -27,7 +27,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
 
   return (
     <View style={styles.cardContainer}>
-      {/* Cover Image Wrapper with Exact A4 Aspect Ratio */}
+      {/* Cover Image Wrapper with A4 Aspect Ratio */}
       <View style={styles.coverWrapper}>
         <Image
           source={{ uri: book.coverUrl }}
@@ -126,10 +126,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cardBg,
     borderRadius: layout.borderRadius.lg,
     overflow: 'hidden',
-    width: 210,
+    width: 220,
     borderWidth: 1,
     borderColor: colors.border,
     ...shadows.md,
+    margin: 8,
   },
   coverWrapper: {
     width: '100%',
@@ -149,24 +150,23 @@ const styles = StyleSheet.create({
   favBtn: {
     position: 'absolute',
     top: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
     borderRadius: layout.borderRadius.full,
-    width: 30,
-    height: 30,
+    width: 32,
+    height: 32,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
-    ...shadows.sm,
   },
   favIcon: {
-    fontSize: 14,
+    fontSize: 16,
   },
   previewOverlayBtn: {
     position: 'absolute',
     bottom: 8,
     left: 8,
     right: 8,
-    backgroundColor: colors.primaryDark,
+    backgroundColor: 'rgba(18, 59, 43, 0.9)',
     borderRadius: layout.borderRadius.sm,
     paddingVertical: 6,
     alignItems: 'center',
