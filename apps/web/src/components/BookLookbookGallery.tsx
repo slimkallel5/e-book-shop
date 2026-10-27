@@ -1,0 +1,391 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
+import { Book } from '../mock/data';
+import { useLanguage } from '../context/LanguageContext';
+import { useStore } from '../context/StoreContext';
+import { colors, layout, shadows, typography } from '../theme/tokens';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+
+interface BookLookbookGalleryProps {
+  books: Book[];
+  onPreviewBook: (book: Book) => void;
+}
+
+export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
+  books,
+  onPreviewBook,
+}) => {
+  const { language, isRTL, t } = useLanguage();
+  const { addToCart } = useStore();
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+
+  if (!books || books.length === 0) {
+    return null;
+  }
+
+  // Ensure index is within current books bounds
+  const activeIndex = selectedIndex >= books.length ? 0 : selectedIndex;
+  const activeBook = books[activeIndex];
+
+  const handleNext = () => {
+    setSelectedIndex((prev) => (prev + 1) % books.length);
+  };
+
+  const handlePrev = () => {
+    setSelectedIndex((prev) => (prev - 1 + books.length) % books.length);
+  };
+
+  return (
+    <View style={styles.lookbookSection}>
+      {/* 3D Arc Gallery Carousel Stage */}
+      <View style={styles.perspectiveStage}>
+        {/* Navigation Control Arrows */}
+        {books.length > 1 && (
+          <>
+            <TouchableOpacity
+              style={[styles.stageArrow, styles.arrowLeft]}
+              onPress={isRTL ? handleNext : handlePrev}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.arrowText}>{isRTL ? '▶' : '◀'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.stageArrow, styles.arrowRight]}
+              onPress={isRTL ? handlePrev : handleNext}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.arrowText}>{isRTL ? '◀' : '▶'}</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {/* 3D Arc Arranged Book Cover Cards */}
+        <View style={styles.cardsArcWrapper}>
+          {books.map((book, idx) => {
+            const isFocal = idx === activeIndex;
+            const title = book.title[language] || book.title.ar;
+            const level = book.levelName[language] || book.levelName.ar;
+
+            // Calculate offset relative to active book
+            const offset = idx - activeIndex;
+            const absOffset = Math.abs(offset);
+
+            if (absOffset > 2) return null; // Show focal item and 2 neighbors
+
+            // Perspective layout transformations
+            const rotateY = offset * -20;
+            const translateX = offset * 150;
+            const scale = 1 - absOffset * 0.18;
+            const opacity = 1 - absOffset * 0.3;
+            const zIndex = 10 - absOffset;
+
+            const discountPercent =
+              book.discountPrice && book.price > 0
+                ? Math.round(((book.price - book.discountPrice) / book.price) * 100)
+                : null;
+
+            return (
+              <TouchableOpacity
+                key={book.id}
+                style={[
+                  styles.lookbookCard,
+                  isFocal && styles.lookbookCardFocal,
+                  {
+                    zIndex,
+                    opacity,
+                    transform: Platform.OS === 'web'
+                      ? ([
+                          { perspective: 900 },
+                          { translateX },
+                          { scale },
+                          { rotateY: `${rotateY}deg` },
+                        ] as any)
+                      : [{ scale }],
+                  },
+                ]}
+                onPress={() => setSelectedIndex(idx)}
+                activeOpacity={0.9}
+              >
+                <Image source={{ uri: book.coverUrl }} style={styles.coverImage} resizeMode="cover" />
+
+                {/* 3D Spine Edge Overlay */}
+                <View style={styles.spine3DEdge} />
+
+                {/* Badges */}
+                <View style={[styles.badgeContainer, isRTL ? { right: 8 } : { left: 8 }]}>
+                  {book.isPack && <Badge label={t('app.packBadge')} variant="pack" />}
+                  {discountPercent && (
+                    <Badge label={`-${discountPercent}%`} variant="discount" style={{ marginTop: 4 }} />
+                  )}
+                </View>
+
+                {/* Bottom Overlay Info */}
+                <View style={styles.cardGradient}>
+                  <Text style={styles.levelBadge}>🎓 {level}</Text>
+                  <Text style={[styles.cardTitle, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={2}>
+                    {title}
+                  </Text>
+                  <Text style={styles.priceLabel}>
+                    {(book.discountPrice ?? book.price).toFixed(2)} {t('app.currency')}
+                  </Text>
+                </View>
+
+                {isFocal && <View style={styles.focalGoldBorder} />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* Selected Book Reveal Details Panel */}
+      {activeBook && (
+        <View style={styles.revealDetailCard}>
+          <View style={[styles.detailHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+            <View style={styles.detailInfoCol}>
+              <View style={[styles.metaBadgesRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={styles.detailLevel}>
+                  🎓 {activeBook.levelName[language] || activeBook.levelName.ar}
+                </Text>
+                {activeBook.quarter && activeBook.quarter !== 'full' && (
+                  <Text style={styles.detailQuarter}>• {t(`app.${activeBook.quarter}`)}</Text>
+                )}
+                <Text style={styles.detailStars}>★ {activeBook.rating.toFixed(1)}</Text>
+              </View>
+
+              <Text style={[styles.detailTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+                {activeBook.title[language] || activeBook.title.ar}
+              </Text>
+
+              <Text style={[styles.detailDesc, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={2}>
+                {activeBook.description[language] || activeBook.description.ar}
+              </Text>
+            </View>
+
+            <View style={styles.detailActionsCol}>
+              <View style={[styles.priceTagRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={styles.currentPrice}>
+                  {(activeBook.discountPrice ?? activeBook.price).toFixed(2)} {t('app.currency')}
+                </Text>
+                {activeBook.discountPrice && (
+                  <Text style={styles.oldPrice}>
+                    {activeBook.price.toFixed(2)} {t('app.currency')}
+                  </Text>
+                )}
+              </View>
+
+              <View style={[styles.btnRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Button
+                  title={t('app.previewBook')}
+                  onPress={() => onPreviewBook(activeBook)}
+                  variant="outline"
+                  size="sm"
+                />
+                <Button
+                  title={t('app.addToCart')}
+                  onPress={() => addToCart(activeBook)}
+                  variant="primary"
+                  size="sm"
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      )}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  lookbookSection: {
+    marginVertical: 16,
+    width: '100%',
+  },
+  perspectiveStage: {
+    height: 320,
+    width: '100%',
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 8,
+    overflow: 'hidden',
+  },
+  stageArrow: {
+    position: 'absolute',
+    top: '42%',
+    backgroundColor: colors.primary,
+    width: 42,
+    height: 42,
+    borderRadius: layout.borderRadius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 50,
+    ...shadows.md,
+  },
+  arrowLeft: {
+    left: 12,
+  },
+  arrowRight: {
+    right: 12,
+  },
+  arrowText: {
+    color: colors.textLight,
+    fontSize: 16,
+    fontWeight: typography.fontWeight.bold,
+  },
+  cardsArcWrapper: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  lookbookCard: {
+    position: 'absolute',
+    width: 210,
+    height: 285,
+    borderRadius: layout.borderRadius.lg,
+    overflow: 'hidden',
+    backgroundColor: colors.cardBg,
+    ...shadows.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  lookbookCardFocal: {
+    borderColor: colors.accent,
+    borderWidth: 2,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.3,
+    shadowRadius: 18,
+  },
+  coverImage: {
+    width: '100%',
+    height: '100%',
+  },
+  spine3DEdge: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 6,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: 8,
+    zIndex: 10,
+  },
+  cardGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 12,
+    backgroundColor: 'rgba(10, 35, 25, 0.88)',
+  },
+  levelBadge: {
+    color: colors.accent,
+    fontSize: 10,
+    fontWeight: typography.fontWeight.bold,
+    marginBottom: 2,
+  },
+  cardTitle: {
+    color: colors.textLight,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+    lineHeight: 16,
+  },
+  priceLabel: {
+    color: colors.accentLight,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.bold,
+    marginTop: 4,
+  },
+  focalGoldBorder: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 4,
+    backgroundColor: colors.accent,
+  },
+  revealDetailCard: {
+    backgroundColor: colors.cardBg,
+    borderRadius: layout.borderRadius.lg,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.md,
+    marginTop: 12,
+  },
+  detailHeader: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 16,
+    flexWrap: 'wrap',
+  },
+  detailInfoCol: {
+    flex: 1,
+    minWidth: 240,
+  },
+  metaBadgesRow: {
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  detailLevel: {
+    color: colors.primary,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+  },
+  detailQuarter: {
+    color: colors.accent,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+  },
+  detailStars: {
+    color: colors.accent,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+  },
+  detailTitle: {
+    color: colors.textPrimary,
+    fontSize: typography.fontSize.md,
+    fontWeight: typography.fontWeight.bold,
+  },
+  detailDesc: {
+    color: colors.textSecondary,
+    fontSize: typography.fontSize.xs,
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  detailActionsCol: {
+    alignItems: 'center',
+    gap: 10,
+  },
+  priceTagRow: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  currentPrice: {
+    color: colors.primary,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
+  },
+  oldPrice: {
+    color: colors.textMuted,
+    fontSize: typography.fontSize.xs,
+    textDecorationLine: 'line-through',
+  },
+  btnRow: {
+    gap: 8,
+  },
+});

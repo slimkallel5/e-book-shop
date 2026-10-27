@@ -46,6 +46,14 @@
     "reviews": "reviews",
     "includedBooks": "Books included in this pack:",
     "contactUs": "Contact Us",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "articlesGalleryTitle": "3D Educational Articles Gallery",
+    "articlesGallerySub": "Explore guidance articles, study tips, and strategies for academic success in Tunisia",
+    "readArticle": "Read Full Article",
+    "closeArticle": "Close Article",
+    "featuredPacks": "Featured Book Packs",
+    "catalogTitle": "Library Catalog",
+    "menuToggle": "Digital Library Menu",
+    "shelfOverview": "Shelves & Levels"
   }
 }

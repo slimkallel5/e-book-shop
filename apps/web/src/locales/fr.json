@@ -46,6 +46,14 @@
     "reviews": "avis",
     "includedBooks": "Livres inclus dans ce pack :",
     "contactUs": "Contactez-nous",
-    "rights": "Tous droits réservés."
+    "rights": "Tous droits réservés.",
+    "articlesGalleryTitle": "Galerie 3D d'Articles Pédagogiques",
+    "articlesGallerySub": "Découvrez nos guides d'orientation, conseils éducatifs et stratégies de réussite scolaire en Tunisie",
+    "readArticle": "Lire l'article complet",
+    "closeArticle": "Fermer l'article",
+    "featuredPacks": "Packs Scolaires Vedettes",
+    "catalogTitle": "Catalogue de la Bibliothèque",
+    "menuToggle": "Menu Numérique",
+    "shelfOverview": "Rayons & Niveaux"
   }
 }

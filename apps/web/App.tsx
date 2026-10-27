@@ -5,17 +5,20 @@ import {
   Text,
   View,
   ScrollView,
-  TextInput,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import { LanguageProvider, useLanguage } from './src/context/LanguageContext';
 import { StoreProvider, useStore } from './src/context/StoreContext';
 import { Header, Footer } from './src/components/Header';
-import { Bookshelf } from './src/components/Bookshelf';
+import { Bookshelf, NavCategory } from './src/components/Bookshelf';
 import { ProductCard } from './src/components/ProductCard';
 import { BookViewer } from './src/components/BookViewer';
 import { ArticleAdmin } from './src/components/ArticleAdmin';
 import { PackAdmin } from './src/components/PackAdmin';
+import { BookLookbookGallery } from './src/components/BookLookbookGallery';
+import { ArticleLookbookGallery } from './src/components/ArticleLookbookGallery';
+import { ImmersiveBackground } from './src/components/ImmersiveBackground';
 import { Modal } from './src/components/ui/Modal';
 import { Button } from './src/components/ui/Button';
 import { MOCK_BOOKS, Book } from './src/mock/data';
@@ -24,18 +27,27 @@ import { colors, layout, shadows, typography } from './src/theme/tokens';
 function StorefrontContent() {
   const { language, isRTL, t } = useLanguage();
   const { cart, favourites, removeFromCart, updateQuantity, subtotal } = useStore();
+  const { width } = useWindowDimensions();
+
+  const isMobile = width < 768;
 
   const [isAdminView, setIsAdminView] = useState<boolean>(false);
   const [adminTab, setAdminTab] = useState<'articles' | 'packs'>('articles');
-  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<NavCategory>('all');
   const [selectedQuarter, setSelectedQuarter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [previewBook, setPreviewBook] = useState<Book | null>(null);
   const [cartModalOpen, setCartModalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Filter books based on search, education level, and quarter
+  // Filter books based on active navigation category, quarter, and search
   const filteredBooks = MOCK_BOOKS.filter((book) => {
-    if (selectedLevel && book.educationLevel !== selectedLevel) return false;
+    if (selectedCategory === 'primary' || selectedCategory === 'middle' || selectedCategory === 'secondary') {
+      if (book.educationLevel !== selectedCategory) return false;
+    }
+    if (selectedCategory === 'packs') {
+      if (!book.isPack) return false;
+    }
     if (selectedQuarter !== 'all' && book.quarter && book.quarter !== selectedQuarter && book.quarter !== 'full') {
       return false;
     }
@@ -50,196 +62,236 @@ function StorefrontContent() {
   const cartTotalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <View style={styles.appContainer}>
-      {/* Header Shell */}
-      <Header
-        cartCount={cartTotalItems}
-        favouritesCount={favourites.length}
-        onOpenCart={() => setCartModalOpen(true)}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        isAdminMode={isAdminView}
-        onToggleAdminMode={() => setIsAdminView(!isAdminView)}
-      />
+    <ImmersiveBackground>
+      <View style={styles.appContainer}>
+        {/* Persistent Shell Header */}
+        <Header
+          cartCount={cartTotalItems}
+          favouritesCount={favourites.length}
+          onOpenCart={() => setCartModalOpen(true)}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          isAdminMode={isAdminView}
+          onToggleAdminMode={() => setIsAdminView(!isAdminView)}
+        />
 
-      {/* Hero Section */}
-      <View style={styles.heroBanner}>
-        <View style={[styles.heroContent, { alignItems: isRTL ? 'flex-start' : 'flex-end' }]}>
-          <Text style={[styles.heroTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            {t('app.name')}
-          </Text>
-          <Text style={[styles.heroSub, { textAlign: isRTL ? 'right' : 'left' }]}>
-            {t('app.tagline')}
-          </Text>
-        </View>
-      </View>
-
-      {/* Main Content: Admin View or Storefront View */}
-      {isAdminView ? (
-        <ScrollView contentContainerStyle={styles.mainScrollContent}>
-          <View style={styles.adminContainer}>
-            {/* Admin Sub-navigation Tabs */}
-            <View style={[styles.adminTabRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <TouchableOpacity
-                style={[styles.adminTabBtn, adminTab === 'articles' && styles.adminTabBtnActive]}
-                onPress={() => setAdminTab('articles')}
-              >
-                <Text style={[styles.adminTabText, adminTab === 'articles' && styles.adminTabTextActive]}>
-                  📦 الكتب والمنتجات
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.adminTabBtn, adminTab === 'packs' && styles.adminTabBtnActive]}
-                onPress={() => setAdminTab('packs')}
-              >
-                <Text style={[styles.adminTabText, adminTab === 'packs' && styles.adminTabTextActive]}>
-                  🎁 الحزم المجمعة
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {adminTab === 'articles' ? <ArticleAdmin /> : <PackAdmin />}
-          </View>
-        </ScrollView>
-      ) : (
-        <ScrollView contentContainerStyle={styles.mainScrollContent}>
-          <View style={[styles.storeLayout, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            {/* Left / Desktop: Interactive 3D Education Level Bookshelf */}
-            <View style={styles.shelfCol}>
-              <Bookshelf
-                selectedLevel={selectedLevel}
-                onSelectLevel={setSelectedLevel}
-              />
-            </View>
-
-            {/* Center: Book Collection Grid & Filters */}
-            <View style={styles.catalogCol}>
-              {/* Filter Pills / Quarters */}
-              <View style={[styles.filterBar, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Text style={styles.filterBarLabel}>🔍 {t('app.filterBy')}:</Text>
-                {['all', 'q1', 'q2', 'q3'].map((q) => (
-                  <TouchableOpacity
-                    key={q}
-                    style={[
-                      styles.pillBtn,
-                      selectedQuarter === q && styles.pillBtnActive,
-                    ]}
-                    onPress={() => setSelectedQuarter(q)}
-                    activeOpacity={0.8}
-                  >
-                    <Text
-                      style={[
-                        styles.pillText,
-                        selectedQuarter === q && styles.pillTextActive,
-                      ]}
-                    >
-                      {q === 'all' ? t('app.allQuarters') : t(`app.${q}`)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+        {/* Main Scroll Content: Admin View or Storefront View */}
+        {isAdminView ? (
+          <ScrollView contentContainerStyle={styles.mainScrollContent}>
+            <View style={styles.adminContainer}>
+              {/* Admin Sub-navigation Tabs */}
+              <View style={[styles.adminTabRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <TouchableOpacity
+                  style={[styles.adminTabBtn, adminTab === 'articles' && styles.adminTabBtnActive]}
+                  onPress={() => setAdminTab('articles')}
+                >
+                  <Text style={[styles.adminTabText, adminTab === 'articles' && styles.adminTabTextActive]}>
+                    📦 الكتب والمنتجات
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.adminTabBtn, adminTab === 'packs' && styles.adminTabBtnActive]}
+                  onPress={() => setAdminTab('packs')}
+                >
+                  <Text style={[styles.adminTabText, adminTab === 'packs' && styles.adminTabTextActive]}>
+                    🎁 الحزم المجمعة
+                  </Text>
+                </TouchableOpacity>
               </View>
 
-              {/* Book Cards Grid */}
-              <View style={[styles.booksGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                {filteredBooks.length > 0 ? (
-                  filteredBooks.map((book) => (
-                    <ProductCard
-                      key={book.id}
-                      book={book}
-                      onPreview={(b) => setPreviewBook(b)}
+              {adminTab === 'articles' ? <ArticleAdmin /> : <PackAdmin />}
+            </View>
+          </ScrollView>
+        ) : (
+          <ScrollView contentContainerStyle={styles.mainScrollContent}>
+            <View style={styles.storeLayoutWrapper}>
+              {/* Mobile Drawer Trigger Bar */}
+              {isMobile && (
+                <TouchableOpacity
+                  style={[styles.mobileMenuTrigger, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
+                  onPress={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.triggerIcon}>📚</Text>
+                  <Text style={styles.triggerText}>{t('app.menuToggle')}</Text>
+                  <Text style={styles.triggerArrow}>{mobileMenuOpen ? '▲' : '▼'}</Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Mobile Dropdown Shelf */}
+              {isMobile && mobileMenuOpen && (
+                <View style={styles.mobileShelfDrawer}>
+                  <Bookshelf
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={(cat) => {
+                      setSelectedCategory(cat);
+                      setMobileMenuOpen(false);
+                    }}
+                    isCompact
+                  />
+                </View>
+              )}
+
+              {/* Main Interactive Library & Storefront Layout */}
+              <View style={[styles.storeLayout, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                {/* Desktop 3D Navigation Bookshelf */}
+                {!isMobile && (
+                  <View style={styles.shelfCol}>
+                    <Bookshelf
+                      selectedCategory={selectedCategory}
+                      onSelectCategory={setSelectedCategory}
                     />
-                  ))
-                ) : (
-                  <View style={styles.emptyGrid}>
-                    <Text style={styles.emptyGridText}>لا توجد كتب مطابقة لبحثك</Text>
                   </View>
                 )}
+
+                {/* Center Catalog / Showcase Section */}
+                <View style={styles.catalogCol}>
+                  {/* Educational Articles Showcase Mode */}
+                  {selectedCategory === 'articles' ? (
+                    <ArticleLookbookGallery />
+                  ) : (
+                    <>
+                      <View style={[styles.catalogHeaderRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                        <Text style={styles.catalogTitle}>{t('app.catalogTitle')}</Text>
+
+                        {/* Quarter Filter Pills */}
+                        <View style={[styles.filterBar, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                          {['all', 'q1', 'q2', 'q3'].map((q) => (
+                            <TouchableOpacity
+                              key={q}
+                              style={[
+                                styles.pillBtn,
+                                selectedQuarter === q && styles.pillBtnActive,
+                              ]}
+                              onPress={() => setSelectedQuarter(q)}
+                              activeOpacity={0.8}
+                            >
+                              <Text
+                                style={[
+                                  styles.pillText,
+                                  selectedQuarter === q && styles.pillTextActive,
+                                ]}
+                              >
+                                {q === 'all' ? t('app.allQuarters') : t(`app.${q}`)}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      </View>
+
+                      {/* Interactive 3D Motion UI Lookbook Reveal Book Showcase */}
+                      {filteredBooks.length > 0 && (
+                        <BookLookbookGallery
+                          books={filteredBooks}
+                          onPreviewBook={(b) => setPreviewBook(b)}
+                        />
+                      )}
+
+                      {/* Responsive Books Grid */}
+                      <View style={[styles.booksGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                        {filteredBooks.length > 0 ? (
+                          filteredBooks.map((book) => (
+                            <ProductCard
+                              key={book.id}
+                              book={book}
+                              onPreview={(b) => setPreviewBook(b)}
+                            />
+                          ))
+                        ) : (
+                          <View style={styles.emptyGrid}>
+                            <Text style={styles.emptyGridText}>لا توجد كتب مطابقة لبحثك</Text>
+                          </View>
+                        )}
+                      </View>
+                    </>
+                  )}
+                </View>
               </View>
             </View>
-          </View>
-        </ScrollView>
-      )}
-
-      {/* Interactive 3D Book Viewer Modal */}
-      <BookViewer
-        book={previewBook}
-        visible={previewBook !== null}
-        onClose={() => setPreviewBook(null)}
-      />
-
-      {/* Cart Modal */}
-      <Modal
-        visible={cartModalOpen}
-        onClose={() => setCartModalOpen(false)}
-        title={t('app.cart')}
-      >
-        {cart.length === 0 ? (
-          <View style={styles.emptyCartContainer}>
-            <Text style={styles.emptyCartText}>{t('app.emptyCart')}</Text>
-          </View>
-        ) : (
-          <View style={styles.cartContent}>
-            {cart.map((item) => (
-              <View
-                key={item.book.id}
-                style={[styles.cartItemRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
-              >
-                <View style={styles.cartItemInfo}>
-                  <Text style={[styles.cartItemTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-                    {item.book.title[language] || item.book.title.ar}
-                  </Text>
-                  <Text style={styles.cartItemPrice}>
-                    {((item.book.discountPrice ?? item.book.price) * item.quantity).toFixed(2)}{' '}
-                    {t('app.currency')}
-                  </Text>
-                </View>
-
-                <View style={styles.cartQtyControls}>
-                  <TouchableOpacity
-                    style={styles.qtyBtn}
-                    onPress={() => updateQuantity(item.book.id, item.quantity - 1)}
-                  >
-                    <Text style={styles.qtyBtnText}>-</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.qtyValue}>{item.quantity}</Text>
-                  <TouchableOpacity
-                    style={styles.qtyBtn}
-                    onPress={() => updateQuantity(item.book.id, item.quantity + 1)}
-                  >
-                    <Text style={styles.qtyBtnText}>+</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.removeBtn}
-                    onPress={() => removeFromCart(item.book.id)}
-                  >
-                    <Text style={styles.removeBtnText}>🗑</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-
-            <View style={styles.cartSummary}>
-              <View style={[styles.cartSummaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Text style={styles.summaryLabel}>{t('app.subtotal')}:</Text>
-                <Text style={styles.summaryValue}>
-                  {subtotal.toFixed(2)} {t('app.currency')}
-                </Text>
-              </View>
-              <Button
-                title={t('app.checkout')}
-                onPress={() => alert('إعادة توجيه إلى التوصيل والمحاسبة')}
-                variant="accent"
-                size="lg"
-                style={{ marginTop: 16 }}
-              />
-            </View>
-          </View>
+          </ScrollView>
         )}
-      </Modal>
 
-      {/* Footer */}
-      <Footer />
-    </View>
+        {/* 3D Book Sample Viewer Modal */}
+        <BookViewer
+          book={previewBook}
+          visible={previewBook !== null}
+          onClose={() => setPreviewBook(null)}
+        />
+
+        {/* Cart Modal */}
+        <Modal
+          visible={cartModalOpen}
+          onClose={() => setCartModalOpen(false)}
+          title={t('app.cart')}
+        >
+          {cart.length === 0 ? (
+            <View style={styles.emptyCartContainer}>
+              <Text style={styles.emptyCartText}>{t('app.emptyCart')}</Text>
+            </View>
+          ) : (
+            <View style={styles.cartContent}>
+              {cart.map((item) => (
+                <View
+                  key={item.book.id}
+                  style={[styles.cartItemRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
+                >
+                  <View style={styles.cartItemInfo}>
+                    <Text style={[styles.cartItemTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+                      {item.book.title[language] || item.book.title.ar}
+                    </Text>
+                    <Text style={styles.cartItemPrice}>
+                      {((item.book.discountPrice ?? item.book.price) * item.quantity).toFixed(2)}{' '}
+                      {t('app.currency')}
+                    </Text>
+                  </View>
+
+                  <View style={styles.cartQtyControls}>
+                    <TouchableOpacity
+                      style={styles.qtyBtn}
+                      onPress={() => updateQuantity(item.book.id, item.quantity - 1)}
+                    >
+                      <Text style={styles.qtyBtnText}>-</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.qtyValue}>{item.quantity}</Text>
+                    <TouchableOpacity
+                      style={styles.qtyBtn}
+                      onPress={() => updateQuantity(item.book.id, item.quantity + 1)}
+                    >
+                      <Text style={styles.qtyBtnText}>+</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.removeBtn}
+                      onPress={() => removeFromCart(item.book.id)}
+                    >
+                      <Text style={styles.removeBtnText}>🗑</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+
+              <View style={styles.cartSummary}>
+                <View style={[styles.cartSummaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <Text style={styles.summaryLabel}>{t('app.subtotal')}:</Text>
+                  <Text style={styles.summaryValue}>
+                    {subtotal.toFixed(2)} {t('app.currency')}
+                  </Text>
+                </View>
+                <Button
+                  title={t('app.checkout')}
+                  onPress={() => alert('إعادة توجيه إلى التوصيل والمحاسبة')}
+                  variant="accent"
+                  size="lg"
+                  style={{ marginTop: 16 }}
+                />
+              </View>
+            </View>
+          )}
+        </Modal>
+
+        {/* Persistent Shell Footer */}
+        <Footer />
+      </View>
+    </ImmersiveBackground>
   );
 }
 
@@ -258,82 +310,98 @@ registerRootComponent(App);
 const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
-    backgroundColor: colors.background,
-  },
-  heroBanner: {
-    backgroundColor: colors.primaryDark,
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    borderBottomWidth: 3,
-    borderBottomColor: colors.accent,
-  },
-  heroContent: {
-    maxWidth: layout.maxWidth,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  heroTitle: {
-    color: colors.textLight,
-    fontSize: typography.fontSize.hero,
-    fontWeight: typography.fontWeight.bold,
-  },
-  heroSub: {
-    color: colors.accentLight,
-    fontSize: typography.fontSize.md,
-    marginTop: 6,
   },
   mainScrollContent: {
     paddingVertical: 24,
     paddingHorizontal: 16,
   },
-  storeLayout: {
-    maxWidth: layout.maxWidth,
+  storeLayoutWrapper: {
     width: '100%',
-    alignSelf: 'center',
+    alignSelf: 'stretch',
+  },
+  mobileMenuTrigger: {
+    backgroundColor: colors.primary,
+    padding: 14,
+    borderRadius: layout.borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+    ...shadows.md,
+  },
+  triggerIcon: {
+    fontSize: 20,
+  },
+  triggerText: {
+    color: colors.textLight,
+    fontWeight: typography.fontWeight.bold,
+    fontSize: typography.fontSize.md,
+  },
+  triggerArrow: {
+    color: colors.accent,
+    fontSize: 14,
+  },
+  mobileShelfDrawer: {
+    marginBottom: 20,
+  },
+  storeLayout: {
     gap: 24,
-    flexWrap: 'wrap',
+    alignItems: 'flex-start',
   },
   shelfCol: {
-    minWidth: 260,
+    width: 280,
   },
   catalogCol: {
     flex: 1,
-    minWidth: 300,
+    minWidth: 280,
+  },
+  catalogHeaderRow: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    flexWrap: 'wrap',
+    gap: 12,
+    backgroundColor: 'rgba(18, 59, 43, 0.85)',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: layout.borderRadius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
+    ...shadows.md,
+  },
+  catalogTitle: {
+    fontSize: typography.fontSize.xl,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textLight,
   },
   filterBar: {
     alignItems: 'center',
     gap: 8,
-    marginBottom: 16,
     flexWrap: 'wrap',
   },
-  filterBarLabel: {
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
-  },
   pillBtn: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: layout.borderRadius.full,
-    backgroundColor: colors.cardBg,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   pillBtnActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.accent,
+    borderColor: colors.accentLight,
   },
   pillText: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: colors.textLight,
   },
   pillTextActive: {
-    color: colors.textLight,
+    color: colors.primaryDark,
     fontWeight: typography.fontWeight.bold,
   },
   booksGrid: {
     flexWrap: 'wrap',
     gap: 12,
+    marginTop: 16,
   },
   emptyGrid: {
     padding: 32,
@@ -363,7 +431,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   adminContainer: {
-    maxWidth: layout.maxWidth,
+    maxWidth: 1200,
     width: '100%',
     alignSelf: 'center',
   },
