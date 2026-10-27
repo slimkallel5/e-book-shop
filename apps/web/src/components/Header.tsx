@@ -180,7 +180,6 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   innerHeader: {
-    maxWidth: layout.maxWidth,
     width: '100%',
     alignSelf: 'center',
     alignItems: 'center',
@@ -355,7 +354,6 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   innerFooter: {
-    maxWidth: layout.maxWidth,
     width: '100%',
     alignSelf: 'center',
     justifyContent: 'space-between',
