@@ -69,18 +69,6 @@ function StorefrontContent() {
           onSearchChange={setSearchQuery}
         />
 
-        {/* Hero Section */}
-        <View style={styles.heroBanner}>
-          <View style={[styles.heroContent, { alignItems: isRTL ? 'flex-start' : 'flex-end' }]}>
-            <Text style={[styles.heroTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('app.name')}
-            </Text>
-            <Text style={[styles.heroSub, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('app.tagline')}
-            </Text>
-          </View>
-        </View>
-
         {/* Main Scroll Content */}
         <ScrollView contentContainerStyle={styles.mainScrollContent}>
           <View style={styles.storeLayoutWrapper}>
@@ -289,28 +277,6 @@ registerRootComponent(App);
 const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
-  },
-  heroBanner: {
-    backgroundColor: 'rgba(10, 35, 25, 0.88)',
-    paddingVertical: 28,
-    paddingHorizontal: 20,
-    borderBottomWidth: 3,
-    borderBottomColor: colors.accent,
-    ...shadows.md,
-  },
-  heroContent: {
-    width: '100%',
-    alignSelf: 'stretch',
-  },
-  heroTitle: {
-    color: colors.textLight,
-    fontSize: typography.fontSize.hero,
-    fontWeight: typography.fontWeight.bold,
-  },
-  heroSub: {
-    color: colors.accentLight,
-    fontSize: typography.fontSize.md,
-    marginTop: 6,
   },
   mainScrollContent: {
     paddingVertical: 24,

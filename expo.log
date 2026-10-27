@@ -14,3 +14,24 @@ Web Bundled 2181ms (App.tsx)
 Web Bundled 677ms (App.tsx)
 Web Bundled 1642ms (App.tsx)
 Web Bundled 2468ms (App.tsx)
+node:internal/fs/watchers:262
+    throw error;
+    ^
+
+Error: ENOENT: no such file or directory, watch '/app/apps/api/data'
+    at FSWatcher.<computed> (node:internal/fs/watchers:254:19)
+    at Object.watch (node:fs:2554:36)
+    at NodeWatcher._watchdir (/app/node_modules/metro-file-map/src/watchers/NodeWatcher.js:89:24)
+    at /app/node_modules/metro-file-map/src/watchers/NodeWatcher.js:185:22
+    at Walker.<anonymous> (/app/node_modules/metro-file-map/src/watchers/common.js:81:31)
+    at Walker.emit (node:events:519:28)
+    at /app/node_modules/walker/lib/walker.js:69:16
+    at FSReqCallback.oncomplete (node:fs:186:23) {
+  errno: -2,
+  syscall: 'watch',
+  code: 'ENOENT',
+  path: '/app/apps/api/data',
+  filename: '/app/apps/api/data'
+}
+
+Node.js v22.22.1
