@@ -183,12 +183,6 @@ function StorefrontContent() {
                       )}
                     </View>
 
-                    {/* Educational Articles Lookbook Section under general catalog */}
-                    {selectedCategory === 'all' && (
-                      <View style={styles.articlesSectionWrapper}>
-                        <ArticleLookbookGallery />
-                      </View>
-                    )}
                   </>
                 )}
               </View>
@@ -404,12 +398,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 12,
     marginTop: 16,
-  },
-  articlesSectionWrapper: {
-    marginTop: 32,
-    paddingTop: 24,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   emptyGrid: {
     padding: 32,
