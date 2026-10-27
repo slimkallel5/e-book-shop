@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   Modal,
-  Dimensions,
 } from 'react-native';
 import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
@@ -50,14 +49,16 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={styles.viewerContainer}>
-          {/* Header Controls */}
+          {/* Header Controls Bar */}
           <View style={[styles.headerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             <View style={styles.titleCol}>
               <Text style={[styles.bookTitle, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
-                {title}
+                📖 {title}
               </Text>
-              <Text style={styles.pageCounter}>
-                {hasPages ? `${t('app.page')} ${currentPage + 1} ${t('app.of')} ${samplePages.length}` : t('app.noPreview')}
+              <Text style={[styles.pageCounter, { textAlign: isRTL ? 'right' : 'left' }]}>
+                {hasPages
+                  ? `${t('app.page')} ${currentPage + 1} ${t('app.of')} ${samplePages.length}`
+                  : t('app.noPreview')}
               </Text>
             </View>
 
@@ -68,7 +69,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   onPress={() => setIsZoomed(!isZoomed)}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.iconBtnText}>{isZoomed ? '🔍-' : '🔍+'}</Text>
+                  <Text style={styles.iconBtnText}>{isZoomed ? '🔍 100%' : '🔍 150%'}</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity style={styles.closeBtn} onPress={onClose} activeOpacity={0.8}>
@@ -77,10 +78,10 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
             </View>
           </View>
 
-          {/* 3D Realistic Book Stage */}
+          {/* Opened Book Stage */}
           <View style={styles.stage}>
             {hasPages ? (
-              <View style={styles.book3DWrapper}>
+              <View style={styles.openedBookWrapper}>
                 {/* Left Navigation Arrow */}
                 <TouchableOpacity
                   style={[styles.navArrow, styles.navArrowLeft]}
@@ -91,16 +92,23 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   <Text style={styles.navArrowText}>{isRTL ? '▶' : '◀'}</Text>
                 </TouchableOpacity>
 
-                {/* Simulated Interactive 3D Open Page Spread */}
-                <View style={[styles.spreadContainer, isZoomed && styles.zoomedContainer]}>
-                  {/* Spine Depth Shadow */}
+                {/* Realistic Open Book Spread */}
+                <View style={[styles.openedBookSpread, isZoomed && styles.zoomedSpread]}>
+                  {/* Spine Crease & Shadow */}
                   <View style={styles.spineShadow} />
 
+                  {/* Left Page Page Fold Edge */}
+                  <View style={styles.leftPageMargin} />
+
+                  {/* Center Sample Page Content */}
                   <Image
                     source={{ uri: samplePages[currentPage] }}
                     style={styles.pageImage}
                     resizeMode="contain"
                   />
+
+                  {/* Right Page Fold Edge */}
+                  <View style={styles.rightPageMargin} />
                 </View>
 
                 {/* Right Navigation Arrow */}
@@ -121,21 +129,21 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
             )}
           </View>
 
-          {/* Footer Page Turning Bar */}
+          {/* Footer Page Turning Controls Bar */}
           {hasPages && (
             <View style={[styles.footerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Button
-                title={t('app.prevPage')}
+                title={`◀ ${t('app.prevPage')}`}
                 onPress={handlePrevPage}
                 disabled={currentPage === 0}
                 variant="outline"
                 size="sm"
               />
               <Text style={styles.footerPageInfo}>
-                {currentPage + 1} / {samplePages.length}
+                {t('app.page')} {currentPage + 1} / {samplePages.length}
               </Text>
               <Button
-                title={t('app.nextPage')}
+                title={`${t('app.nextPage')} ▶`}
                 onPress={handleNextPage}
                 disabled={currentPage === samplePages.length - 1}
                 variant="primary"
@@ -152,15 +160,15 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(10, 35, 25, 0.85)',
+    backgroundColor: 'rgba(7, 33, 25, 0.88)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
   },
   viewerContainer: {
     width: '100%',
-    maxWidth: 900,
-    height: '88%',
+    maxWidth: 960,
+    height: '90%',
     backgroundColor: colors.background,
     borderRadius: layout.borderRadius.xl,
     overflow: 'hidden',
@@ -170,9 +178,11 @@ const styles = StyleSheet.create({
   headerRow: {
     paddingHorizontal: 20,
     paddingVertical: 14,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryDark,
     alignItems: 'center',
     justifyContent: 'space-between',
+    borderBottomWidth: 2,
+    borderBottomColor: colors.accent,
   },
   titleCol: {
     flex: 1,
@@ -185,7 +195,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold,
   },
   pageCounter: {
-    color: colors.accent,
+    color: colors.accentLight,
     fontSize: typography.fontSize.xs,
     marginTop: 2,
   },
@@ -195,13 +205,13 @@ const styles = StyleSheet.create({
   },
   iconBtn: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: layout.borderRadius.sm,
   },
   iconBtnText: {
     color: colors.textLight,
-    fontSize: typography.fontSize.sm,
+    fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
   },
   closeBtn: {
@@ -218,13 +228,13 @@ const styles = StyleSheet.create({
   },
   stage: {
     flex: 1,
-    backgroundColor: '#1E2923',
+    backgroundColor: '#172720',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
     position: 'relative',
   },
-  book3DWrapper: {
+  openedBookWrapper: {
     width: '100%',
     height: '100%',
     flexDirection: 'row',
@@ -232,7 +242,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   navArrow: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     width: 44,
     height: 44,
     borderRadius: layout.borderRadius.full,
@@ -241,20 +251,20 @@ const styles = StyleSheet.create({
     zIndex: 20,
   },
   navArrowLeft: {
-    marginRight: 8,
+    marginRight: 10,
   },
   navArrowRight: {
-    marginLeft: 8,
+    marginLeft: 10,
   },
   navArrowText: {
     color: colors.textLight,
     fontSize: 18,
     fontWeight: typography.fontWeight.bold,
   },
-  spreadContainer: {
+  openedBookSpread: {
     flex: 1,
     height: '100%',
-    backgroundColor: colors.cardBg,
+    backgroundColor: colors.pageBg,
     borderRadius: layout.borderRadius.md,
     overflow: 'hidden',
     position: 'relative',
@@ -264,8 +274,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.borderDark,
   },
-  zoomedContainer: {
-    transform: [{ scale: 1.2 }],
+  zoomedSpread: {
+    transform: [{ scale: 1.15 }],
   },
   spineShadow: {
     position: 'absolute',
@@ -274,8 +284,24 @@ const styles = StyleSheet.create({
     left: '50%',
     width: 16,
     marginLeft: -8,
-    backgroundColor: 'rgba(0, 0, 0, 0.12)',
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
     zIndex: 10,
+  },
+  leftPageMargin: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+  },
+  rightPageMargin: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    width: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.04)',
   },
   pageImage: {
     width: '100%',
