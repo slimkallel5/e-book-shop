@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { EDUCATION_LEVELS, EducationLevel } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
@@ -7,124 +7,93 @@ import { colors, layout, shadows, typography } from '../theme/tokens';
 interface BookshelfProps {
   selectedLevel: string | null;
   onSelectLevel: (levelId: string | null) => void;
-  booksCountByLevel?: Record<string, number>;
 }
 
-export const Bookshelf: React.FC<BookshelfProps> = ({
-  selectedLevel,
-  onSelectLevel,
-  booksCountByLevel = {},
-}) => {
+export const Bookshelf: React.FC<BookshelfProps> = ({ selectedLevel, onSelectLevel }) => {
   const { language, isRTL, t } = useLanguage();
 
   return (
-    <View style={styles.libraryMenuContainer}>
-      <View style={[styles.menuHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <Text style={styles.menuHeaderIcon}>📚</Text>
-        <Text style={[styles.menuTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-          {t('app.allLevels')}
-        </Text>
-      </View>
+    <View style={styles.shelfContainer}>
+      <Text style={[styles.shelfTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+        📚 {t('app.allLevels')}
+      </Text>
 
-      {/* Stacked Level Books / Volume Spines */}
-      <View style={styles.shelfStack}>
-        {/* All Levels Option */}
-        <TouchableOpacity
-          style={[
-            styles.bookVolumeCard,
-            selectedLevel === null && styles.bookVolumeSelected,
-            { backgroundColor: colors.primary },
-          ]}
-          onPress={() => onSelectLevel(null)}
-          activeOpacity={0.85}
-        >
-          <View style={styles.spineRibbon} />
-          <View style={styles.volumeContent}>
-            <Text style={styles.volumeTitle}>{t('app.allLevels')}</Text>
-            <Text style={styles.volumeSub}>جميع المستويات التعليمية</Text>
-          </View>
-          {selectedLevel === null && (
-            <View style={styles.openTag}>
-              <Text style={styles.openTagText}>مفتوح</Text>
-            </View>
-          )}
-        </TouchableOpacity>
+      {/* Reset / All Levels Option */}
+      <TouchableOpacity
+        style={[
+          styles.spineCard,
+          selectedLevel === null && styles.spineCardSelected,
+          { backgroundColor: colors.primaryDark },
+        ]}
+        onPress={() => onSelectLevel(null)}
+        activeOpacity={0.85}
+      >
+        <View style={styles.spineRibbon} />
+        <Text style={styles.spineText}>{t('app.allLevels')}</Text>
+      </TouchableOpacity>
 
+      {/* Shelf Levels list as 3D-styled Book Spines */}
+      <ScrollView showsVerticalScrollIndicator={false}>
         {EDUCATION_LEVELS.map((level) => {
           const title = level.title[language] || level.title.ar;
           const subtitle = level.subTitle[language] || level.subTitle.ar;
           const isSelected = selectedLevel === level.id;
-          const count = booksCountByLevel[level.id] || 0;
 
           return (
             <TouchableOpacity
               key={level.id}
               style={[
-                styles.bookVolumeCard,
-                isSelected && styles.bookVolumeSelected,
+                styles.spineCard,
+                isSelected && styles.spineCardSelected,
                 { backgroundColor: level.spineColor },
               ]}
               onPress={() => onSelectLevel(level.id)}
               activeOpacity={0.85}
             >
-              {/* Gold Spine Trim */}
-              <View style={styles.goldSpineBand} />
-              <View style={styles.volumeContent}>
-                <View style={[styles.titleRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  <Text style={styles.volumeTitle}>{title}</Text>
-                  {count > 0 && (
-                    <Text style={styles.bookCountBadge}>{count} كتب</Text>
-                  )}
-                </View>
-                <Text style={styles.volumeSub}>{subtitle}</Text>
+              <View style={styles.spineGoldAccent} />
+              <View style={styles.spineContent}>
+                <Text style={styles.spineText}>{title}</Text>
+                <Text style={styles.spineSubText}>{subtitle}</Text>
               </View>
-
-              {isSelected && (
-                <View style={styles.openTag}>
-                  <Text style={styles.openTagText}>📖 مفتوح</Text>
-                </View>
-              )}
+              {isSelected && <Text style={styles.activeIndicator}>▶</Text>}
             </TouchableOpacity>
           );
         })}
+      </ScrollView>
+
+      {/* Wooden Shelf Base Visual Effect */}
+      <View style={styles.woodenBase}>
+        <View style={styles.woodenGrain} />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  libraryMenuContainer: {
-    width: '100%',
-    backgroundColor: '#27170B', // Dark rich oak wood finish
+  shelfContainer: {
+    width: 260,
+    backgroundColor: '#3E2723', // Deep rich walnut wood color
     borderRadius: layout.borderRadius.xl,
     padding: 16,
     ...shadows.lg,
+    alignSelf: 'flex-start',
     borderWidth: 2,
-    borderColor: colors.secondary,
+    borderColor: '#5D4037',
   },
-  menuHeader: {
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  menuHeaderIcon: {
-    fontSize: 20,
-  },
-  menuTitle: {
-    color: '#F0E6D2',
+  shelfTitle: {
+    color: '#D7CCC8',
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#5D4037',
+    paddingBottom: 8,
   },
-  shelfStack: {
-    gap: 10,
-  },
-  bookVolumeCard: {
+  spineCard: {
     borderRadius: layout.borderRadius.md,
     paddingVertical: 14,
     paddingHorizontal: 16,
+    marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -134,19 +103,19 @@ const styles = StyleSheet.create({
     borderLeftColor: 'rgba(255, 255, 255, 0.4)',
     ...shadows.md,
   },
-  bookVolumeSelected: {
+  spineCardSelected: {
+    transform: [{ scale: 1.03 }],
     borderLeftColor: colors.accent,
     borderWidth: 2,
-    borderColor: colors.accent,
-    transform: [{ scale: 1.02 }],
+    borderColor: colors.accentLight,
   },
-  goldSpineBand: {
+  spineGoldAccent: {
     position: 'absolute',
     top: 0,
     bottom: 0,
-    right: 10,
-    width: 4,
-    backgroundColor: 'rgba(212, 175, 55, 0.4)',
+    right: 8,
+    width: 3,
+    backgroundColor: 'rgba(255, 215, 0, 0.3)',
   },
   spineRibbon: {
     position: 'absolute',
@@ -156,42 +125,33 @@ const styles = StyleSheet.create({
     width: 4,
     backgroundColor: colors.accent,
   },
-  volumeContent: {
+  spineContent: {
     flex: 1,
   },
-  titleRow: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  volumeTitle: {
+  spineText: {
     color: colors.textLight,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
   },
-  volumeSub: {
-    color: 'rgba(255, 255, 255, 0.8)',
+  spineSubText: {
+    color: 'rgba(255, 255, 255, 0.75)',
     fontSize: typography.fontSize.xs,
     marginTop: 2,
   },
-  bookCountBadge: {
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-    color: colors.accentLight,
-    fontSize: 10,
-    fontWeight: typography.fontWeight.bold,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: layout.borderRadius.full,
+  activeIndicator: {
+    color: colors.accent,
+    fontSize: 14,
+    marginLeft: 6,
   },
-  openTag: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  woodenBase: {
+    height: 12,
+    backgroundColor: '#27170B',
     borderRadius: layout.borderRadius.sm,
-    marginLeft: 8,
+    marginTop: 8,
   },
-  openTagText: {
-    color: colors.primaryDark,
-    fontSize: 11,
-    fontWeight: typography.fontWeight.bold,
+  woodenGrain: {
+    height: 2,
+    backgroundColor: '#1A0E07',
+    marginTop: 5,
   },
 });
