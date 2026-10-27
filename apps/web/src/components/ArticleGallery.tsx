@@ -33,9 +33,6 @@ export const ArticleGallery: React.FC = () => {
     <View style={styles.gallerySection}>
       {/* Gallery Header */}
       <View style={[styles.sectionHeader, { alignItems: isRTL ? 'flex-start' : 'flex-end' }]}>
-        <View style={[styles.badgeRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-          <Text style={styles.badgeText}>✨ Motion UI 3D Lookbook Reveal</Text>
-        </View>
         <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
           {t('app.articlesGalleryTitle')}
         </Text>
