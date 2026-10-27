@@ -6,7 +6,6 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
   useWindowDimensions,
 } from 'react-native';
 import { LanguageProvider, useLanguage } from './src/context/LanguageContext';
@@ -15,7 +14,7 @@ import { Header, Footer } from './src/components/Header';
 import { Bookshelf, NavCategory } from './src/components/Bookshelf';
 import { ProductCard } from './src/components/ProductCard';
 import { BookViewer } from './src/components/BookViewer';
-import { ArticleGallery } from './src/components/ArticleGallery';
+import { BookLookbookGallery } from './src/components/BookLookbookGallery';
 import { ImmersiveBackground } from './src/components/ImmersiveBackground';
 import { Modal } from './src/components/ui/Modal';
 import { Button } from './src/components/ui/Button';
@@ -111,73 +110,74 @@ function StorefrontContent() {
               </View>
             )}
 
-            {/* Motion UI Lookbook Article Gallery Section */}
-            {(selectedCategory === 'all' || selectedCategory === 'articles') && (
-              <ArticleGallery />
-            )}
-
             {/* Main Interactive Library & Storefront Layout */}
-            {(selectedCategory !== 'articles') && (
-              <View style={[styles.storeLayout, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                {/* Desktop 3D Navigation Bookshelf */}
-                {!isMobile && (
-                  <View style={styles.shelfCol}>
-                    <Bookshelf
-                      selectedCategory={selectedCategory}
-                      onSelectCategory={setSelectedCategory}
-                    />
-                  </View>
-                )}
+            <View style={[styles.storeLayout, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              {/* Desktop 3D Navigation Bookshelf */}
+              {!isMobile && (
+                <View style={styles.shelfCol}>
+                  <Bookshelf
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={setSelectedCategory}
+                  />
+                </View>
+              )}
 
-                {/* Center Catalog Grid */}
-                <View style={styles.catalogCol}>
-                  <View style={[styles.catalogHeaderRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                    <Text style={styles.catalogTitle}>{t('app.catalogTitle')}</Text>
+              {/* Center Catalog Grid & 3D Lookbook Section */}
+              <View style={styles.catalogCol}>
+                <View style={[styles.catalogHeaderRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <Text style={styles.catalogTitle}>{t('app.catalogTitle')}</Text>
 
-                    {/* Quarter Filter Pills */}
-                    <View style={[styles.filterBar, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                      {['all', 'q1', 'q2', 'q3'].map((q) => (
-                        <TouchableOpacity
-                          key={q}
+                  {/* Quarter Filter Pills */}
+                  <View style={[styles.filterBar, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                    {['all', 'q1', 'q2', 'q3'].map((q) => (
+                      <TouchableOpacity
+                        key={q}
+                        style={[
+                          styles.pillBtn,
+                          selectedQuarter === q && styles.pillBtnActive,
+                        ]}
+                        onPress={() => setSelectedQuarter(q)}
+                        activeOpacity={0.8}
+                      >
+                        <Text
                           style={[
-                            styles.pillBtn,
-                            selectedQuarter === q && styles.pillBtnActive,
+                            styles.pillText,
+                            selectedQuarter === q && styles.pillTextActive,
                           ]}
-                          onPress={() => setSelectedQuarter(q)}
-                          activeOpacity={0.8}
                         >
-                          <Text
-                            style={[
-                              styles.pillText,
-                              selectedQuarter === q && styles.pillTextActive,
-                            ]}
-                          >
-                            {q === 'all' ? t('app.allQuarters') : t(`app.${q}`)}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-
-                  {/* Books Grid */}
-                  <View style={[styles.booksGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                    {filteredBooks.length > 0 ? (
-                      filteredBooks.map((book) => (
-                        <ProductCard
-                          key={book.id}
-                          book={book}
-                          onPreview={(b) => setPreviewBook(b)}
-                        />
-                      ))
-                    ) : (
-                      <View style={styles.emptyGrid}>
-                        <Text style={styles.emptyGridText}>لا توجد كتب مطابقة لبحثك</Text>
-                      </View>
-                    )}
+                          {q === 'all' ? t('app.allQuarters') : t(`app.${q}`)}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
                   </View>
                 </View>
+
+                {/* Interactive 3D Motion UI Lookbook Reveal Book Showcase */}
+                {filteredBooks.length > 0 && (
+                  <BookLookbookGallery
+                    books={filteredBooks}
+                    onPreviewBook={(b) => setPreviewBook(b)}
+                  />
+                )}
+
+                {/* Responsive Books Grid */}
+                <View style={[styles.booksGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  {filteredBooks.length > 0 ? (
+                    filteredBooks.map((book) => (
+                      <ProductCard
+                        key={book.id}
+                        book={book}
+                        onPreview={(b) => setPreviewBook(b)}
+                      />
+                    ))
+                  ) : (
+                    <View style={styles.emptyGrid}>
+                      <Text style={styles.emptyGridText}>لا توجد كتب مطابقة لبحثك</Text>
+                    </View>
+                  )}
+                </View>
               </View>
-            )}
+            </View>
           </View>
         </ScrollView>
 
@@ -388,6 +388,7 @@ const styles = StyleSheet.create({
   booksGrid: {
     flexWrap: 'wrap',
     gap: 12,
+    marginTop: 16,
   },
   emptyGrid: {
     padding: 32,
