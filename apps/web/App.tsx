@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { registerRootComponent } from 'expo';
 import {
   StyleSheet,
@@ -14,6 +14,7 @@ import { Header, Footer } from './src/components/Header';
 import { Bookshelf, NavCategory } from './src/components/Bookshelf';
 import { ProductCard } from './src/components/ProductCard';
 import { BookViewer } from './src/components/BookViewer';
+import { ProductDetailModal } from './src/components/ProductDetailModal';
 import { ArticleAdmin } from './src/components/ArticleAdmin';
 import { PackAdmin } from './src/components/PackAdmin';
 import { AdminDashboard } from './src/components/AdminDashboard';
@@ -23,7 +24,8 @@ import { ArticleLookbookGallery } from './src/components/ArticleLookbookGallery'
 import { ImmersiveBackground } from './src/components/ImmersiveBackground';
 import { Modal } from './src/components/ui/Modal';
 import { Button } from './src/components/ui/Button';
-import { MOCK_BOOKS, Book } from './src/mock/data';
+import { Book, MOCK_BOOKS } from './src/mock/data';
+import { fetchCatalogBooks } from './src/services/api';
 import { colors, layout, shadows, typography } from './src/theme/tokens';
 
 function StorefrontContent() {
@@ -33,18 +35,31 @@ function StorefrontContent() {
 
   const isMobile = width < 768;
 
+  const [books, setBooks] = useState<Book[]>(MOCK_BOOKS);
   const [isAdminView, setIsAdminView] = useState<boolean>(false);
   const [adminToken, setAdminToken] = useState<string | null>(null);
   const [adminLoginOpen, setAdminLoginOpen] = useState<boolean>(false);
   const [adminTab, setAdminTab] = useState<'dashboard' | 'articles' | 'packs'>('dashboard');
 
-  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<NavCategory>('all');
   const [selectedQuarter, setSelectedQuarter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [previewBook, setPreviewBook] = useState<Book | null>(null);
+  const [detailBook, setDetailBook] = useState<Book | null>(null);
   const [cartModalOpen, setCartModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchCatalogBooks().then((data) => {
+      if (isMounted && data.length > 0) {
+        setBooks(data);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleToggleAdminMode = () => {
     if (!isAdminView && !adminToken) {
@@ -60,7 +75,7 @@ function StorefrontContent() {
   };
 
   // Filter books based on active navigation category, quarter, and search
-  const filteredBooks = MOCK_BOOKS.filter((book) => {
+  const filteredBooks = books.filter((book) => {
     if (selectedCategory === 'primary' || selectedCategory === 'middle' || selectedCategory === 'secondary') {
       if (book.educationLevel !== selectedCategory) return false;
     }
@@ -210,7 +225,7 @@ function StorefrontContent() {
                       {filteredBooks.length > 0 && (
                         <BookLookbookGallery
                           books={filteredBooks}
-                          onPreviewBook={(b) => setPreviewBook(b)}
+                          onPreviewBook={(b) => setDetailBook(b)}
                         />
                       )}
 
@@ -221,7 +236,7 @@ function StorefrontContent() {
                             <ProductCard
                               key={book.id}
                               book={book}
-                              onPreview={(b) => setPreviewBook(b)}
+                              onPreview={(b) => setDetailBook(b)}
                             />
                           ))
                         ) : (
@@ -243,6 +258,16 @@ function StorefrontContent() {
           visible={adminLoginOpen}
           onClose={() => setAdminLoginOpen(false)}
           onSuccess={handleAdminLoginSuccess}
+        />
+
+        {/* Product Details Modal */}
+        <ProductDetailModal
+          book={detailBook}
+          allBooks={books}
+          visible={detailBook !== null}
+          onClose={() => setDetailBook(null)}
+          onPreviewBook={(b) => setPreviewBook(b)}
+          onSelectBook={(b) => setDetailBook(b)}
         />
 
         {/* 3D Book Sample Viewer Modal */}
