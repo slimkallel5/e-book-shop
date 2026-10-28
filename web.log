@@ -1,9 +1,5 @@
-
-> @ebookshop/web@1.0.0 start
-> expo start
-
 Starting project at /app/apps/web
-(node:142628) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(node:25482) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 Starting Metro Bundler
 The following packages should be updated for best compatibility with the installed expo version:
@@ -11,4 +7,4 @@ The following packages should be updated for best compatibility with the install
 Your project may not work correctly until you install the correct versions of the packages.
 Waiting on http://localhost:8081
 Logs for your project will appear below.
-Web Bundled 12022ms (App.tsx)
+Web Bundled 9980ms (App.tsx)
