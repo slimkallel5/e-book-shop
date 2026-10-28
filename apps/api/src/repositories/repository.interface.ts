@@ -6,6 +6,7 @@ import {
   Order,
   Pack,
   Review,
+  User,
 } from '../common/interfaces/domain.interface';
 
 export interface IEducationLevelRepository {
@@ -55,4 +56,10 @@ export interface IContactRepository {
   findAll(): Promise<ContactMessage[]>;
   create(data: Omit<ContactMessage, 'id' | 'read' | 'createdAt'>): Promise<ContactMessage>;
   markAsRead(id: string): Promise<ContactMessage | null>;
+}
+
+export interface IUserRepository {
+  findByEmail(email: string): Promise<User | null>;
+  findById(id: string): Promise<User | null>;
+  create(data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User>;
 }

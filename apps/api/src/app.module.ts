@@ -11,11 +11,14 @@ import {
   ReviewsController,
   UploadsController,
 } from './controllers/orders-and-tools.controller';
+import { AdminDashboardController } from './controllers/admin-dashboard.controller';
+import { AuthModule } from './auth/auth.module';
 import { RepositoryModule } from './repositories/repository.module';
 
 @Module({
   imports: [
     RepositoryModule.register(),
+    AuthModule,
     ServeStaticModule.forRoot({
       rootPath: path.resolve(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
@@ -32,6 +35,7 @@ import { RepositoryModule } from './repositories/repository.module';
     ReviewsController,
     ContactController,
     UploadsController,
+    AdminDashboardController,
   ],
   providers: [AppService],
 })

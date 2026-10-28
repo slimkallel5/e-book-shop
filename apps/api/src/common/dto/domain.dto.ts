@@ -265,3 +265,27 @@ export class CreateContactMessageDto {
   @IsString()
   message!: string;
 }
+
+export class LoginDto {
+  @ApiProperty()
+  @IsEmail()
+  email!: string;
+
+  @ApiProperty()
+  @IsString()
+  password!: string;
+}
+
+export class RegisterDto {
+  @ApiProperty()
+  @IsEmail()
+  email!: string;
+
+  @ApiProperty()
+  @IsString()
+  password!: string;
+
+  @ApiProperty()
+  @IsString()
+  fullName!: string;
+}

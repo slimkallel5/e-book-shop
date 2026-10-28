@@ -1,0 +1,53 @@
+[
+  {
+    "sku": "MATH-P1",
+    "name": {
+      "ar": "كتاب الرياضيات - السنة الأولى ابتدائي",
+      "fr": "Livre de Mathématiques 1ère Année",
+      "en": "Math Book 1st Grade"
+    },
+    "description": {
+      "ar": "تمارين وأنشطة شاملة للرياضيات وفق البرنامج التونسي الرسمي",
+      "fr": "Exercices et activités conformes au programme tunisien",
+      "en": "Comprehensive math exercises according to Tunisian curriculum"
+    },
+    "price": 18.5,
+    "discountPrice": 15,
+    "stock": 50,
+    "educationLevelId": "ed_1793180880749_a0mwr",
+    "quarter": "ALL_YEAR",
+    "posterUrl": "/assets/covers/math1.jpg",
+    "samplePdfUrl": "/assets/samples/math1.pdf",
+    "author": "المركز الوطني للبيداغوجيا",
+    "publisher": "CNP",
+    "active": true,
+    "id": "art_1793180880750_cjj24",
+    "createdAt": "2026-10-28T09:48:00.750Z",
+    "updatedAt": "2026-10-28T09:48:00.750Z"
+  },
+  {
+    "sku": "ARAB-P1",
+    "name": {
+      "ar": "كتاب القراءة واللغة العربية - السنة الأولى ابتدائي",
+      "fr": "Livre de Langue Arabe 1ère Année",
+      "en": "Arabic Language 1st Grade"
+    },
+    "description": {
+      "ar": "كتاب متكامل لتعلم الحروف والقراءة للسنوات الأولى",
+      "fr": "Livre complet d'apprentissage de la langue arabe",
+      "en": "Complete textbook for learning Arabic language"
+    },
+    "price": 16,
+    "stock": 40,
+    "educationLevelId": "ed_1793180880749_a0mwr",
+    "quarter": "ALL_YEAR",
+    "posterUrl": "/assets/covers/arabic1.jpg",
+    "samplePdfUrl": "/assets/samples/arabic1.pdf",
+    "author": "المركز الوطني للبيداغوجيا",
+    "publisher": "CNP",
+    "active": true,
+    "id": "art_1793180880750_8w4jo",
+    "createdAt": "2026-10-28T09:48:00.750Z",
+    "updatedAt": "2026-10-28T09:48:00.750Z"
+  }
+]
