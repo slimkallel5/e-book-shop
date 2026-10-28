@@ -6,11 +6,11 @@ export interface CartItem {
   quantity: number;
 }
 
-interface CartContextType {
+interface StoreContextType {
   cart: CartItem[];
-  addToCart: (book: Book, quantity?: number) => void;
+  addToCart: (book: Book, quantity?: number) => boolean;
   removeFromCart: (bookId: string) => void;
-  updateQuantity: (bookId: string, quantity: number) => void;
+  updateQuantity: (bookId: string, quantity: number) => boolean;
   clearCart: () => void;
   subtotal: number;
   favourites: string[];
@@ -18,13 +18,25 @@ interface CartContextType {
   isFavourite: (bookId: string) => boolean;
 }
 
-const StoreContext = createContext<CartContextType | undefined>(undefined);
+const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [favourites, setFavourites] = useState<string[]>([]);
 
-  const addToCart = (book: Book, quantity = 1) => {
+  const addToCart = (book: Book, quantity = 1): boolean => {
+    if (!book.inStock || (book.stockCount !== undefined && book.stockCount <= 0)) {
+      return false;
+    }
+
+    const existing = cart.find((item) => item.book.id === book.id);
+    const currentQty = existing ? existing.quantity : 0;
+    const targetQty = currentQty + quantity;
+
+    if (book.stockCount !== undefined && targetQty > book.stockCount) {
+      return false;
+    }
+
     setCart((prev) => {
       const existing = prev.find((item) => item.book.id === book.id);
       if (existing) {
@@ -36,22 +48,33 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
       return [...prev, { book, quantity }];
     });
+
+    return true;
   };
 
   const removeFromCart = (bookId: string) => {
     setCart((prev) => prev.filter((item) => item.book.id !== bookId));
   };
 
-  const updateQuantity = (bookId: string, quantity: number) => {
+  const updateQuantity = (bookId: string, quantity: number): boolean => {
     if (quantity <= 0) {
       removeFromCart(bookId);
-      return;
+      return true;
     }
+
+    const itemToUpdate = cart.find((item) => item.book.id === bookId);
+    if (itemToUpdate && itemToUpdate.book.stockCount !== undefined && quantity > itemToUpdate.book.stockCount) {
+      return false;
+    }
+
     setCart((prev) =>
-      prev.map((item) =>
-        item.book.id === bookId ? { ...item, quantity } : item
-      )
+      prev.map((item) => {
+        if (item.book.id !== bookId) return item;
+        return { ...item, quantity };
+      })
     );
+
+    return true;
   };
 
   const clearCart = () => setCart([]);
