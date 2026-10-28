@@ -16,6 +16,8 @@ import { ProductCard } from './src/components/ProductCard';
 import { BookViewer } from './src/components/BookViewer';
 import { ArticleAdmin } from './src/components/ArticleAdmin';
 import { PackAdmin } from './src/components/PackAdmin';
+import { AdminDashboard } from './src/components/AdminDashboard';
+import { AdminLoginModal } from './src/components/AdminLoginModal';
 import { BookLookbookGallery } from './src/components/BookLookbookGallery';
 import { ArticleLookbookGallery } from './src/components/ArticleLookbookGallery';
 import { ImmersiveBackground } from './src/components/ImmersiveBackground';
@@ -32,7 +34,10 @@ function StorefrontContent() {
   const isMobile = width < 768;
 
   const [isAdminView, setIsAdminView] = useState<boolean>(false);
-  const [adminTab, setAdminTab] = useState<'articles' | 'packs'>('articles');
+  const [adminToken, setAdminToken] = useState<string | null>(null);
+  const [adminLoginOpen, setAdminLoginOpen] = useState<boolean>(false);
+  const [adminTab, setAdminTab] = useState<'dashboard' | 'articles' | 'packs'>('dashboard');
+
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<NavCategory>('all');
   const [selectedQuarter, setSelectedQuarter] = useState<string>('all');
@@ -40,6 +45,19 @@ function StorefrontContent() {
   const [previewBook, setPreviewBook] = useState<Book | null>(null);
   const [cartModalOpen, setCartModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleToggleAdminMode = () => {
+    if (!isAdminView && !adminToken) {
+      setAdminLoginOpen(true);
+    } else {
+      setIsAdminView(!isAdminView);
+    }
+  };
+
+  const handleAdminLoginSuccess = (token: string) => {
+    setAdminToken(token);
+    setIsAdminView(true);
+  };
 
   // Filter books based on active navigation category, quarter, and search
   const filteredBooks = MOCK_BOOKS.filter((book) => {
@@ -73,7 +91,7 @@ function StorefrontContent() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           isAdminMode={isAdminView}
-          onToggleAdminMode={() => setIsAdminView(!isAdminView)}
+          onToggleAdminMode={handleToggleAdminMode}
         />
 
         {/* Main Content Area */}
@@ -112,11 +130,19 @@ function StorefrontContent() {
                 {/* Admin Sub-navigation Tabs */}
                 <View style={[styles.adminTabRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <TouchableOpacity
+                    style={[styles.adminTabBtn, adminTab === 'dashboard' && styles.adminTabBtnActive]}
+                    onPress={() => setAdminTab('dashboard')}
+                  >
+                    <Text style={[styles.adminTabText, adminTab === 'dashboard' && styles.adminTabTextActive]}>
+                      📊 {t('admin.dashboardTab')}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
                     style={[styles.adminTabBtn, adminTab === 'articles' && styles.adminTabBtnActive]}
                     onPress={() => setAdminTab('articles')}
                   >
                     <Text style={[styles.adminTabText, adminTab === 'articles' && styles.adminTabTextActive]}>
-                      📦 الكتب والمنتجات
+                      📦 {t('admin.articlesTab')}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -124,12 +150,14 @@ function StorefrontContent() {
                     onPress={() => setAdminTab('packs')}
                   >
                     <Text style={[styles.adminTabText, adminTab === 'packs' && styles.adminTabTextActive]}>
-                      🎁 الحزم المجمعة
+                      🎁 {t('admin.packsTab')}
                     </Text>
                   </TouchableOpacity>
                 </View>
 
-                {adminTab === 'articles' ? <ArticleAdmin /> : <PackAdmin />}
+                {adminTab === 'dashboard' && <AdminDashboard token={adminToken || undefined} />}
+                {adminTab === 'articles' && <ArticleAdmin />}
+                {adminTab === 'packs' && <PackAdmin />}
               </View>
             ) : (
               <View style={[styles.storeLayout, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
@@ -209,6 +237,13 @@ function StorefrontContent() {
             )}
           </View>
         </ScrollView>
+
+        {/* Admin Login Modal */}
+        <AdminLoginModal
+          visible={adminLoginOpen}
+          onClose={() => setAdminLoginOpen(false)}
+          onSuccess={handleAdminLoginSuccess}
+        />
 
         {/* 3D Book Sample Viewer Modal */}
         <BookViewer

@@ -1,0 +1,44 @@
+[
+  {
+    "code": "PRIMARY",
+    "name": {
+      "ar": "التعليم الابتدائي",
+      "fr": "Enseignement Primaire",
+      "en": "Primary Education"
+    },
+    "category": "primary",
+    "displayOrder": 1,
+    "active": true,
+    "id": "ed_1793180880749_a0mwr",
+    "createdAt": "2026-10-28T09:48:00.749Z",
+    "updatedAt": "2026-10-28T09:48:00.749Z"
+  },
+  {
+    "code": "MIDDLE",
+    "name": {
+      "ar": "التعليم الإعدادي",
+      "fr": "Enseignement de Base / Collège",
+      "en": "Middle School"
+    },
+    "category": "middle",
+    "displayOrder": 2,
+    "active": true,
+    "id": "ed_1793180880749_2qt3f",
+    "createdAt": "2026-10-28T09:48:00.749Z",
+    "updatedAt": "2026-10-28T09:48:00.749Z"
+  },
+  {
+    "code": "SECONDARY",
+    "name": {
+      "ar": "التعليم الثانوي",
+      "fr": "Enseignement Secondaire",
+      "en": "Secondary Education"
+    },
+    "category": "secondary",
+    "displayOrder": 3,
+    "active": true,
+    "id": "ed_1793180880749_u81f4",
+    "createdAt": "2026-10-28T09:48:00.749Z",
+    "updatedAt": "2026-10-28T09:48:00.749Z"
+  }
+]

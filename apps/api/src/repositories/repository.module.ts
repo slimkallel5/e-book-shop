@@ -7,6 +7,7 @@ import {
   JsonOrderRepository,
   JsonPackRepository,
   JsonReviewRepository,
+  JsonUserRepository,
 } from './json/json-repositories';
 import {
   PostgresArticleRepository,
@@ -16,6 +17,7 @@ import {
   PostgresOrderRepository,
   PostgresPackRepository,
   PostgresReviewRepository,
+  PostgresUserRepository,
 } from './postgres/postgres-repositories';
 import { PrismaService } from './postgres/prisma.service';
 
@@ -26,6 +28,7 @@ export const DELIVERY_RULE_REPOSITORY = 'DELIVERY_RULE_REPOSITORY';
 export const ORDER_REPOSITORY = 'ORDER_REPOSITORY';
 export const REVIEW_REPOSITORY = 'REVIEW_REPOSITORY';
 export const CONTACT_REPOSITORY = 'CONTACT_REPOSITORY';
+export const USER_REPOSITORY = 'USER_REPOSITORY';
 
 @Module({})
 export class RepositoryModule {
@@ -61,6 +64,10 @@ export class RepositoryModule {
       {
         provide: CONTACT_REPOSITORY,
         useClass: isPostgres ? PostgresContactRepository : JsonContactRepository,
+      },
+      {
+        provide: USER_REPOSITORY,
+        useClass: isPostgres ? PostgresUserRepository : JsonUserRepository,
       },
     ];
 

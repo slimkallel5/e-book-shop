@@ -7,6 +7,7 @@ import {
   Order,
   Pack,
   Review,
+  User,
 } from '../../common/interfaces/domain.interface';
 import {
   IArticleRepository,
@@ -16,6 +17,7 @@ import {
   IOrderRepository,
   IPackRepository,
   IReviewRepository,
+  IUserRepository,
 } from '../repository.interface';
 import { JsonStorage } from './json-storage';
 
@@ -271,5 +273,30 @@ export class JsonContactRepository implements IContactRepository {
 
   async markAsRead(id: string): Promise<ContactMessage | null> {
     return this.storage.update(id, { read: true });
+  }
+}
+
+@Injectable()
+export class JsonUserRepository implements IUserRepository {
+  private storage = new JsonStorage<User>('users.json');
+
+  async findByEmail(email: string): Promise<User | null> {
+    const items = await this.storage.readAll();
+    return items.find((u) => u.email.toLowerCase() === email.toLowerCase()) || null;
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return this.storage.findById(id);
+  }
+
+  async create(data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
+    const now = new Date().toISOString();
+    const item: User = {
+      ...data,
+      id: `user_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      createdAt: now,
+      updatedAt: now,
+    };
+    return this.storage.create(item);
   }
 }

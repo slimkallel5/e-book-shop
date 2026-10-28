@@ -1,9 +1,11 @@
+import * as bcrypt from 'bcryptjs';
 import {
   JsonArticleRepository,
   JsonDeliveryRuleRepository,
   JsonEducationLevelRepository,
   JsonOrderRepository,
   JsonPackRepository,
+  JsonUserRepository,
 } from '../src/repositories/json/json-repositories';
 import {
   PostgresArticleRepository,
@@ -63,6 +65,19 @@ export async function seedJsonData() {
   const artRepo = new JsonArticleRepository();
   const packRepo = new JsonPackRepository();
   const dlvRepo = new JsonDeliveryRuleRepository();
+  const userRepo = new JsonUserRepository();
+
+  const adminEmail = 'admin@ebookshop.tn';
+  const existingAdmin = await userRepo.findByEmail(adminEmail);
+  if (!existingAdmin) {
+    const passwordHash = await bcrypt.hash('admin123', 10);
+    await userRepo.create({
+      email: adminEmail,
+      passwordHash,
+      role: 'admin',
+      fullName: 'مدير النظام',
+    });
+  }
 
   const existingLevels = await edRepo.findAll();
   let primaryLevelId = existingLevels.find((l) => l.code === 'PRIMARY')?.id;

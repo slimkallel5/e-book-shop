@@ -1,0 +1,33 @@
+[
+  {
+    "name": {
+      "ar": "شحن عادي",
+      "fr": "Livraison standard",
+      "en": "Standard Delivery"
+    },
+    "minSubtotal": 0,
+    "maxSubtotal": 60,
+    "fee": 7,
+    "isFree": false,
+    "active": true,
+    "priority": 1,
+    "id": "dlv_1793180880751_rl891",
+    "createdAt": "2026-10-28T09:48:00.751Z",
+    "updatedAt": "2026-10-28T09:48:00.751Z"
+  },
+  {
+    "name": {
+      "ar": "شحن مجاني للطلبات الكبيرة",
+      "fr": "Livraison gratuite",
+      "en": "Free Delivery"
+    },
+    "minSubtotal": 60.001,
+    "fee": 0,
+    "isFree": true,
+    "active": true,
+    "priority": 2,
+    "id": "dlv_1793180880752_3epjs",
+    "createdAt": "2026-10-28T09:48:00.752Z",
+    "updatedAt": "2026-10-28T09:48:00.752Z"
+  }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "sku": "PACK-P1-FULL",
+    "name": {
+      "ar": "حقيبة الكتب الكاملة - السنة الأولى ابتدائي",
+      "fr": "Pack Complet 1ère Année Primaire",
+      "en": "Full Pack 1st Grade"
+    },
+    "description": {
+      "ar": "تشمل جميع الكتب والكراريس للسنة الأولى ابتدائي",
+      "fr": "Contient tous les manuels scolaires pour la 1ère année",
+      "en": "Includes all required books for 1st grade"
+    },
+    "price": 32,
+    "discountPrice": 28,
+    "items": [
+      {
+        "articleId": "art_1793180880750_cjj24",
+        "quantity": 1
+      }
+    ],
+    "posterUrl": "/assets/covers/pack1.jpg",
+    "active": true,
+    "id": "pack_1793180880751_ye7p8",
+    "createdAt": "2026-10-28T09:48:00.751Z",
+    "updatedAt": "2026-10-28T09:48:00.751Z"
+  }
+]

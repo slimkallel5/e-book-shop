@@ -7,6 +7,7 @@ import {
   Order,
   Pack,
   Review,
+  User,
 } from '../../common/interfaces/domain.interface';
 import {
   IArticleRepository,
@@ -16,6 +17,7 @@ import {
   IOrderRepository,
   IPackRepository,
   IReviewRepository,
+  IUserRepository,
 } from '../repository.interface';
 import { PrismaService } from './prisma.service';
 
@@ -73,6 +75,61 @@ export class PostgresEducationLevelRepository implements IEducationLevelReposito
       category: created.category as any,
       displayOrder: created.displayOrder,
       active: created.active,
+      createdAt: created.createdAt.toISOString(),
+      updatedAt: created.updatedAt.toISOString(),
+    };
+  }
+}
+
+@Injectable()
+export class PostgresUserRepository implements IUserRepository {
+  constructor(private prisma: PrismaService) {}
+
+  async findByEmail(email: string): Promise<User | null> {
+    const item = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+    if (!item) return null;
+    return {
+      id: item.id,
+      email: item.email,
+      passwordHash: item.passwordHash,
+      role: item.role as any,
+      fullName: item.fullName,
+      createdAt: item.createdAt.toISOString(),
+      updatedAt: item.updatedAt.toISOString(),
+    };
+  }
+
+  async findById(id: string): Promise<User | null> {
+    const item = await this.prisma.user.findUnique({ where: { id } });
+    if (!item) return null;
+    return {
+      id: item.id,
+      email: item.email,
+      passwordHash: item.passwordHash,
+      role: item.role as any,
+      fullName: item.fullName,
+      createdAt: item.createdAt.toISOString(),
+      updatedAt: item.updatedAt.toISOString(),
+    };
+  }
+
+  async create(data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
+    const created = await this.prisma.user.create({
+      data: {
+        email: data.email.toLowerCase(),
+        passwordHash: data.passwordHash,
+        fullName: data.fullName,
+        role: data.role as any,
+      },
+    });
+    return {
+      id: created.id,
+      email: created.email,
+      passwordHash: created.passwordHash,
+      role: created.role as any,
+      fullName: created.fullName,
       createdAt: created.createdAt.toISOString(),
       updatedAt: created.updatedAt.toISOString(),
     };

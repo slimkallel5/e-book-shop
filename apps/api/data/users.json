@@ -1,0 +1,11 @@
+[
+  {
+    "email": "admin@ebookshop.tn",
+    "passwordHash": "$2b$10$ZH/R1GnWafNDksHUNe1wKegk47e0RQXVxQBDqJCFx2ZZyFyq1Eqom",
+    "role": "admin",
+    "fullName": "مدير النظام",
+    "id": "user_1793180880748_omq1a",
+    "createdAt": "2026-10-28T09:48:00.748Z",
+    "updatedAt": "2026-10-28T09:48:00.748Z"
+  }
+]

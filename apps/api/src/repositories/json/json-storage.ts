@@ -3,19 +3,25 @@ import * as path from 'path';
 
 export class JsonStorage<T extends { id: string }> {
   private filePath: string;
+  private dataDir: string;
 
   constructor(filename: string) {
-    const dataDir = path.resolve(process.cwd(), 'data');
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
+    this.dataDir = path.resolve(process.cwd(), 'data');
+    this.filePath = path.join(this.dataDir, filename);
+    this.ensureFile();
+  }
+
+  private ensureFile() {
+    if (!fs.existsSync(this.dataDir)) {
+      fs.mkdirSync(this.dataDir, { recursive: true });
     }
-    this.filePath = path.join(dataDir, filename);
     if (!fs.existsSync(this.filePath)) {
       fs.writeFileSync(this.filePath, JSON.stringify([], null, 2), 'utf-8');
     }
   }
 
   async readAll(): Promise<T[]> {
+    this.ensureFile();
     try {
       const data = fs.readFileSync(this.filePath, 'utf-8');
       return JSON.parse(data) as T[];
@@ -25,6 +31,7 @@ export class JsonStorage<T extends { id: string }> {
   }
 
   async writeAll(items: T[]): Promise<void> {
+    this.ensureFile();
     fs.writeFileSync(this.filePath, JSON.stringify(items, null, 2), 'utf-8');
   }
 
