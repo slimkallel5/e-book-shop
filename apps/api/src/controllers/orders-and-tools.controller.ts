@@ -264,10 +264,32 @@ export class UploadsController {
         },
       }),
       limits: { fileSize: 15 * 1024 * 1024 }, // 15MB
+      fileFilter: (_req, file, cb) => {
+        const allowedMimeTypes = [
+          'image/jpeg',
+          'image/jpg',
+          'image/png',
+          'image/webp',
+          'application/pdf',
+        ];
+        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
+        const ext = path.extname(file.originalname).toLowerCase();
+
+        if (allowedMimeTypes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
+          cb(null, true);
+        } else {
+          cb(
+            new BadRequestException(
+              'Unsupported file type. Only JPEG, PNG, WEBP images and PDF files are allowed.',
+            ),
+            false,
+          );
+        }
+      },
     }),
   )
   uploadFile(@UploadedFile() file: any) {
-    if (!file) throw new BadRequestException('File is required');
+    if (!file) throw new BadRequestException('File is required or file format is unsupported');
     return {
       filename: file.filename,
       originalName: file.originalname,
