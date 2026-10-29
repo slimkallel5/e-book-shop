@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  StyleSheet,
-  Text,
-  View,
   Image,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import { Modal } from './ui/Modal';
-import { Button } from './ui/Button';
-import { Badge } from './ui/Badge';
-import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { useStore } from '../context/StoreContext';
+import { Book } from '../mock/data';
 import { colors, layout, typography } from '../theme/tokens';
+import { Badge } from './ui/Badge';
+import { Button } from './ui/Button';
+import { Modal } from './ui/Modal';
 
 interface ProductDetailModalProps {
   book: Book | null;
@@ -34,6 +35,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 }) => {
   const { language, isRTL, t } = useLanguage();
   const { addToCart, isFavourite, toggleFavourite } = useStore();
+
+  // Review Form state
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewAuthor, setReviewAuthor] = useState('');
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewError, setReviewError] = useState('');
 
   if (!book) return null;
 
@@ -62,6 +71,38 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     const success = addToCart(book, 1);
     if (!success) {
       alert(t('app.outOfStock') || 'المخزون غير كافٍ');
+    }
+  };
+
+  const handleReviewSubmit = async () => {
+    setReviewError('');
+    if (!reviewAuthor.trim() || !reviewComment.trim()) {
+      setReviewError('الاسم والتعليق مطلوبان لكتابة التقييم');
+      return;
+    }
+
+    setReviewSubmitting(true);
+    try {
+      const res = await fetch('/api/v1/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          articleId: book.id,
+          rating: reviewRating,
+          authorName: reviewAuthor.trim(),
+          comment: reviewComment.trim(),
+        }),
+      });
+
+      if (!res.ok) throw new Error('فشل في إرسال التقييم');
+
+      setReviewSuccess(true);
+      setReviewAuthor('');
+      setReviewComment('');
+    } catch (err: any) {
+      setReviewError(err.message || 'خطأ في إرسال التقييم');
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -168,6 +209,60 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             </Text>
           </View>
         ) : null}
+
+        {/* Customer Review Submission Form */}
+        <View style={styles.sectionBlock}>
+          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+            ⭐ إضافة تقييم للكتاب
+          </Text>
+
+          {reviewSuccess ? (
+            <View style={styles.reviewSuccessBox}>
+              <Text style={styles.reviewSuccessText}>
+                ✅ شكراً لك! تم تسليم تقييمك بنجاح وهو الآن قيد المراجعة قبل الظهور.
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.reviewForm}>
+              {reviewError ? (
+                <Text style={styles.reviewErrorText}>⚠️ {reviewError}</Text>
+              ) : null}
+
+              <Text style={styles.fieldLabel}>التقييم:</Text>
+              <View style={styles.starRow}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <TouchableOpacity key={star} onPress={() => setReviewRating(star)}>
+                    <Text style={styles.starIcon}>{star <= reviewRating ? '⭐' : '☆'}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TextInput
+                style={[styles.reviewInput, { textAlign: isRTL ? 'right' : 'left' }]}
+                placeholder="الاسم واللقب..."
+                value={reviewAuthor}
+                onChangeText={setReviewAuthor}
+              />
+
+              <TextInput
+                style={[styles.reviewInput, styles.textArea, { textAlign: isRTL ? 'right' : 'left' }]}
+                placeholder="اكتب انطباعك أو تعليقك حول هذا الكتاب..."
+                value={reviewComment}
+                onChangeText={setReviewComment}
+                multiline
+                numberOfLines={3}
+              />
+
+              <Button
+                title={reviewSubmitting ? 'جاري الإرسال...' : 'إرسال التقييم'}
+                onPress={handleReviewSubmit}
+                variant="accent"
+                size="sm"
+                disabled={reviewSubmitting}
+              />
+            </View>
+          )}
+        </View>
 
         {/* Pack Breakdown Section */}
         {book.isPack && includedBooks.length > 0 && (
@@ -325,6 +420,47 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.sm,
     color: colors.textSecondary,
     lineHeight: 20,
+  },
+  reviewSuccessBox: {
+    backgroundColor: '#D1FAE5',
+    padding: 12,
+    borderRadius: layout.borderRadius.md,
+  },
+  reviewSuccessText: {
+    color: '#059669',
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+  },
+  reviewForm: {
+    gap: 8,
+  },
+  reviewErrorText: {
+    color: '#D32F2F',
+    fontSize: typography.fontSize.xs,
+  },
+  fieldLabel: {
+    fontSize: typography.fontSize.xs,
+    color: colors.textSecondary,
+  },
+  starRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  starIcon: {
+    fontSize: 22,
+    color: colors.secondary,
+  },
+  reviewInput: {
+    backgroundColor: colors.cardBg,
+    borderColor: colors.borderDark,
+    borderWidth: 1,
+    borderRadius: layout.borderRadius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: typography.fontSize.xs,
+  },
+  textArea: {
+    height: 70,
   },
   packItemRow: {
     alignItems: 'center',

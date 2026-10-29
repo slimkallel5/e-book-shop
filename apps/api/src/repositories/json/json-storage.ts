@@ -6,7 +6,7 @@ export class JsonStorage<T extends { id: string }> {
   private dataDir: string;
 
   constructor(filename: string) {
-    this.dataDir = path.resolve(process.cwd(), 'data');
+    this.dataDir = process.env.DATA_DIR || path.resolve(process.cwd(), 'data');
     this.filePath = path.join(this.dataDir, filename);
     this.ensureFile();
   }

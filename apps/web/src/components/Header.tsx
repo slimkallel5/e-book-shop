@@ -16,6 +16,7 @@ interface HeaderProps {
   onOpenCart?: () => void;
   onOpenFavourites?: () => void;
   onOpenOrderLookup?: () => void;
+  onOpenContact?: () => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
   isAdminMode?: boolean;
@@ -28,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenCart,
   onOpenFavourites,
   onOpenOrderLookup,
+  onOpenContact,
   searchQuery = '',
   onSearchChange,
   isAdminMode = false,
@@ -105,6 +107,17 @@ export const Header: React.FC<HeaderProps> = ({
               activeOpacity={0.7}
             >
               <Text style={styles.actionIcon}>📦</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Contact Us Button */}
+          {onOpenContact && (
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={onOpenContact}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.actionIcon}>📩</Text>
             </TouchableOpacity>
           )}
 

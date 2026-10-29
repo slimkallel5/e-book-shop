@@ -3,17 +3,19 @@ import * as path from 'path';
 import { JsonArticleRepository, JsonEducationLevelRepository } from '../src/repositories/json/json-repositories';
 
 describe('Repository Parity & Integrity Tests', () => {
-  const dataDir = path.resolve(process.cwd(), 'data');
+  const testDataDir = path.resolve(__dirname, 'tmp-repo-data');
 
   beforeAll(() => {
-    if (fs.existsSync(dataDir)) {
-      fs.rmSync(dataDir, { recursive: true, force: true });
+    process.env.DATA_DIR = testDataDir;
+    if (fs.existsSync(testDataDir)) {
+      fs.rmSync(testDataDir, { recursive: true, force: true });
     }
   });
 
   afterAll(() => {
-    if (fs.existsSync(dataDir)) {
-      fs.rmSync(dataDir, { recursive: true, force: true });
+    delete process.env.DATA_DIR;
+    if (fs.existsSync(testDataDir)) {
+      fs.rmSync(testDataDir, { recursive: true, force: true });
     }
   });
 
