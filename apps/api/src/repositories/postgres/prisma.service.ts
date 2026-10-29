@@ -4,10 +4,14 @@ import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
-    await this.$connect();
+    if (process.env.DATA_STORE === 'postgres') {
+      await this.$connect();
+    }
   }
 
   async onModuleDestroy() {
-    await this.$disconnect();
+    if (process.env.DATA_STORE === 'postgres') {
+      await this.$disconnect();
+    }
   }
 }

@@ -17,6 +17,9 @@ import { BookViewer } from './src/components/BookViewer';
 import { ProductDetailModal } from './src/components/ProductDetailModal';
 import { ArticleAdmin } from './src/components/ArticleAdmin';
 import { PackAdmin } from './src/components/PackAdmin';
+import { OrderAdmin } from './src/components/OrderAdmin';
+import { ReviewAdmin } from './src/components/ReviewAdmin';
+import { ContactAdmin } from './src/components/ContactAdmin';
 import { AdminDashboard } from './src/components/AdminDashboard';
 import { AdminLoginModal } from './src/components/AdminLoginModal';
 import { BookLookbookGallery } from './src/components/BookLookbookGallery';
@@ -24,6 +27,7 @@ import { ArticleLookbookGallery } from './src/components/ArticleLookbookGallery'
 import { ImmersiveBackground } from './src/components/ImmersiveBackground';
 import { CheckoutModal } from './src/components/CheckoutModal';
 import { OrderLookupModal } from './src/components/OrderLookupModal';
+import { ContactModal } from './src/components/ContactModal';
 import { Modal } from './src/components/ui/Modal';
 import { Button } from './src/components/ui/Button';
 import { Book, MOCK_BOOKS } from './src/mock/data';
@@ -41,7 +45,7 @@ function StorefrontContent() {
   const [isAdminView, setIsAdminView] = useState<boolean>(false);
   const [adminToken, setAdminToken] = useState<string | null>(null);
   const [adminLoginOpen, setAdminLoginOpen] = useState<boolean>(false);
-  const [adminTab, setAdminTab] = useState<'dashboard' | 'articles' | 'packs'>('dashboard');
+  const [adminTab, setAdminTab] = useState<'dashboard' | 'orders' | 'articles' | 'packs' | 'reviews' | 'contact'>('dashboard');
 
   const [selectedCategory, setSelectedCategory] = useState<NavCategory>('all');
   const [selectedQuarter, setSelectedQuarter] = useState<string>('all');
@@ -51,6 +55,7 @@ function StorefrontContent() {
   const [cartModalOpen, setCartModalOpen] = useState(false);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
   const [orderLookupOpen, setOrderLookupOpen] = useState(false);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -108,6 +113,7 @@ function StorefrontContent() {
           favouritesCount={favourites.length}
           onOpenCart={() => setCartModalOpen(true)}
           onOpenOrderLookup={() => setOrderLookupOpen(true)}
+          onOpenContact={() => setContactModalOpen(true)}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           isAdminMode={isAdminView}
@@ -158,6 +164,14 @@ function StorefrontContent() {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
+                    style={[styles.adminTabBtn, adminTab === 'orders' && styles.adminTabBtnActive]}
+                    onPress={() => setAdminTab('orders')}
+                  >
+                    <Text style={[styles.adminTabText, adminTab === 'orders' && styles.adminTabTextActive]}>
+                      🛒 الطلبات
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
                     style={[styles.adminTabBtn, adminTab === 'articles' && styles.adminTabBtnActive]}
                     onPress={() => setAdminTab('articles')}
                   >
@@ -173,11 +187,30 @@ function StorefrontContent() {
                       🎁 {t('admin.packsTab')}
                     </Text>
                   </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.adminTabBtn, adminTab === 'reviews' && styles.adminTabBtnActive]}
+                    onPress={() => setAdminTab('reviews')}
+                  >
+                    <Text style={[styles.adminTabText, adminTab === 'reviews' && styles.adminTabTextActive]}>
+                      ⭐ التقييمات
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.adminTabBtn, adminTab === 'contact' && styles.adminTabBtnActive]}
+                    onPress={() => setAdminTab('contact')}
+                  >
+                    <Text style={[styles.adminTabText, adminTab === 'contact' && styles.adminTabTextActive]}>
+                      📩 الرسائل
+                    </Text>
+                  </TouchableOpacity>
                 </View>
 
                 {adminTab === 'dashboard' && <AdminDashboard token={adminToken || undefined} />}
+                {adminTab === 'orders' && <OrderAdmin token={adminToken || undefined} />}
                 {adminTab === 'articles' && <ArticleAdmin />}
                 {adminTab === 'packs' && <PackAdmin />}
+                {adminTab === 'reviews' && <ReviewAdmin token={adminToken || undefined} />}
+                {adminTab === 'contact' && <ContactAdmin token={adminToken || undefined} />}
               </View>
             ) : (
               <View style={[styles.storeLayout, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
@@ -370,6 +403,12 @@ function StorefrontContent() {
         <OrderLookupModal
           visible={orderLookupOpen}
           onClose={() => setOrderLookupOpen(false)}
+        />
+
+        {/* Contact Us Modal */}
+        <ContactModal
+          visible={contactModalOpen}
+          onClose={() => setContactModalOpen(false)}
         />
 
         {/* Persistent Shell Footer */}

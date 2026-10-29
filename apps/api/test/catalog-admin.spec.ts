@@ -5,17 +5,22 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 describe('Catalog Admin Business Rules & Validation Tests', () => {
-  const dataDir = path.resolve(process.cwd(), 'data');
+  const testDataDir = path.resolve(__dirname, 'tmp-catalog-data');
+
+  beforeAll(() => {
+    process.env.DATA_DIR = testDataDir;
+  });
 
   beforeEach(() => {
-    if (fs.existsSync(dataDir)) {
-      fs.rmSync(dataDir, { recursive: true, force: true });
+    if (fs.existsSync(testDataDir)) {
+      fs.rmSync(testDataDir, { recursive: true, force: true });
     }
   });
 
   afterAll(() => {
-    if (fs.existsSync(dataDir)) {
-      fs.rmSync(dataDir, { recursive: true, force: true });
+    delete process.env.DATA_DIR;
+    if (fs.existsSync(testDataDir)) {
+      fs.rmSync(testDataDir, { recursive: true, force: true });
     }
   });
 
