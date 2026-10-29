@@ -1,0 +1,474 @@
+import React, { useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+import { Modal } from './ui/Modal';
+import { Input } from './ui/Input';
+import { Button } from './ui/Button';
+import { useLanguage } from '../context/LanguageContext';
+import { CartItem } from '../context/StoreContext';
+import { colors, layout, shadows, typography } from '../theme/tokens';
+
+export interface CheckoutModalProps {
+  visible: boolean;
+  onClose: () => void;
+  cart: CartItem[];
+  subtotal: number;
+  onSuccess: (orderReference: string) => void;
+}
+
+export interface CreatedOrder {
+  id: string;
+  reference: string;
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  status: string;
+}
+
+export const CheckoutModal: React.FC<CheckoutModalProps> = ({
+  visible,
+  onClose,
+  cart,
+  subtotal,
+  onSuccess,
+}) => {
+  const { isRTL, t } = useLanguage();
+
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
+  const [instructions, setInstructions] = useState('');
+
+  const [deliveryFee, setDeliveryFee] = useState<number>(7.0);
+  const [isFreeDelivery, setIsFreeDelivery] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [confirmedOrder, setConfirmedOrder] = useState<CreatedOrder | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  // Fetch server delivery rules to compute delivery fee dynamically
+  useEffect(() => {
+    if (visible) {
+      fetch('/api/v1/delivery-rules?activeOnly=true')
+        .then((res) => res.json())
+        .then((rules) => {
+          if (Array.isArray(rules) && rules.length > 0) {
+            let appliedFee = 7.0;
+            let free = false;
+            for (const rule of rules) {
+              if (
+                subtotal >= rule.minSubtotal &&
+                (rule.maxSubtotal === undefined || rule.maxSubtotal === null || subtotal <= rule.maxSubtotal)
+              ) {
+                appliedFee = rule.isFree ? 0 : rule.fee;
+                free = rule.isFree;
+                break;
+              }
+            }
+            setDeliveryFee(appliedFee);
+            setIsFreeDelivery(free);
+          } else {
+            setIsFreeDelivery(subtotal >= 100);
+            setDeliveryFee(subtotal >= 100 ? 0 : 7.0);
+          }
+        })
+        .catch(() => {
+          setIsFreeDelivery(subtotal >= 100);
+          setDeliveryFee(subtotal >= 100 ? 0 : 7.0);
+        });
+    }
+  }, [visible, subtotal]);
+
+  const validateTunisianPhone = (p: string) => {
+    const clean = p.replace(/[\s\-\+]/g, '');
+    return /^(216)?\d{8}$/.test(clean);
+  };
+
+  const handleSubmit = async () => {
+    setErrorMsg(null);
+
+    if (!fullName.trim() || !email.trim() || !phone.trim() || !city.trim() || !address.trim()) {
+      setErrorMsg(t('app.requiredError'));
+      return;
+    }
+
+    if (!validateTunisianPhone(phone)) {
+      setErrorMsg(t('app.phoneError'));
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const orderItems = cart.map((item) => ({
+        type: item.book.isPack ? ('pack' as const) : ('article' as const),
+        itemId: item.book.id,
+        quantity: item.quantity,
+      }));
+
+      const res = await fetch('/api/v1/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer: {
+            fullName: fullName.trim(),
+            email: email.trim(),
+            phone: phone.trim(),
+            city: city.trim(),
+            address: address.trim(),
+            instructions: instructions.trim() || undefined,
+          },
+          items: orderItems,
+          recaptchaToken: 'dev-recaptcha-token',
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to submit order');
+      }
+
+      const createdOrder: CreatedOrder = await res.json();
+      setConfirmedOrder(createdOrder);
+      onSuccess(createdOrder.reference);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error processing order');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    setConfirmedOrder(null);
+    setErrorMsg(null);
+    setCopied(false);
+    onClose();
+  };
+
+  const totalAmount = subtotal + deliveryFee;
+
+  return (
+    <Modal
+      visible={visible}
+      onClose={handleClose}
+      title={confirmedOrder ? t('app.orderSuccessTitle') : t('app.checkout')}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        {confirmedOrder ? (
+          /* Order Confirmation Screen */
+          <View style={styles.successContainer}>
+            <Text style={styles.successBadge}>✅</Text>
+            <Text style={styles.successTitle}>{t('app.orderSuccessTitle')}</Text>
+            <Text style={styles.successSub}>{t('app.orderSuccessSub')}</Text>
+
+            <View style={styles.referenceBox}>
+              <Text style={styles.referenceLabel}>{t('app.orderRefLabel')}:</Text>
+              <Text style={styles.referenceCode}>{confirmedOrder.reference}</Text>
+              <TouchableOpacity
+                style={styles.copyBtn}
+                onPress={() => {
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+              >
+                <Text style={styles.copyBtnText}>
+                  {copied ? t('app.copied') : t('app.copyRef')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.orderSummaryBox}>
+              <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={styles.summaryLabel}>{t('app.subtotal')}:</Text>
+                <Text style={styles.summaryVal}>{confirmedOrder.subtotal.toFixed(2)} {t('app.currency')}</Text>
+              </View>
+              <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={styles.summaryLabel}>{t('app.delivery')}:</Text>
+                <Text style={styles.summaryVal}>{confirmedOrder.deliveryFee.toFixed(2)} {t('app.currency')}</Text>
+              </View>
+              <View style={[styles.summaryRow, styles.totalRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={styles.totalLabel}>{t('app.total')}:</Text>
+                <Text style={styles.totalVal}>{confirmedOrder.total.toFixed(2)} {t('app.currency')}</Text>
+              </View>
+            </View>
+
+            <Button
+              title={t('app.closeConfirmation')}
+              onPress={handleClose}
+              variant="accent"
+              size="lg"
+              style={{ width: '100%', marginTop: 20 }}
+            />
+          </View>
+        ) : (
+          /* Customer Checkout Form */
+          <View style={styles.formContent}>
+            {errorMsg && (
+              <View style={styles.errorBox}>
+                <Text style={styles.errorText}>⚠️ {errorMsg}</Text>
+              </View>
+            )}
+
+            {/* Customer Details */}
+            <Text style={[styles.sectionHeading, { textAlign: isRTL ? 'right' : 'left' }]}>
+              👤 {t('app.customerDetails')}
+            </Text>
+
+            <Input
+              label={t('app.fullName')}
+              value={fullName}
+              onChangeText={setFullName}
+              placeholder="سامي بن علي / Sami Ben Ali"
+            />
+
+            <View style={styles.twoColRow}>
+              <View style={{ flex: 1 }}>
+                <Input
+                  label={t('app.email')}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="name@domain.tn"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <Input
+                  label={t('app.phone')}
+                  value={phone}
+                  onChangeText={setPhone}
+                  placeholder="20 123 456"
+                  keyboardType="phone-pad"
+                />
+              </View>
+            </View>
+
+            <Input
+              label={t('app.city')}
+              value={city}
+              onChangeText={setCity}
+              placeholder="تونس / أريانة / سوسة / صفاقس"
+            />
+
+            <Input
+              label={t('app.address')}
+              value={address}
+              onChangeText={setAddress}
+              placeholder="شارع الحبيب بورقيبة، نهج الإستقلال، عمارة 4"
+            />
+
+            <Input
+              label={t('app.instructions')}
+              value={instructions}
+              onChangeText={setInstructions}
+              placeholder="ملاحظات للسائق أو أوقات التسليم الفضلى"
+            />
+
+            {/* Payment & Delivery Summary */}
+            <Text style={[styles.sectionHeading, { textAlign: isRTL ? 'right' : 'left' }, { marginTop: 16 }]}>
+              🚚 {t('app.paymentMethodLabel')}
+            </Text>
+
+            <View style={styles.paymentMethodBox}>
+              <Text style={styles.paymentMethodTitle}>💵 {t('app.cashOnDelivery')}</Text>
+              <Text style={styles.paymentMethodSub}>
+                الدفع نقداً بالدينار التونسي عند تسلم الكتب من موزع الخدمة
+              </Text>
+            </View>
+
+            {/* Financial Breakdown */}
+            <View style={styles.breakdownCard}>
+              <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={styles.summaryLabel}>{t('app.subtotal')}:</Text>
+                <Text style={styles.summaryVal}>{subtotal.toFixed(2)} {t('app.currency')}</Text>
+              </View>
+
+              <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={styles.summaryLabel}>{t('app.delivery')}:</Text>
+                <Text style={[styles.summaryVal, isFreeDelivery && styles.freeBadge]}>
+                  {isFreeDelivery ? t('app.freeDeliveryBadge') : `${deliveryFee.toFixed(2)} ${t('app.currency')}`}
+                </Text>
+              </View>
+
+              <View style={[styles.summaryRow, styles.totalRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={styles.totalLabel}>{t('app.total')}:</Text>
+                <Text style={styles.totalVal}>{totalAmount.toFixed(2)} {t('app.currency')}</Text>
+              </View>
+            </View>
+
+            <Button
+              title={loading ? 'جاري تسجيل الطلب...' : t('app.submitOrder')}
+              onPress={handleSubmit}
+              variant="accent"
+              size="lg"
+              disabled={loading}
+              style={{ marginTop: 20 }}
+            />
+          </View>
+        )}
+      </ScrollView>
+    </Modal>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    paddingVertical: 12,
+  },
+  formContent: {
+    gap: 12,
+  },
+  sectionHeading: {
+    fontSize: typography.fontSize.md,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.primary,
+    marginBottom: 4,
+  },
+  twoColRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  errorBox: {
+    backgroundColor: '#FFEBEE',
+    borderColor: '#FFCDD2',
+    borderWidth: 1,
+    borderRadius: layout.borderRadius.md,
+    padding: 12,
+  },
+  errorText: {
+    color: '#D32F2F',
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.medium,
+  },
+  paymentMethodBox: {
+    backgroundColor: colors.cardBg,
+    borderColor: colors.accent,
+    borderWidth: 1.5,
+    borderRadius: layout.borderRadius.md,
+    padding: 14,
+    ...shadows.sm,
+  },
+  paymentMethodTitle: {
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.primaryDark,
+  },
+  paymentMethodSub: {
+    fontSize: typography.fontSize.xs,
+    color: colors.textSecondary,
+    marginTop: 4,
+  },
+  breakdownCard: {
+    backgroundColor: colors.background,
+    borderColor: colors.borderDark,
+    borderWidth: 1,
+    borderRadius: layout.borderRadius.md,
+    padding: 14,
+    marginTop: 12,
+    gap: 8,
+  },
+  summaryRow: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  summaryLabel: {
+    fontSize: typography.fontSize.sm,
+    color: colors.textSecondary,
+  },
+  summaryVal: {
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textPrimary,
+  },
+  freeBadge: {
+    color: colors.secondary,
+    fontWeight: typography.fontWeight.bold,
+  },
+  totalRow: {
+    borderTopWidth: 1,
+    borderTopColor: colors.borderDark,
+    paddingTop: 8,
+    marginTop: 4,
+  },
+  totalLabel: {
+    fontSize: typography.fontSize.md,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textPrimary,
+  },
+  totalVal: {
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.primary,
+  },
+  successContainer: {
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  successBadge: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  successTitle: {
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.primary,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  successSub: {
+    fontSize: typography.fontSize.sm,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  referenceBox: {
+    backgroundColor: colors.primaryDark,
+    padding: 16,
+    borderRadius: layout.borderRadius.lg,
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 16,
+    ...shadows.md,
+  },
+  referenceLabel: {
+    fontSize: typography.fontSize.xs,
+    color: colors.accentLight,
+    marginBottom: 4,
+  },
+  referenceCode: {
+    fontSize: 24,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textLight,
+    letterSpacing: 2,
+    marginBottom: 12,
+  },
+  copyBtn: {
+    backgroundColor: colors.accent,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: layout.borderRadius.full,
+  },
+  copyBtnText: {
+    color: colors.primaryDark,
+    fontWeight: typography.fontWeight.bold,
+    fontSize: typography.fontSize.xs,
+  },
+  orderSummaryBox: {
+    width: '100%',
+    backgroundColor: colors.cardBg,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: layout.borderRadius.md,
+    padding: 14,
+    gap: 8,
+  },
+});
