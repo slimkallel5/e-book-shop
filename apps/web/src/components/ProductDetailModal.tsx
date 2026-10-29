@@ -70,14 +70,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const handleAddToCart = () => {
     const success = addToCart(book, 1);
     if (!success) {
-      alert(t('app.outOfStock') || 'المخزون غير كافٍ');
+      alert(t('app.outOfStock'));
     }
   };
 
   const handleReviewSubmit = async () => {
     setReviewError('');
     if (!reviewAuthor.trim() || !reviewComment.trim()) {
-      setReviewError('الاسم والتعليق مطلوبان لكتابة التقييم');
+      setReviewError(t('app.reviewRequiredError'));
       return;
     }
 
@@ -94,20 +94,20 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         }),
       });
 
-      if (!res.ok) throw new Error('فشل في إرسال التقييم');
+      if (!res.ok) throw new Error(t('app.reviewSubmitError'));
 
       setReviewSuccess(true);
       setReviewAuthor('');
       setReviewComment('');
     } catch (err: any) {
-      setReviewError(err.message || 'خطأ في إرسال التقييم');
+      setReviewError(err.message || t('app.reviewSubmitError'));
     } finally {
       setReviewSubmitting(false);
     }
   };
 
   return (
-    <Modal visible={visible} onClose={onClose} title={book.isPack ? t('app.packDetails') || 'تفاصيل الحزمة' : t('app.productDetails') || 'تفاصيل الكتاب'}>
+    <Modal visible={visible} onClose={onClose} title={book.isPack ? t('app.packDetails') : t('app.productDetails')}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* Main Product Banner / Details */}
         <View style={[styles.mainSection, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
@@ -136,7 +136,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
             {book.author && (
               <Text style={[styles.author, { textAlign: isRTL ? 'right' : 'left' }]}>
-                {t('app.author') || 'المؤلف'}: {book.author}
+                {t('app.author')}: {book.author}
               </Text>
             )}
 
@@ -144,7 +144,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <Badge label={levelName} variant="primary" />
               {book.quarter && (
                 <Badge
-                  label={book.quarter === 'full' ? t('app.fullYear') || 'سنة كاملة' : t(`app.${book.quarter}`)}
+                  label={book.quarter === 'full' ? t('app.fullYear') : t(`app.${book.quarter}`)}
                   variant="secondary"
                 />
               )}
@@ -169,8 +169,8 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             <View style={[styles.stockRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Text style={[styles.stockStatus, { color: book.inStock ? colors.success : colors.error }]}>
                 {book.inStock
-                  ? `${t('app.inStock') || 'متوفر'} (${book.stockCount})`
-                  : t('app.outOfStock') || 'غير متوفر'}
+                  ? `${t('app.inStock')} (${book.stockCount})`
+                  : t('app.outOfStock')}
               </Text>
             </View>
 
@@ -185,7 +185,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               />
               {book.samplePages && book.samplePages.length > 0 && onPreviewBook && (
                 <Button
-                  title={t('app.previewSample') || 'معاينة عينة'}
+                  title={t('app.previewSample')}
                   onPress={() => {
                     onClose();
                     onPreviewBook(book);
@@ -202,7 +202,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         {description ? (
           <View style={styles.sectionBlock}>
             <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('app.description') || 'الوصف'}
+              {t('app.description')}
             </Text>
             <Text style={[styles.descriptionText, { textAlign: isRTL ? 'right' : 'left' }]}>
               {description}
@@ -213,13 +213,13 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         {/* Customer Review Submission Form */}
         <View style={styles.sectionBlock}>
           <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            ⭐ إضافة تقييم للكتاب
+            ⭐ {t('app.addReviewTitle')}
           </Text>
 
           {reviewSuccess ? (
             <View style={styles.reviewSuccessBox}>
               <Text style={styles.reviewSuccessText}>
-                ✅ شكراً لك! تم تسليم تقييمك بنجاح وهو الآن قيد المراجعة قبل الظهور.
+                ✅ {t('app.reviewSuccess')}
               </Text>
             </View>
           ) : (
@@ -228,7 +228,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <Text style={styles.reviewErrorText}>⚠️ {reviewError}</Text>
               ) : null}
 
-              <Text style={styles.fieldLabel}>التقييم:</Text>
+              <Text style={styles.fieldLabel}>{t('app.reviews')}:</Text>
               <View style={styles.starRow}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <TouchableOpacity key={star} onPress={() => setReviewRating(star)}>
@@ -239,14 +239,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
               <TextInput
                 style={[styles.reviewInput, { textAlign: isRTL ? 'right' : 'left' }]}
-                placeholder="الاسم واللقب..."
+                placeholder={t('app.reviewAuthorPlaceholder')}
                 value={reviewAuthor}
                 onChangeText={setReviewAuthor}
               />
 
               <TextInput
                 style={[styles.reviewInput, styles.textArea, { textAlign: isRTL ? 'right' : 'left' }]}
-                placeholder="اكتب انطباعك أو تعليقك حول هذا الكتاب..."
+                placeholder={t('app.reviewCommentPlaceholder')}
                 value={reviewComment}
                 onChangeText={setReviewComment}
                 multiline
@@ -254,7 +254,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               />
 
               <Button
-                title={reviewSubmitting ? 'جاري الإرسال...' : 'إرسال التقييم'}
+                title={reviewSubmitting ? t('app.submitting') : t('app.submitReview')}
                 onPress={handleReviewSubmit}
                 variant="accent"
                 size="sm"
@@ -268,7 +268,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         {book.isPack && includedBooks.length > 0 && (
           <View style={styles.sectionBlock}>
             <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('app.packContents') || 'محتويات الحزمة'}
+              {t('app.packContents')}
             </Text>
             {includedBooks.map((item) => (
               <View
@@ -293,7 +293,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         {relatedBooks.length > 0 && (
           <View style={styles.sectionBlock}>
             <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('app.relatedProducts') || 'منتجات ذات صلة'}
+              {t('app.relatedProducts')}
             </Text>
             <View style={[styles.relatedGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               {relatedBooks.map((rel) => (
