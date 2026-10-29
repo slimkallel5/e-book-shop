@@ -22,6 +22,8 @@ import { AdminLoginModal } from './src/components/AdminLoginModal';
 import { BookLookbookGallery } from './src/components/BookLookbookGallery';
 import { ArticleLookbookGallery } from './src/components/ArticleLookbookGallery';
 import { ImmersiveBackground } from './src/components/ImmersiveBackground';
+import { CheckoutModal } from './src/components/CheckoutModal';
+import { OrderLookupModal } from './src/components/OrderLookupModal';
 import { Modal } from './src/components/ui/Modal';
 import { Button } from './src/components/ui/Button';
 import { Book, MOCK_BOOKS } from './src/mock/data';
@@ -30,7 +32,7 @@ import { colors, layout, shadows, typography } from './src/theme/tokens';
 
 function StorefrontContent() {
   const { language, isRTL, t } = useLanguage();
-  const { cart, favourites, removeFromCart, updateQuantity, subtotal } = useStore();
+  const { cart, favourites, removeFromCart, updateQuantity, subtotal, clearCart } = useStore();
   const { width } = useWindowDimensions();
 
   const isMobile = width < 768;
@@ -47,6 +49,8 @@ function StorefrontContent() {
   const [previewBook, setPreviewBook] = useState<Book | null>(null);
   const [detailBook, setDetailBook] = useState<Book | null>(null);
   const [cartModalOpen, setCartModalOpen] = useState(false);
+  const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
+  const [orderLookupOpen, setOrderLookupOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -103,6 +107,7 @@ function StorefrontContent() {
           cartCount={cartTotalItems}
           favouritesCount={favourites.length}
           onOpenCart={() => setCartModalOpen(true)}
+          onOpenOrderLookup={() => setOrderLookupOpen(true)}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           isAdminMode={isAdminView}
@@ -337,7 +342,10 @@ function StorefrontContent() {
                 </View>
                 <Button
                   title={t('app.checkout')}
-                  onPress={() => alert('إعادة توجيه إلى التوصيل والمحاسبة')}
+                  onPress={() => {
+                    setCartModalOpen(false);
+                    setCheckoutModalOpen(true);
+                  }}
                   variant="accent"
                   size="lg"
                   style={{ marginTop: 16 }}
@@ -346,6 +354,23 @@ function StorefrontContent() {
             </View>
           )}
         </Modal>
+
+        {/* Guest Checkout Modal */}
+        <CheckoutModal
+          visible={checkoutModalOpen}
+          onClose={() => setCheckoutModalOpen(false)}
+          cart={cart}
+          subtotal={subtotal}
+          onSuccess={(_reference) => {
+            clearCart();
+          }}
+        />
+
+        {/* Guest Order Tracking / Lookup Modal */}
+        <OrderLookupModal
+          visible={orderLookupOpen}
+          onClose={() => setOrderLookupOpen(false)}
+        />
 
         {/* Persistent Shell Footer */}
         <Footer />

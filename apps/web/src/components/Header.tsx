@@ -15,6 +15,7 @@ interface HeaderProps {
   favouritesCount?: number;
   onOpenCart?: () => void;
   onOpenFavourites?: () => void;
+  onOpenOrderLookup?: () => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
   isAdminMode?: boolean;
@@ -26,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   favouritesCount = 0,
   onOpenCart,
   onOpenFavourites,
+  onOpenOrderLookup,
   searchQuery = '',
   onSearchChange,
   isAdminMode = false,
@@ -95,6 +97,17 @@ export const Header: React.FC<HeaderProps> = ({
               </Text>
             </TouchableOpacity>
           )}
+          {/* Order Tracking Lookup Button */}
+          {onOpenOrderLookup && (
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={onOpenOrderLookup}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.actionIcon}>📦</Text>
+            </TouchableOpacity>
+          )}
+
           {/* Favourites Button */}
           <TouchableOpacity
             style={styles.actionBtn}
