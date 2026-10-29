@@ -5,7 +5,6 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
 } from 'react-native';
 import { Modal } from './ui/Modal';
 import { Input } from './ui/Input';
@@ -133,14 +132,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to submit order');
+        throw new Error(errorData.message || t('app.orderProcessingError'));
       }
 
       const createdOrder: CreatedOrder = await res.json();
       setConfirmedOrder(createdOrder);
       onSuccess(createdOrder.reference);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Error processing order');
+      setErrorMsg(err.message || t('app.orderProcessingError'));
     } finally {
       setLoading(false);
     }
@@ -226,7 +225,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               label={t('app.fullName')}
               value={fullName}
               onChangeText={setFullName}
-              placeholder="سامي بن علي / Sami Ben Ali"
+              placeholder="Sami Ben Ali"
             />
 
             <View style={styles.twoColRow}>
@@ -256,21 +255,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               label={t('app.city')}
               value={city}
               onChangeText={setCity}
-              placeholder="تونس / أريانة / سوسة / صفاقس"
+              placeholder="Tunis / Ariana / Sousse / Sfax"
             />
 
             <Input
               label={t('app.address')}
               value={address}
               onChangeText={setAddress}
-              placeholder="شارع الحبيب بورقيبة، نهج الإستقلال، عمارة 4"
+              placeholder="Av. Habib Bourguiba, App. 4"
             />
 
             <Input
               label={t('app.instructions')}
               value={instructions}
               onChangeText={setInstructions}
-              placeholder="ملاحظات للسائق أو أوقات التسليم الفضلى"
+              placeholder="..."
             />
 
             {/* Payment & Delivery Summary */}
@@ -281,7 +280,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             <View style={styles.paymentMethodBox}>
               <Text style={styles.paymentMethodTitle}>💵 {t('app.cashOnDelivery')}</Text>
               <Text style={styles.paymentMethodSub}>
-                الدفع نقداً بالدينار التونسي عند تسلم الكتب من موزع الخدمة
+                {t('app.cashOnDeliverySub')}
               </Text>
             </View>
 
@@ -306,7 +305,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </View>
 
             <Button
-              title={loading ? 'جاري تسجيل الطلب...' : t('app.submitOrder')}
+              title={loading ? t('app.submittingOrder') : t('app.submitOrder')}
               onPress={handleSubmit}
               variant="accent"
               size="lg"
