@@ -90,5 +90,6 @@ const styles = StyleSheet.create({
   },
   body: {
     padding: 20,
+    flexShrink: 1,
   },
 });

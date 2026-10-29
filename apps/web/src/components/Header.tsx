@@ -95,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Text style={styles.actionIcon}>⚙️</Text>
               <Text style={[styles.cartLabel, isAdminMode && { color: colors.textLight }]}>
-                {isAdminMode ? 'المتجر' : 'الإدارة'}
+                {isAdminMode ? t('app.storefront') : t('app.administrator')}
               </Text>
             </TouchableOpacity>
           )}
