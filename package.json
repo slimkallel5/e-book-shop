@@ -11,7 +11,8 @@
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "web": "npm --workspace=apps/web run start",
-    "api": "npm --workspace=apps/api run start:dev"
+    "api": "npm --workspace=apps/api run start:dev",
+    "postinstall": "prisma generate --schema=apps/api/prisma/schema.prisma"
   },
   "devDependencies": {
     "typescript": "^5.3.3"
