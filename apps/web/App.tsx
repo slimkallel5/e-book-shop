@@ -475,7 +475,8 @@ const styles = StyleSheet.create({
   },
   catalogCol: {
     flex: 1,
-    minWidth: 280,
+    minWidth: 0,
+    width: '100%',
   },
   catalogHeaderRow: {
     justifyContent: 'space-between',
@@ -562,8 +563,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   adminTabRow: {
-    gap: 12,
+    gap: 8,
     marginBottom: 16,
+    flexWrap: 'wrap',
   },
   adminTabBtn: {
     paddingHorizontal: 16,

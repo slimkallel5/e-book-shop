@@ -128,6 +128,8 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
                   onChangeText={setPhone}
                   placeholder="98 123 456"
                   keyboardType="phone-pad"
+                  inputStyle={{ textAlign: 'left' }}
+                  style={{ textAlign: 'left' }}
                 />
               </View>
             </View>

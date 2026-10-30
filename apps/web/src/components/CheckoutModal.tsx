@@ -247,6 +247,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   onChangeText={setPhone}
                   placeholder="20 123 456"
                   keyboardType="phone-pad"
+                  inputStyle={{ textAlign: 'left' }}
+                  style={{ textAlign: 'left' }}
                 />
               </View>
             </View>

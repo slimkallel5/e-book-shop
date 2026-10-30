@@ -81,6 +81,9 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
               ]}
               onPress={() => onSelectCategory(item.id)}
               activeOpacity={0.88}
+              accessibilityRole="button"
+              accessibilityLabel={displayTitle}
+              accessibilityState={{ selected: isSelected }}
             >
               {/* Spine 3D Left Edge Shadow & Ribbing */}
               <View style={styles.spineRibEdge} />

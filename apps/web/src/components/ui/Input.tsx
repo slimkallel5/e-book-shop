@@ -48,6 +48,7 @@ export const Input: React.FC<InputProps> = ({
           style,
         ]}
         placeholderTextColor={colors.textSecondary}
+        accessibilityLabel={label || props.placeholder}
         {...props}
       />
       {error && (

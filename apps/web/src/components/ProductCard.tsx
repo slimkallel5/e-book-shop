@@ -25,8 +25,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
       ? Math.round(((book.price - book.discountPrice) / book.price) * 100)
       : null;
 
+  const prefersReducedMotion =
+    Platform.OS === 'web' &&
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
   return (
-    <View style={styles.card3DWrapper}>
+    <View style={[styles.card3DWrapper, prefersReducedMotion && { transform: [] }]}>
       <View style={styles.cardContainer}>
         {/* Cover Image Wrapper with A4 Aspect Ratio and 3D Spine Shadow */}
         <View style={styles.coverWrapper}>
