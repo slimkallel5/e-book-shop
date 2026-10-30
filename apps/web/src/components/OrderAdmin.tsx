@@ -163,7 +163,7 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
 
   const confirmRejection = async () => {
     if (!rejectionReasonInput.trim()) {
-      setRejectionError('سبب الرفض إجباري عند إرجاع أو رفض الطلب');
+      setRejectionError(t('admin.rejectionRequiredError'));
       return;
     }
     if (targetRejectOrderId) {
@@ -195,18 +195,18 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
             🛒 {t('admin.orderManagement')}
           </Text>
           <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            متابعة وتحديث حالات الطلبات، وإضافة أسباب الرفض عند اللزوم
+            {t('admin.orderManagementSub')}
           </Text>
         </View>
         <TouchableOpacity style={styles.refreshBtn} onPress={fetchOrders}>
-          <Text style={styles.refreshBtnText}>🔄 تحديث البيانات</Text>
+          <Text style={styles.refreshBtnText}>🔄 {t('admin.refreshData')}</Text>
         </TouchableOpacity>
       </View>
 
       {/* Status Filter Tabs */}
       <View style={[styles.tabsRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         {[
-          { key: 'all', label: 'الكل' },
+          { key: 'all', label: t('admin.all') },
           { key: 'pending', label: t('admin.pending') },
           { key: 'in_progress', label: t('admin.inProgress') },
           { key: 'delivered', label: t('admin.delivered') },
@@ -227,7 +227,7 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
       {/* Search Input */}
       <TextInput
         style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
-        placeholder="ابحث بالمرجع TN-XXXXXX أو اسم الحريف أو الهاتف..."
+        placeholder={t('admin.searchOrderPlaceholder')}
         placeholderTextColor={colors.textMuted}
         value={searchQuery}
         onChangeText={setSearchQuery}
@@ -238,7 +238,7 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
       ) : (
         <ScrollView style={styles.ordersList}>
           {orders.length === 0 ? (
-            <Text style={styles.emptyText}>لا توجد طلبات مطابقة للبحث</Text>
+            <Text style={styles.emptyText}>{t('admin.noMatchingOrders')}</Text>
           ) : (
             orders.map((ord) => {
               const badge = getStatusBadge(ord.status);
@@ -268,7 +268,7 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
 
                   {ord.status === 'rejected' && ord.rejectionReason && (
                     <View style={styles.rejectionBox}>
-                      <Text style={styles.rejectionText}>❌ سبب الرفض: {ord.rejectionReason}</Text>
+                      <Text style={styles.rejectionText}>❌ {t('admin.rejectionReasonLabel')}: {ord.rejectionReason}</Text>
                     </View>
                   )}
 

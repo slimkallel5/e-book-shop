@@ -107,23 +107,23 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View>
           <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-            ⭐ إدارة التقييمات والمراجعات
+            ⭐ {t('admin.reviewsManagementTitle')}
           </Text>
           <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            مراجعة وتقييمات الحرفاء وقبول النشر أو الإخفاء
+            {t('admin.reviewsManagementSub')}
           </Text>
         </View>
         <TouchableOpacity style={styles.refreshBtn} onPress={fetchReviews}>
-          <Text style={styles.refreshBtnText}>🔄 تحديث</Text>
+          <Text style={styles.refreshBtnText}>🔄 {t('admin.refresh')}</Text>
         </TouchableOpacity>
       </View>
 
       {/* Filter Tabs */}
       <View style={[styles.tabsRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         {[
-          { key: 'all', label: 'الكل' },
-          { key: 'pending', label: 'قيد المراجعة' },
-          { key: 'published', label: 'منشورة' },
+          { key: 'all', label: t('admin.all') },
+          { key: 'pending', label: t('admin.underReview') },
+          { key: 'published', label: t('admin.published') },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
@@ -142,7 +142,7 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
       ) : (
         <ScrollView style={styles.list}>
           {filteredReviews.length === 0 ? (
-            <Text style={styles.emptyText}>لا توجد تقييمات</Text>
+            <Text style={styles.emptyText}>{t('admin.noReviews')}</Text>
           ) : (
             filteredReviews.map((rev) => (
               <View key={rev.id} style={styles.card}>
@@ -152,7 +152,7 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
                     <Text style={styles.starsText}>{renderStars(rev.rating)} ({rev.rating}/5)</Text>
                   </View>
                   <Badge
-                    label={rev.published ? 'منشور' : 'قيد المراجعة'}
+                    label={rev.published ? t('admin.publishedSingle') : t('admin.underReview')}
                     variant={rev.published ? 'primary' : 'discount'}
                   />
                 </View>
@@ -163,7 +163,7 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
 
                 <View style={[styles.cardFooter, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <Text style={styles.dateText}>
-                    📅 {new Date(rev.createdAt).toLocaleDateString()} {rev.articleId ? `| كتاب ID: ${rev.articleId}` : '| تقييم للمتجر'}
+                    📅 {new Date(rev.createdAt).toLocaleDateString()} {rev.articleId ? `| ${t('admin.bookId')}: ${rev.articleId}` : `| ${t('admin.storeReview')}`}
                   </Text>
 
                   <TouchableOpacity
@@ -171,7 +171,7 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
                     onPress={() => togglePublish(rev.id, rev.published)}
                   >
                     <Text style={[styles.actionBtnText, rev.published ? styles.hideBtnText : styles.publishBtnText]}>
-                      {rev.published ? '👁️‍🗨️ إخفاء' : '✅ موافقة ونشر'}
+                      {rev.published ? `👁️‍🗨️ ${t('admin.hide')}` : `✅ ${t('admin.approveAndPublish')}`}
                     </Text>
                   </TouchableOpacity>
                 </View>

@@ -69,7 +69,7 @@ const INITIAL_ARTICLES: AdminArticle[] = [
 ];
 
 export const ArticleAdmin: React.FC = () => {
-  const { language, isRTL } = useLanguage();
+  const { language, isRTL, t } = useLanguage();
   const [articles, setArticles] = useState<AdminArticle[]>(INITIAL_ARTICLES);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
@@ -130,16 +130,16 @@ export const ArticleAdmin: React.FC = () => {
   const handleSave = () => {
     setErrorMessage('');
     if (!sku.trim()) {
-      setErrorMessage('رمز الكتاب (SKU) مطلوب');
+      setErrorMessage(t('admin.skuRequired'));
       return;
     }
     if (!nameAr.trim()) {
-      setErrorMessage('اسم الكتاب باللغة العربية مطلوب');
+      setErrorMessage(t('admin.arNameRequired'));
       return;
     }
     const price = parseFloat(priceStr);
     if (isNaN(price) || price < 0) {
-      setErrorMessage('السعر الأصلي يجب أن يكون رقماً موجباً');
+      setErrorMessage(t('admin.pricePositiveRequired'));
       return;
     }
 
@@ -147,11 +147,11 @@ export const ArticleAdmin: React.FC = () => {
     if (discountStr.trim()) {
       discountPrice = parseFloat(discountStr);
       if (isNaN(discountPrice) || discountPrice < 0) {
-        setErrorMessage('سعر التخفيض يجب أن يكون رقماً موجباً');
+        setErrorMessage(t('admin.discountPricePositiveRequired'));
         return;
       }
       if (discountPrice >= price) {
-        setErrorMessage('سعر التخفيض يجب أن يكون أقل من السعر الأصلي');
+        setErrorMessage(t('admin.discountPriceLowerRequired'));
         return;
       }
     }
@@ -202,14 +202,14 @@ export const ArticleAdmin: React.FC = () => {
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View style={styles.titleGroup}>
           <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            📦 إدارة الكتب والمستلزمات التعليمية
+            📦 {t('admin.articlesManagementTitle')}
           </Text>
           <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
-            إضافة، تعديل، وتحديث الأسعار ومعاينات PDF
+            {t('admin.articlesManagementSub')}
           </Text>
         </View>
         <Button
-          title="➕ إضافة كتاب جديد"
+          title={`➕ ${t('admin.addNewArticle')}`}
           onPress={() => openModal()}
           variant="accent"
           size="md"
@@ -220,7 +220,7 @@ export const ArticleAdmin: React.FC = () => {
       <View style={styles.searchBox}>
         <TextInput
           style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
-          placeholder="ابحث بالاسم أو SKU..."
+          placeholder={t('admin.searchArticlePlaceholder')}
           placeholderTextColor={colors.textMuted}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -236,7 +236,7 @@ export const ArticleAdmin: React.FC = () => {
                 <View style={[styles.skuRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <Badge label={art.sku} variant="outline" />
                   <Badge
-                    label={art.active ? 'مفعل' : 'معطل'}
+                    label={art.active ? t('admin.active') : t('admin.inactive')}
                     variant={art.active ? 'primary' : 'discount'}
                   />
                   {art.quarter && (

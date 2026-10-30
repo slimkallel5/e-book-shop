@@ -53,12 +53,12 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
       });
 
       if (!res.ok) {
-        throw new Error('فشل في إرسال الرسالة. يرجى إعادة المحاولة.');
+        throw new Error(t('app.sendError'));
       }
 
       setSuccess(true);
     } catch (err: any) {
-      setErrorMsg(err.message || 'خطأ في إرسال الرسالة');
+      setErrorMsg(err.message || t('app.sendError'));
     } finally {
       setLoading(false);
     }
@@ -76,15 +76,15 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
   };
 
   return (
-    <Modal visible={visible} onClose={handleClose} title="📩 اتصل بنا / Contact Us">
+    <Modal visible={visible} onClose={handleClose} title={`📩 ${t('app.contactModalTitle')}`}>
       <ScrollView contentContainerStyle={styles.container}>
         {success ? (
           <View style={styles.successBox}>
             <Text style={styles.successBadge}>✅</Text>
 
-            <Text style={styles.successTitle}>تم إرسال رسالتك بنجاح!</Text>
+            <Text style={styles.successTitle}>{t('app.messageSuccessTitle')}</Text>
             <Text style={styles.successSub}>
-              شكراً لتواصلك معنا. سيقوم فريق خدمة الحرفاء بالرد عليك عبر البريد أو الهاتف في أقرب وقت.
+              {t('app.messageSuccessSub')}
             </Text>
             <Button
               title={t('app.closeConfirmation')}
@@ -103,16 +103,16 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
             )}
 
             <Input
-              label="الاسم واللقب / Name *"
+              label={`${t('app.fullName')} *`}
               value={name}
               onChangeText={setName}
-              placeholder="مثال: علي بن سالم"
+              placeholder="Ali Ben Salem"
             />
 
             <View style={styles.twoColRow}>
               <View style={{ flex: 1 }}>
                 <Input
-                  label="البريد الإلكتروني / Email *"
+                  label={`${t('app.email')} *`}
                   value={email}
                   onChangeText={setEmail}
                   placeholder="name@domain.tn"
@@ -123,7 +123,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
 
               <View style={{ flex: 1 }}>
                 <Input
-                  label="الهاتف / Phone (اختياري)"
+                  label={t('app.optionalPhone')}
                   value={phone}
                   onChangeText={setPhone}
                   placeholder="98 123 456"
@@ -133,24 +133,24 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
             </View>
 
             <Input
-              label="الموضوع / Subject *"
+              label={`${t('app.subject')} *`}
               value={subject}
               onChangeText={setSubject}
-              placeholder="استفسار عن الكتب، طلب خاص، إلخ..."
+              placeholder={t('app.subjectPlaceholder')}
             />
 
             <Input
-              label="الرسالة / Message *"
+              label={`${t('app.message')} *`}
               value={message}
               onChangeText={setMessage}
-              placeholder="اكتب تفاصيل استفسارك هنا..."
+              placeholder={t('app.messagePlaceholder')}
               multiline
               numberOfLines={4}
               style={{ height: 100 }}
             />
 
             <Button
-              title={loading ? 'جاري الإرسال...' : 'إرسال الرسالة'}
+              title={loading ? t('app.sending') : t('app.sendMessage')}
               onPress={handleSubmit}
               variant="accent"
               size="lg"

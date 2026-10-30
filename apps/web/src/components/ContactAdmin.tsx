@@ -27,7 +27,7 @@ interface ContactAdminProps {
 }
 
 export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const [messages, setMessages] = useState<AdminContactMessage[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -85,14 +85,14 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View>
           <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-            📩 رسائل اتصل بنا واستفسارات الزوار
+            📩 {t('admin.contactMessagesTitle')}
           </Text>
           <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            عرض طلبات التواصل والاستفسارات الخاصة بالمكتبة
+            {t('admin.contactMessagesSub')}
           </Text>
         </View>
         <TouchableOpacity style={styles.refreshBtn} onPress={fetchMessages}>
-          <Text style={styles.refreshBtnText}>🔄 تحديث</Text>
+          <Text style={styles.refreshBtnText}>🔄 {t('admin.refresh')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -101,7 +101,7 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
       ) : (
         <ScrollView style={styles.list}>
           {messages.length === 0 ? (
-            <Text style={styles.emptyText}>لا توجد رسائل جديدة</Text>
+            <Text style={styles.emptyText}>{t('admin.noNewMessages')}</Text>
           ) : (
             messages.map((msg) => (
               <View key={msg.id} style={[styles.card, !msg.read && styles.unreadCard]}>
@@ -113,13 +113,13 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
                     </Text>
                   </View>
                   <Badge
-                    label={msg.read ? 'مقروءة' : 'جديدة'}
+                    label={msg.read ? t('admin.readStatus') : t('admin.newStatus')}
                     variant={msg.read ? 'outline' : 'primary'}
                   />
                 </View>
 
                 <Text style={[styles.subjectText, { textAlign: isRTL ? 'right' : 'left' }]}>
-                  📌 الموضوع: {msg.subject}
+                  📌 {t('app.subject')}: {msg.subject}
                 </Text>
 
                 <Text style={[styles.messageText, { textAlign: isRTL ? 'right' : 'left' }]}>
@@ -136,7 +136,7 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
                       style={styles.readBtn}
                       onPress={() => markAsRead(msg.id)}
                     >
-                      <Text style={styles.readBtnText}>✅ تحديد كمقروءة</Text>
+                      <Text style={styles.readBtnText}>✅ {t('admin.markAsRead')}</Text>
                     </TouchableOpacity>
                   )}
                 </View>

@@ -168,7 +168,7 @@ function StorefrontContent() {
                     onPress={() => setAdminTab('orders')}
                   >
                     <Text style={[styles.adminTabText, adminTab === 'orders' && styles.adminTabTextActive]}>
-                      🛒 الطلبات
+                      🛒 {t('admin.ordersTab')}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -192,7 +192,7 @@ function StorefrontContent() {
                     onPress={() => setAdminTab('reviews')}
                   >
                     <Text style={[styles.adminTabText, adminTab === 'reviews' && styles.adminTabTextActive]}>
-                      ⭐ التقييمات
+                      ⭐ {t('admin.reviewsTab')}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -200,7 +200,7 @@ function StorefrontContent() {
                     onPress={() => setAdminTab('contact')}
                   >
                     <Text style={[styles.adminTabText, adminTab === 'contact' && styles.adminTabTextActive]}>
-                      📩 الرسائل
+                      📩 {t('admin.contactTab')}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -326,7 +326,7 @@ function StorefrontContent() {
               <Text style={styles.emptyCartText}>{t('app.emptyCart')}</Text>
             </View>
           ) : (
-            <View style={styles.cartContent}>
+            <ScrollView style={styles.cartModalScrollView} contentContainerStyle={styles.cartContent}>
               {cart.map((item) => (
                 <View
                   key={item.book.id}
@@ -384,7 +384,7 @@ function StorefrontContent() {
                   style={{ marginTop: 16 }}
                 />
               </View>
-            </View>
+            </ScrollView>
           )}
         </Modal>
 
@@ -542,6 +542,9 @@ const styles = StyleSheet.create({
   emptyCartText: {
     color: colors.textMuted,
     fontSize: typography.fontSize.md,
+  },
+  cartModalScrollView: {
+    maxHeight: '100%',
   },
   cartContent: {
     gap: 12,

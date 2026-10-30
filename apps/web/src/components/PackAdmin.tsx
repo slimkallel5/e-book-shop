@@ -57,7 +57,7 @@ const INITIAL_PACKS: AdminPack[] = [
 ];
 
 export const PackAdmin: React.FC = () => {
-  const { language, isRTL } = useLanguage();
+  const { language, isRTL, t } = useLanguage();
   const [packs, setPacks] = useState<AdminPack[]>(INITIAL_PACKS);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
@@ -111,7 +111,7 @@ export const PackAdmin: React.FC = () => {
       (sa) => !selectedItems.some((si) => si.articleId === sa.id),
     );
     if (!unusedArticle) {
-      setErrorMessage('تم اختيار جميع الكتب المتاحة بالكامل');
+      setErrorMessage(t('admin.allBooksSelectedError'));
       return;
     }
     setSelectedItems((prev) => [...prev, { articleId: unusedArticle.id, quantity: 1 }]);
@@ -130,16 +130,16 @@ export const PackAdmin: React.FC = () => {
   const handleSave = () => {
     setErrorMessage('');
     if (!sku.trim()) {
-      setErrorMessage('رمز الحزمة (SKU) مطلوب');
+      setErrorMessage(t('admin.packSkuRequired'));
       return;
     }
     if (!nameAr.trim()) {
-      setErrorMessage('اسم الحزمة باللغة العربية مطلوب');
+      setErrorMessage(t('admin.packArNameRequired'));
       return;
     }
     const price = parseFloat(priceStr);
     if (isNaN(price) || price < 0) {
-      setErrorMessage('سعر الحزمة يجب أن يكون رقماً موجباً');
+      setErrorMessage(t('admin.packPricePositiveRequired'));
       return;
     }
 
@@ -147,24 +147,24 @@ export const PackAdmin: React.FC = () => {
     if (discountStr.trim()) {
       discountPrice = parseFloat(discountStr);
       if (isNaN(discountPrice) || discountPrice < 0) {
-        setErrorMessage('سعر التخفيض يجب أن يكون رقماً موجباً');
+        setErrorMessage(t('admin.discountPricePositiveRequired'));
         return;
       }
       if (discountPrice >= price) {
-        setErrorMessage('سعر التخفيض يجب أن يكون أقل من السعر الأصلي');
+        setErrorMessage(t('admin.discountPriceLowerRequired'));
         return;
       }
     }
 
     if (selectedItems.length === 0) {
-      setErrorMessage('يجب أن تحتوي الحزمة على كتاب واحد على الأقل');
+      setErrorMessage(t('admin.minOneBookError'));
       return;
     }
 
     // Check duplicate article selections
     const articleIds = selectedItems.map((si) => si.articleId);
     if (new Set(articleIds).size !== articleIds.length) {
-      setErrorMessage('لا يمكن تكرار نفس الكتاب أكثر من مرة داخل نفس الحزمة');
+      setErrorMessage(t('admin.noDuplicateBooksError'));
       return;
     }
 
@@ -209,14 +209,14 @@ export const PackAdmin: React.FC = () => {
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View style={styles.titleGroup}>
           <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            🎁 إدارة العروض والحزم المجمعة
+            🎁 {t('admin.packsManagementTitle')}
           </Text>
           <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
-            إنشاء وتعديل حزم الكتب بأسعار مخصصة
+            {t('admin.packsManagementSub')}
           </Text>
         </View>
         <Button
-          title="➕ إضافة حزمة جديدة"
+          title={`➕ ${t('admin.addNewPack')}`}
           onPress={() => openModal()}
           variant="accent"
           size="md"
@@ -227,7 +227,7 @@ export const PackAdmin: React.FC = () => {
       <View style={styles.searchBox}>
         <TextInput
           style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
-          placeholder="ابحث باسم الحزمة أو SKU..."
+          placeholder={t('admin.searchPackPlaceholder')}
           placeholderTextColor={colors.textMuted}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -244,7 +244,7 @@ export const PackAdmin: React.FC = () => {
                   <Badge label="PACK" variant="pack" />
                   <Badge label={pack.sku} variant="outline" />
                   <Badge
-                    label={pack.active ? 'مفعل' : 'معطل'}
+                    label={pack.active ? t('admin.active') : t('admin.inactive')}
                     variant={pack.active ? 'primary' : 'discount'}
                   />
                 </View>
@@ -252,16 +252,16 @@ export const PackAdmin: React.FC = () => {
                   {pack.name[language] || pack.name.ar}
                 </Text>
                 <Text style={[styles.itemsSummary, { textAlign: isRTL ? 'right' : 'left' }]}>
-                  تتضمن {pack.items.length} عنصر
+                  {t('admin.containsItems').replace('{count}', pack.items.length.toString())}
                 </Text>
               </View>
 
               <View style={styles.priceContainer}>
                 <Text style={styles.priceCurrent}>
-                  {(pack.discountPrice ?? pack.price).toFixed(2)} د.ت
+                  {(pack.discountPrice ?? pack.price).toFixed(2)} {t('app.currency')}
                 </Text>
                 {pack.discountPrice && (
-                  <Text style={styles.priceOriginal}>{pack.price.toFixed(2)} د.ت</Text>
+                  <Text style={styles.priceOriginal}>{pack.price.toFixed(2)} {t('app.currency')}</Text>
                 )}
               </View>
             </View>
@@ -272,13 +272,13 @@ export const PackAdmin: React.FC = () => {
                 style={styles.editBtn}
                 onPress={() => openModal(pack)}
               >
-                <Text style={styles.editBtnText}>✏️ تعديل الحزمة</Text>
+                <Text style={styles.editBtnText}>✏️ {t('admin.editPack')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.deleteBtn}
                 onPress={() => handleDelete(pack.id)}
               >
-                <Text style={styles.deleteBtnText}>🗑 حذف</Text>
+                <Text style={styles.deleteBtnText}>🗑 {t('admin.delete')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -289,7 +289,7 @@ export const PackAdmin: React.FC = () => {
       <Modal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        title={editingPack ? 'تعديل الحزمة' : 'إضافة حزمة جديدة'}
+        title={editingPack ? t('admin.editPack') : t('admin.addNewPack')}
       >
         <ScrollView style={styles.formScroll}>
           {errorMessage ? (
@@ -298,23 +298,23 @@ export const PackAdmin: React.FC = () => {
             </View>
           ) : null}
 
-          <Text style={styles.fieldLabel}>رمز الحزمة (SKU):</Text>
+          <Text style={styles.fieldLabel}>{t('admin.packSkuLabel')}:</Text>
           <TextInput
             style={styles.formInput}
             value={sku}
             onChangeText={setSku}
-            placeholder="مثال: TUN-PACK-01"
+            placeholder="TUN-PACK-01"
           />
 
-          <Text style={styles.fieldLabel}>اسم الحزمة (عربي) *:</Text>
+          <Text style={styles.fieldLabel}>{t('admin.packTitleAr')} *:</Text>
           <TextInput
             style={styles.formInput}
             value={nameAr}
             onChangeText={setNameAr}
-            placeholder="عنوان الحزمة بالعربية"
+            placeholder="Pack Title in Arabic"
           />
 
-          <Text style={styles.fieldLabel}>سعر الحزمة (د.ت) *:</Text>
+          <Text style={styles.fieldLabel}>{t('admin.packPriceLabel')} *:</Text>
           <TextInput
             style={styles.formInput}
             value={priceStr}
@@ -323,7 +323,7 @@ export const PackAdmin: React.FC = () => {
             placeholder="45.00"
           />
 
-          <Text style={styles.fieldLabel}>سعر التخفيض (د.ت) (اختياري):</Text>
+          <Text style={styles.fieldLabel}>{t('admin.discountPriceOpt')}:</Text>
           <TextInput
             style={styles.formInput}
             value={discountStr}
@@ -333,7 +333,7 @@ export const PackAdmin: React.FC = () => {
           />
 
           {/* Included Items Section */}
-          <Text style={styles.fieldLabel}>الكتب المدرجة بالحزمة *:</Text>
+          <Text style={styles.fieldLabel}>{t('admin.includedBooksLabel')} *:</Text>
           {selectedItems.map((item, index) => (
             <View key={index} style={styles.itemSelectRow}>
               <ScrollView horizontal style={styles.pickerScroll}>
@@ -370,10 +370,10 @@ export const PackAdmin: React.FC = () => {
           ))}
 
           <TouchableOpacity style={styles.addItemBtn} onPress={addItemRow}>
-            <Text style={styles.addItemBtnText}>➕ إضافة كتاب آخر للحزمة</Text>
+            <Text style={styles.addItemBtnText}>➕ {t('admin.addAnotherBook')}</Text>
           </TouchableOpacity>
 
-          <Text style={styles.fieldLabel}>رابط poster/غلاف الحزمة (اختياري):</Text>
+          <Text style={styles.fieldLabel}>{t('admin.packCoverUrl')}:</Text>
           <TextInput
             style={styles.formInput}
             value={posterUrl}
@@ -386,12 +386,12 @@ export const PackAdmin: React.FC = () => {
             onPress={() => setActive(!active)}
           >
             <Text style={styles.toggleText}>
-              الحالة: {active ? '✅ مفعل للبيع' : '❌ معطل'}
+              {t('admin.status')}: {active ? `✅ ${t('admin.statusEnabled')}` : `❌ ${t('admin.statusDisabled')}`}
             </Text>
           </TouchableOpacity>
 
           <Button
-            title={editingPack ? 'حفظ التغييرات' : 'إضافة الحزمة'}
+            title={editingPack ? t('admin.saveChanges') : t('admin.addPackBtn')}
             onPress={handleSave}
             variant="accent"
             size="lg"
