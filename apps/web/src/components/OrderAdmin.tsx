@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { useLanguage } from '../context/LanguageContext';
+import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
@@ -69,12 +70,13 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      let url = '/api/v1/orders';
+      let endpoint = '/orders';
       const params: string[] = [];
       if (selectedStatus !== 'all') params.push(`status=${selectedStatus}`);
       if (searchQuery.trim()) params.push(`search=${encodeURIComponent(searchQuery.trim())}`);
-      if (params.length > 0) url += `?${params.join('&')}`;
+      if (params.length > 0) endpoint += `?${params.join('&')}`;
 
+      const url = getApiUrl(endpoint);
       const res = await fetch(url, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -127,7 +129,7 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
 
   const handleUpdateStatus = async (orderId: string, newStatus: AdminOrder['status'], reason?: string) => {
     try {
-      const res = await fetch(`/api/v1/orders/${orderId}/status`, {
+      const res = await fetch(getApiUrl(`/orders/${orderId}/status`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -6,6 +6,7 @@ import {
   View,
 } from 'react-native';
 import { useLanguage } from '../context/LanguageContext';
+import { getApiUrl } from '../services/api';
 import { colors, layout, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
@@ -40,7 +41,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
     setLoading(true);
 
     try {
-      const res = await fetch('/api/v1/contact', {
+      const res = await fetch(getApiUrl('/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useLanguage } from '../context/LanguageContext';
+import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 
@@ -34,7 +35,7 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
   const fetchMessages = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/contact', {
+      const res = await fetch(getApiUrl('/contact'), {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {
@@ -66,7 +67,7 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
 
   const markAsRead = async (id: string) => {
     try {
-      const res = await fetch(`/api/v1/contact/${id}/read`, {
+      const res = await fetch(getApiUrl(`/contact/${id}/read`), {
         method: 'PUT',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });

@@ -11,6 +11,7 @@ import { Input } from './ui/Input';
 import { Button } from './ui/Button';
 import { useLanguage } from '../context/LanguageContext';
 import { CartItem } from '../context/StoreContext';
+import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 
 export interface CheckoutModalProps {
@@ -56,7 +57,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // Fetch server delivery rules to compute delivery fee dynamically
   useEffect(() => {
     if (visible) {
-      fetch('/api/v1/delivery-rules?activeOnly=true')
+      fetch(getApiUrl('/delivery-rules?activeOnly=true'))
         .then((res) => res.json())
         .then((rules) => {
           if (Array.isArray(rules) && rules.length > 0) {
@@ -113,7 +114,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         quantity: item.quantity,
       }));
 
-      const res = await fetch('/api/v1/orders', {
+      const res = await fetch(getApiUrl('/orders'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

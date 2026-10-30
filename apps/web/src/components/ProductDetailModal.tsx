@@ -11,6 +11,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { useStore } from '../context/StoreContext';
 import { Book } from '../mock/data';
+import { getApiUrl } from '../services/api';
 import { colors, layout, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
@@ -83,7 +84,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
     setReviewSubmitting(true);
     try {
-      const res = await fetch('/api/v1/reviews', {
+      const res = await fetch(getApiUrl('/reviews'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

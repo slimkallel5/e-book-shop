@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useLanguage } from '../context/LanguageContext';
+import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 
@@ -34,7 +35,7 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/reviews', {
+      const res = await fetch(getApiUrl('/reviews'), {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {
@@ -73,7 +74,7 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
 
   const togglePublish = async (reviewId: string, currentPublishedStatus: boolean) => {
     try {
-      const res = await fetch(`/api/v1/reviews/${reviewId}/publish`, {
+      const res = await fetch(getApiUrl(`/reviews/${reviewId}/publish`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
