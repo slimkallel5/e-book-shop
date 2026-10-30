@@ -29,3 +29,6 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
+apps/api/data/reviews.json
+apps/api/data/contact-messages.json
+apps/api/data/orders.json
