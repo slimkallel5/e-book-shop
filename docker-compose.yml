@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: ebookshop-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ebookshop
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ebookshop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: ebookshop-api
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATA_STORE: postgres
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/ebookshop?schema=public"
+      JWT_SECRET: super-secret-jwt-key-change-in-production
+      JWT_EXPIRES_IN: 1d
+      RECAPTCHA_SECRET_KEY: dev-recaptcha-secret-key
+      RECAPTCHA_ENABLED: "false"
+      UPLOAD_DIR: uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - api_uploads:/app/apps/api/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: ebookshop-web
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  api_uploads:
