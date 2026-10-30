@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useLanguage } from '../context/LanguageContext';
+import { getApiUrl } from '../services/api';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { colors, layout, typography } from '../theme/tokens';
@@ -37,7 +38,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/auth/login', {
+      const response = await fetch(getApiUrl('/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

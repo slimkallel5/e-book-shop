@@ -11,6 +11,7 @@ import { Modal } from './ui/Modal';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
 import { useLanguage } from '../context/LanguageContext';
+import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 
 export interface OrderLookupModalProps {
@@ -66,7 +67,7 @@ export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ visible, onC
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/v1/orders/lookup/${encodeURIComponent(ref)}`);
+      const res = await fetch(getApiUrl(`/orders/lookup/${encodeURIComponent(ref)}`));
       if (res.status === 404) {
         throw new Error(t('app.orderNotFound'));
       }

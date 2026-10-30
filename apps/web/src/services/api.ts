@@ -1,6 +1,22 @@
 import { Book, MOCK_BOOKS } from '../mock/data';
 
-const API_BASE_URL = '/api/v1';
+const RAW_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || process.env.EXPO_PUBLIC_API_URL || '';
+const CLEAN_BASE_URL = RAW_BASE_URL.replace(/\/+$/, '');
+
+export const API_BASE_URL = CLEAN_BASE_URL
+  ? (CLEAN_BASE_URL.endsWith('/api/v1') ? CLEAN_BASE_URL : `${CLEAN_BASE_URL}/api/v1`)
+  : '/api/v1';
+
+export function getApiUrl(endpoint: string): string {
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  if (cleanEndpoint.startsWith('/api/v1/')) {
+    return `${API_BASE_URL}${cleanEndpoint.slice(7)}`;
+  }
+  if (cleanEndpoint === '/api/v1') {
+    return API_BASE_URL;
+  }
+  return `${API_BASE_URL}${cleanEndpoint}`;
+}
 
 export interface ApiArticle {
   id: string;
@@ -137,9 +153,9 @@ export function packToBook(pack: ApiPack): Book {
 export async function fetchCatalogBooks(): Promise<Book[]> {
   try {
     const [articlesRes, packsRes, levelsRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/articles?activeOnly=true`),
-      fetch(`${API_BASE_URL}/packs?activeOnly=true`),
-      fetch(`${API_BASE_URL}/education-levels`),
+      fetch(getApiUrl('/articles?activeOnly=true')),
+      fetch(getApiUrl('/packs?activeOnly=true')),
+      fetch(getApiUrl('/education-levels')),
     ]);
 
     if (!articlesRes.ok || !packsRes.ok || !levelsRes.ok) {

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useLanguage } from '../context/LanguageContext';
+import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 
 interface DashboardStats {
@@ -90,7 +91,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
     if (!token) return;
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/v1/admin/dashboard/stats', {
+        const response = await fetch(getApiUrl('/admin/dashboard/stats'), {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (response.ok) {
