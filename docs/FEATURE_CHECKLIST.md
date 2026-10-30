@@ -85,9 +85,9 @@ This checklist tracks completion of features and acceptance criteria outlined in
 ---
 
 ## Task 10 — End-to-End Integration & Regression Testing
-- [ ] Audit and run end-to-end user journeys (storefront browsing → 3D preview → checkout → admin management).
-- [ ] Run repository adapter parity tests (JSON vs PostgreSQL).
-- [ ] Verify error handling, edge cases, and security authorization boundaries.
+- [x] Audit and run end-to-end user journeys (storefront browsing → 3D preview → checkout → admin management).
+- [x] Run repository adapter parity tests (JSON vs PostgreSQL).
+- [x] Verify error handling, edge cases, and security authorization boundaries.
 
 ---
 

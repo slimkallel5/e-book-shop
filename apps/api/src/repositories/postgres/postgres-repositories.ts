@@ -600,7 +600,7 @@ export class PostgresReviewRepository implements IReviewRepository {
 
   async findAll(filters?: { articleId?: string; publishedOnly?: boolean }): Promise<Review[]> {
     const where: any = {};
-    if (filters?.publishedOnly) where.active = true;
+    if (filters?.publishedOnly) where.published = true;
     if (filters?.articleId !== undefined) where.articleId = filters.articleId;
 
     const items = await this.prisma.review.findMany({ where, orderBy: { createdAt: 'desc' } });
