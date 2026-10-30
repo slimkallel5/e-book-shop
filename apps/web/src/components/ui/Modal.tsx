@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal as RNModal } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal as RNModal, Platform } from 'react-native';
 import { colors, layout, shadows, typography } from '../../theme/tokens';
 
 interface ModalProps {
@@ -17,6 +17,21 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   maxWidth = 700,
 }) => {
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web' || typeof window === 'undefined') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [visible, onClose]);
+
   return (
     <RNModal
       visible={visible}
@@ -36,7 +51,12 @@ export const Modal: React.FC<ModalProps> = ({
         >
           <View style={styles.header}>
             {title ? <Text style={styles.title}>{title}</Text> : <View />}
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+            <TouchableOpacity
+              onPress={onClose}
+              style={styles.closeBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Close dialog"
+            >
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>
           </View>

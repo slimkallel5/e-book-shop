@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Modal,
-  Dimensions,
+  Platform,
 } from 'react-native';
 import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
@@ -23,6 +23,11 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
   const { language, isRTL, t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
+
+  const prefersReducedMotion =
+    Platform.OS === 'web' &&
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   if (!book) return null;
 
@@ -45,6 +50,25 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
   // In RTL mode (Arabic), next page goes left-to-right structurally
   const onRightArrow = isRTL ? handlePrevPage : handleNextPage;
   const onLeftArrow = isRTL ? handleNextPage : handlePrevPage;
+
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web' || typeof window === 'undefined') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      } else if (e.key === 'ArrowLeft') {
+        onLeftArrow();
+      } else if (e.key === 'ArrowRight') {
+        onRightArrow();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [visible, currentPage, isRTL, samplePages.length]);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -71,7 +95,13 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   <Text style={styles.iconBtnText}>{isZoomed ? '🔍-' : '🔍+'}</Text>
                 </TouchableOpacity>
               )}
-              <TouchableOpacity style={styles.closeBtn} onPress={onClose} activeOpacity={0.8}>
+              <TouchableOpacity
+                style={styles.closeBtn}
+                onPress={onClose}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Close book preview"
+              >
                 <Text style={styles.closeBtnText}>✕</Text>
               </TouchableOpacity>
             </View>
@@ -87,12 +117,14 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   onPress={onLeftArrow}
                   disabled={isRTL ? currentPage === samplePages.length - 1 : currentPage === 0}
                   activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel="Previous Page"
                 >
                   <Text style={styles.navArrowText}>{isRTL ? '▶' : '◀'}</Text>
                 </TouchableOpacity>
 
                 {/* Simulated Interactive 3D Open Page Spread */}
-                <View style={[styles.spreadContainer, isZoomed && styles.zoomedContainer]}>
+                <View style={[styles.spreadContainer, isZoomed && (prefersReducedMotion ? styles.zoomedContainerReduced : styles.zoomedContainer)]}>
                   {/* Spine Depth Shadow */}
                   <View style={styles.spineShadow} />
 
@@ -100,6 +132,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                     source={{ uri: samplePages[currentPage] }}
                     style={styles.pageImage}
                     resizeMode="contain"
+                    accessibilityLabel={`${title} - ${t('app.page')} ${currentPage + 1}`}
                   />
                 </View>
 
@@ -109,6 +142,8 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   onPress={onRightArrow}
                   disabled={isRTL ? currentPage === 0 : currentPage === samplePages.length - 1}
                   activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel="Next Page"
                 >
                   <Text style={styles.navArrowText}>{isRTL ? '◀' : '▶'}</Text>
                 </TouchableOpacity>
@@ -266,6 +301,10 @@ const styles = StyleSheet.create({
   },
   zoomedContainer: {
     transform: [{ scale: 1.2 }],
+  },
+  zoomedContainerReduced: {
+    borderWidth: 3,
+    borderColor: colors.accent,
   },
   spineShadow: {
     position: 'absolute',
