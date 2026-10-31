@@ -50,13 +50,16 @@ export class JsonEducationLevelRepository implements IEducationLevelRepository {
 export class JsonArticleRepository implements IArticleRepository {
   private storage = new JsonStorage<Article>('articles.json');
 
-  async findAll(filters?: { educationLevelId?: string; activeOnly?: boolean; search?: string }): Promise<Article[]> {
+  async findAll(filters?: { educationLevelId?: string; educationSubLevel?: string; activeOnly?: boolean; search?: string }): Promise<Article[]> {
     let items = await this.storage.readAll();
     if (filters?.activeOnly) {
       items = items.filter((a) => a.active);
     }
     if (filters?.educationLevelId) {
       items = items.filter((a) => a.educationLevelId === filters.educationLevelId);
+    }
+    if (filters?.educationSubLevel) {
+      items = items.filter((a) => a.educationSubLevel === filters.educationSubLevel);
     }
     if (filters?.search) {
       const q = filters.search.toLowerCase();

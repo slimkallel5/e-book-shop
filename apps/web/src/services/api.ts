@@ -27,6 +27,7 @@ export interface ApiArticle {
   discountPrice?: number;
   stock?: number;
   educationLevelId: string;
+  educationSubLevel?: string;
   quarter?: 'Q1' | 'Q2' | 'Q3' | 'ALL_YEAR';
   posterUrl?: string;
   samplePdfUrl?: string;
@@ -103,6 +104,7 @@ export function articleToBook(article: ApiArticle, levelsMap: Map<string, ApiEdu
     price: article.price,
     discountPrice: article.discountPrice,
     educationLevel: edLevel,
+    educationSubLevel: article.educationSubLevel,
     levelName,
     quarter: mapQuarter(article.quarter),
     coverUrl: article.posterUrl || 'https://placehold.co/300x424/123B2B/FAF8F5?text=Cover',

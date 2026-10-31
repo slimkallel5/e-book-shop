@@ -81,6 +81,7 @@ model Article {
   stock            Int?
   educationLevelId String
   educationLevel   EducationLevel @relation(fields: [educationLevelId], references: [id])
+  educationSubLevel String?
   quarter          Quarter?
   posterUrl        String?
   samplePdfUrl     String?

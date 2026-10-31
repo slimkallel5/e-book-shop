@@ -16,7 +16,7 @@ export interface IEducationLevelRepository {
 }
 
 export interface IArticleRepository {
-  findAll(filters?: { educationLevelId?: string; activeOnly?: boolean; search?: string }): Promise<Article[]>;
+  findAll(filters?: { educationLevelId?: string; educationSubLevel?: string; activeOnly?: boolean; search?: string }): Promise<Article[]>;
   findById(id: string): Promise<Article | null>;
   create(data: Omit<Article, 'id' | 'createdAt' | 'updatedAt'>): Promise<Article>;
   update(id: string, data: Partial<Article>): Promise<Article | null>;

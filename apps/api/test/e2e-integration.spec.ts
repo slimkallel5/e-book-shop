@@ -101,7 +101,7 @@ describe('End-to-End User Journey & Security Integration Tests', () => {
     });
 
     // Search catalog
-    const searchResult = await artController.getAll(level1.id, undefined, 'الرياضيات');
+    const searchResult = await artController.getAll(level1.id, undefined, undefined, 'الرياضيات');
     expect(searchResult.length).toBe(1);
     expect(searchResult[0].sku).toBe('MATH-6-TN');
 

@@ -44,11 +44,13 @@ export class ArticlesController {
   @Get()
   async getAll(
     @Query('educationLevelId') educationLevelId?: string,
+    @Query('educationSubLevel') educationSubLevel?: string,
     @Query('activeOnly') activeOnly?: string,
     @Query('search') search?: string,
   ) {
     return this.articleRepo.findAll({
       educationLevelId,
+      educationSubLevel,
       activeOnly: activeOnly === 'true',
       search,
     });
@@ -83,6 +85,7 @@ export class ArticlesController {
       discountPrice: dto.discountPrice,
       stock: dto.stock,
       educationLevelId: dto.educationLevelId,
+      educationSubLevel: dto.educationSubLevel,
       quarter: dto.quarter,
       posterUrl: dto.posterUrl,
       samplePdfUrl: dto.samplePdfUrl,
