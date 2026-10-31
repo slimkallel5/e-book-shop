@@ -11,6 +11,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
+import { Select } from './ui/Select';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 
 export interface AdminArticle {
@@ -22,6 +23,7 @@ export interface AdminArticle {
   discountPrice?: number;
   stock?: number;
   educationLevelId: string;
+  educationSubLevel?: string;
   quarter?: 'Q1' | 'Q2' | 'Q3' | 'ALL_YEAR';
   posterUrl?: string;
   samplePdfUrl?: string;
@@ -29,6 +31,65 @@ export interface AdminArticle {
   publisher?: string;
   active: boolean;
 }
+
+export interface EducationLevelOption {
+  id: string;
+  category: 'primary' | 'middle' | 'secondary';
+  label: { ar: string; fr: string; en: string };
+  subLevels: Array<{
+    value: string;
+    label: { ar: string; fr: string; en: string };
+  }>;
+}
+
+export const EDUCATION_LEVEL_OPTIONS: EducationLevelOption[] = [
+  {
+    id: 'primary',
+    category: 'primary',
+    label: {
+      ar: 'التعليم الابتدائي',
+      fr: 'Enseignement Primaire',
+      en: 'Primary Education',
+    },
+    subLevels: [
+      { value: '1', label: { ar: 'السنة الأولى (1)', fr: '1ère Année (1)', en: '1st Grade (1)' } },
+      { value: '2', label: { ar: 'السنة الثانية (2)', fr: '2ème Année (2)', en: '2nd Grade (2)' } },
+      { value: '3', label: { ar: 'السنة الثالثة (3)', fr: '3ème Année (3)', en: '3rd Grade (3)' } },
+      { value: '4', label: { ar: 'السنة الرابعة (4)', fr: '4ème Année (4)', en: '4th Grade (4)' } },
+      { value: '5', label: { ar: 'السنة الخامسة (5)', fr: '5ème Année (5)', en: '5th Grade (5)' } },
+      { value: '6', label: { ar: 'السنة السادسة (6)', fr: '6ème Année (6)', en: '6th Grade (6)' } },
+    ],
+  },
+  {
+    id: 'middle',
+    category: 'middle',
+    label: {
+      ar: 'التعليم الإعدادي',
+      fr: 'Enseignement de Base / Collège',
+      en: 'Middle School',
+    },
+    subLevels: [
+      { value: '7', label: { ar: 'السنة السابعة أساسي (7)', fr: '7ème Année de Base (7)', en: '7th Grade (7)' } },
+      { value: '8', label: { ar: 'السنة الثامنة أساسي (8)', fr: '8ème Année de Base (8)', en: '8th Grade (8)' } },
+      { value: '9', label: { ar: 'السنة التاسعة أساسي (9)', fr: '9ème Année de Base (9)', en: '9th Grade (9)' } },
+    ],
+  },
+  {
+    id: 'secondary',
+    category: 'secondary',
+    label: {
+      ar: 'التعليم الثانوي',
+      fr: 'Enseignement Secondaire',
+      en: 'Secondary Education',
+    },
+    subLevels: [
+      { value: '1', label: { ar: 'السنة الأولى ثانوي (1)', fr: '1ère Année Secondaire (1)', en: '1st Year Secondary (1)' } },
+      { value: '2', label: { ar: 'السنة الثانية ثانوي (2)', fr: '2ème Année Secondaire (2)', en: '2nd Year Secondary (2)' } },
+      { value: '3', label: { ar: 'السنة الثالثة ثانوي (3)', fr: '3ème Année Secondaire (3)', en: '3rd Year Secondary (3)' } },
+      { value: '4', label: { ar: 'السنة الرابعة ثانوي / بكالوريا (4)', fr: '4ème Année / Baccalauréat (4)', en: '4th Year / Baccalaureate (4)' } },
+    ],
+  },
+];
 
 const INITIAL_ARTICLES: AdminArticle[] = [
   {
@@ -43,7 +104,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     price: 18.5,
     discountPrice: 15.0,
     stock: 120,
-    educationLevelId: 'primary-1',
+    educationLevelId: 'primary',
+    educationSubLevel: '1',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/math1.jpg',
     samplePdfUrl: '/assets/samples/math1.pdf',
@@ -62,7 +124,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     description: { ar: 'كتاب متكامل لتعلم الحروف والقراءة للسنوات الأولى' },
     price: 16.0,
     stock: 80,
-    educationLevelId: 'primary-1',
+    educationLevelId: 'primary',
+    educationSubLevel: '1',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/arabic1.jpg',
     samplePdfUrl: '/assets/samples/arabic1.pdf',
@@ -82,7 +145,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     price: 17.5,
     discountPrice: 14.5,
     stock: 65,
-    educationLevelId: 'primary-2',
+    educationLevelId: 'primary',
+    educationSubLevel: '2',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/math2.jpg',
     samplePdfUrl: '/assets/samples/math2.pdf',
@@ -101,7 +165,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     description: { ar: 'أنشطة استكشاف البيئة وجسم الإنسان والتجارب العلمية المبسطة' },
     price: 14.0,
     stock: 50,
-    educationLevelId: 'primary-2',
+    educationLevelId: 'primary',
+    educationSubLevel: '2',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/science2.jpg',
     samplePdfUrl: '/assets/samples/science2.pdf',
@@ -121,7 +186,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     price: 19.0,
     discountPrice: 16.0,
     stock: 70,
-    educationLevelId: 'primary-3',
+    educationLevelId: 'primary',
+    educationSubLevel: '3',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/math3.jpg',
     samplePdfUrl: '/assets/samples/math3.pdf',
@@ -140,7 +206,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     description: { ar: 'انطلاق تعلم اللغة الفرنسية: قراءة وحوارات وأنشطة كتابية أولى' },
     price: 18.0,
     stock: 60,
-    educationLevelId: 'primary-3',
+    educationLevelId: 'primary',
+    educationSubLevel: '3',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/french3.jpg',
     samplePdfUrl: '/assets/samples/french3.pdf',
@@ -160,7 +227,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     price: 19.5,
     discountPrice: 16.5,
     stock: 75,
-    educationLevelId: 'primary-4',
+    educationLevelId: 'primary',
+    educationSubLevel: '4',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/math4.jpg',
     samplePdfUrl: '/assets/samples/math4.pdf',
@@ -180,7 +248,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     price: 20.0,
     discountPrice: 17.0,
     stock: 80,
-    educationLevelId: 'primary-5',
+    educationLevelId: 'primary',
+    educationSubLevel: '5',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/math5.jpg',
     samplePdfUrl: '/assets/samples/math5.pdf',
@@ -199,7 +268,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     description: { ar: 'مدخل إلى المحادثة والمفردات وقواعد اللغة الإنجليزية للطور الابتدائي' },
     price: 17.5,
     stock: 55,
-    educationLevelId: 'primary-5',
+    educationLevelId: 'primary',
+    educationSubLevel: '5',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/english5.jpg',
     samplePdfUrl: '/assets/samples/english5.pdf',
@@ -219,7 +289,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     price: 21.0,
     discountPrice: 18.0,
     stock: 90,
-    educationLevelId: 'primary-6',
+    educationLevelId: 'primary',
+    educationSubLevel: '6',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/math6.jpg',
     samplePdfUrl: '/assets/samples/math6.pdf',
@@ -239,7 +310,8 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     price: 17.5,
     discountPrice: 15.0,
     stock: 70,
-    educationLevelId: 'primary-6',
+    educationLevelId: 'primary',
+    educationSubLevel: '6',
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/science6.jpg',
     samplePdfUrl: '/assets/samples/science6.pdf',
@@ -265,12 +337,38 @@ export const ArticleAdmin: React.FC = () => {
   const [priceStr, setPriceStr] = useState('');
   const [discountStr, setDiscountStr] = useState('');
   const [stockStr, setStockStr] = useState('');
-  const [educationLevelId, setEducationLevelId] = useState('primary-1');
+  const [educationLevelId, setEducationLevelId] = useState('primary');
+  const [educationSubLevel, setEducationSubLevel] = useState('1');
   const [quarter, setQuarter] = useState<'Q1' | 'Q2' | 'Q3' | 'ALL_YEAR'>('ALL_YEAR');
   const [posterUrl, setPosterUrl] = useState('');
   const [samplePdfUrl, setSamplePdfUrl] = useState('');
   const [active, setActive] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Handle Level Selection and auto-update Sub-level Options
+  const handleLevelChange = (levelId: string) => {
+    setEducationLevelId(levelId);
+    const selectedLevel = EDUCATION_LEVEL_OPTIONS.find((l) => l.id === levelId || l.category === levelId);
+    if (selectedLevel && selectedLevel.subLevels.length > 0) {
+      setEducationSubLevel(selectedLevel.subLevels[0].value);
+    } else {
+      setEducationSubLevel('');
+    }
+  };
+
+  const currentLevelOption = EDUCATION_LEVEL_OPTIONS.find(
+    (l) => l.id === educationLevelId || l.category === educationLevelId,
+  ) || EDUCATION_LEVEL_OPTIONS[0];
+
+  const levelSelectOptions = EDUCATION_LEVEL_OPTIONS.map((l) => ({
+    value: l.id,
+    label: l.label[language] || l.label.ar,
+  }));
+
+  const subLevelSelectOptions = (currentLevelOption?.subLevels || []).map((sl) => ({
+    value: sl.value,
+    label: sl.label[language] || sl.label.ar,
+  }));
 
   const openModal = (article?: AdminArticle) => {
     setErrorMessage('');
@@ -284,7 +382,20 @@ export const ArticleAdmin: React.FC = () => {
       setPriceStr(article.price.toString());
       setDiscountStr(article.discountPrice?.toString() || '');
       setStockStr(article.stock !== undefined ? article.stock.toString() : '');
-      setEducationLevelId(article.educationLevelId);
+
+      const normalizedLevel = article.educationLevelId.startsWith('primary')
+        ? 'primary'
+        : article.educationLevelId.startsWith('middle')
+        ? 'middle'
+        : article.educationLevelId.startsWith('sec')
+        ? 'secondary'
+        : article.educationLevelId;
+      setEducationLevelId(normalizedLevel);
+
+      const matchedLevel = EDUCATION_LEVEL_OPTIONS.find((l) => l.id === normalizedLevel);
+      const defaultSub = article.educationSubLevel || (matchedLevel?.subLevels[0]?.value ?? '1');
+      setEducationSubLevel(defaultSub);
+
       setQuarter(article.quarter || 'ALL_YEAR');
       setPosterUrl(article.posterUrl || '');
       setSamplePdfUrl(article.samplePdfUrl || '');
@@ -299,7 +410,8 @@ export const ArticleAdmin: React.FC = () => {
       setPriceStr('');
       setDiscountStr('');
       setStockStr('');
-      setEducationLevelId('primary-1');
+      setEducationLevelId('primary');
+      setEducationSubLevel('1');
       setQuarter('ALL_YEAR');
       setPosterUrl('');
       setSamplePdfUrl('');
@@ -348,6 +460,7 @@ export const ArticleAdmin: React.FC = () => {
       discountPrice,
       stock,
       educationLevelId,
+      educationSubLevel: educationSubLevel || undefined,
       quarter,
       posterUrl: posterUrl || undefined,
       samplePdfUrl: samplePdfUrl || undefined,
@@ -420,6 +533,18 @@ export const ArticleAdmin: React.FC = () => {
                     label={art.active ? t('admin.active') : t('admin.inactive')}
                     variant={art.active ? 'primary' : 'discount'}
                   />
+                  {art.educationSubLevel && (
+                    <Badge
+                      label={
+                        art.educationLevelId === 'primary' || art.educationLevelId.startsWith('primary')
+                          ? `سنة ${art.educationSubLevel} ابتدائي`
+                          : art.educationLevelId === 'middle' || art.educationLevelId.startsWith('middle')
+                          ? `سنة ${art.educationSubLevel} أساسي`
+                          : `سنة ${art.educationSubLevel} ثانوي`
+                      }
+                      variant="primary"
+                    />
+                  )}
                   {art.quarter && (
                     <Badge label={art.quarter} variant="secondary" />
                   )}
@@ -523,6 +648,24 @@ export const ArticleAdmin: React.FC = () => {
             onChangeText={setStockStr}
             keyboardType="numeric"
             placeholder="100"
+          />
+
+          {/* Education Level Dropdown */}
+          <Select
+            label={t('admin.educationLevelLabel')}
+            options={levelSelectOptions}
+            value={educationLevelId}
+            onChange={handleLevelChange}
+            placeholder={t('admin.selectEducationLevelPlaceholder')}
+          />
+
+          {/* Education Sub-Level (Academic Year) Dropdown */}
+          <Select
+            label={t('admin.educationSubLevelLabel')}
+            options={subLevelSelectOptions}
+            value={educationSubLevel}
+            onChange={setEducationSubLevel}
+            placeholder={t('admin.selectEducationSubLevelPlaceholder')}
           />
 
           <Text style={styles.fieldLabel}>الثلاثي / الفترة:</Text>

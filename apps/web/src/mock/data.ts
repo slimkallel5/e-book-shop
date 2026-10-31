@@ -9,6 +9,7 @@ export interface Book {
   price: number;
   discountPrice?: number;
   educationLevel: 'primary' | 'middle' | 'secondary';
+  educationSubLevel?: string;
   levelName: {
     ar: string;
     fr: string;
@@ -131,6 +132,7 @@ export const MOCK_BOOKS: Book[] = [
     price: 18.5,
     discountPrice: 15.0,
     educationLevel: 'primary',
+    educationSubLevel: '1',
     levelName: {
       ar: 'السنة 1 ابتدائي',
       fr: '1ère Primaire',
@@ -188,6 +190,7 @@ export const MOCK_BOOKS: Book[] = [
     price: 17.5,
     discountPrice: 14.5,
     educationLevel: 'primary',
+    educationSubLevel: '2',
     levelName: {
       ar: 'السنة 2 ابتدائي',
       fr: '2ème Primaire',
@@ -245,6 +248,7 @@ export const MOCK_BOOKS: Book[] = [
     price: 19.0,
     discountPrice: 16.0,
     educationLevel: 'primary',
+    educationSubLevel: '3',
     levelName: {
       ar: 'السنة 3 ابتدائي',
       fr: '3ème Primaire',
@@ -302,6 +306,7 @@ export const MOCK_BOOKS: Book[] = [
     price: 19.5,
     discountPrice: 16.5,
     educationLevel: 'primary',
+    educationSubLevel: '4',
     levelName: {
       ar: 'السنة 4 ابتدائي',
       fr: '4ème Primaire',
@@ -331,6 +336,7 @@ export const MOCK_BOOKS: Book[] = [
     price: 20.0,
     discountPrice: 17.0,
     educationLevel: 'primary',
+    educationSubLevel: '5',
     levelName: {
       ar: 'السنة 5 ابتدائي',
       fr: '5ème Primaire',
@@ -388,6 +394,7 @@ export const MOCK_BOOKS: Book[] = [
     price: 21.0,
     discountPrice: 18.0,
     educationLevel: 'primary',
+    educationSubLevel: '6',
     levelName: {
       ar: 'السنة 6 ابتدائي',
       fr: '6ème Primaire',
@@ -445,6 +452,7 @@ export const MOCK_BOOKS: Book[] = [
     author: 'أستاذ خبير بالتأليف',
     price: 18.0,
     educationLevel: 'middle',
+    educationSubLevel: '9',
     levelName: {
       ar: 'السنة 9 أساسي',
       fr: '9ème Base',
@@ -477,6 +485,7 @@ export const MOCK_BOOKS: Book[] = [
     price: 22.0,
     discountPrice: 19.5,
     educationLevel: 'secondary',
+    educationSubLevel: '4',
     levelName: {
       ar: 'البكالوريا - جميع الشعب',
       fr: 'Baccalauréat Toutes Sections',
@@ -508,6 +517,7 @@ export const MOCK_BOOKS: Book[] = [
     price: 35.0,
     discountPrice: 28.0,
     educationLevel: 'primary',
+    educationSubLevel: '6',
     levelName: {
       ar: 'السنة 6 ابتدائي',
       fr: '6ème Primaire',

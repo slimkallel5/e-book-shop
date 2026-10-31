@@ -140,10 +140,11 @@ export class PostgresUserRepository implements IUserRepository {
 export class PostgresArticleRepository implements IArticleRepository {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(filters?: { educationLevelId?: string; activeOnly?: boolean; search?: string }): Promise<Article[]> {
+  async findAll(filters?: { educationLevelId?: string; educationSubLevel?: string; activeOnly?: boolean; search?: string }): Promise<Article[]> {
     const where: any = {};
     if (filters?.activeOnly) where.active = true;
     if (filters?.educationLevelId) where.educationLevelId = filters.educationLevelId;
+    if (filters?.educationSubLevel) where.educationSubLevel = filters.educationSubLevel;
     if (filters?.search) {
       where.OR = [
         { nameAr: { contains: filters.search, mode: 'insensitive' } },
@@ -164,6 +165,7 @@ export class PostgresArticleRepository implements IArticleRepository {
       discountPrice: item.discountPrice ? Number(item.discountPrice) : undefined,
       stock: item.stock !== null ? item.stock : undefined,
       educationLevelId: item.educationLevelId,
+      educationSubLevel: item.educationSubLevel || undefined,
       quarter: item.quarter ? (item.quarter as any) : undefined,
       posterUrl: item.posterUrl || undefined,
       samplePdfUrl: item.samplePdfUrl || undefined,
@@ -214,6 +216,7 @@ export class PostgresArticleRepository implements IArticleRepository {
         discountPrice: data.discountPrice,
         stock: data.stock,
         educationLevelId: data.educationLevelId,
+        educationSubLevel: data.educationSubLevel,
         quarter: data.quarter as any,
         posterUrl: data.posterUrl,
         samplePdfUrl: data.samplePdfUrl,
@@ -242,6 +245,7 @@ export class PostgresArticleRepository implements IArticleRepository {
     if (data.discountPrice !== undefined) updateData.discountPrice = data.discountPrice;
     if (data.stock !== undefined) updateData.stock = data.stock;
     if (data.educationLevelId !== undefined) updateData.educationLevelId = data.educationLevelId;
+    if (data.educationSubLevel !== undefined) updateData.educationSubLevel = data.educationSubLevel;
     if (data.quarter !== undefined) updateData.quarter = data.quarter;
     if (data.posterUrl !== undefined) updateData.posterUrl = data.posterUrl;
     if (data.samplePdfUrl !== undefined) updateData.samplePdfUrl = data.samplePdfUrl;

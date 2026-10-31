@@ -23,7 +23,8 @@
     "active": true,
     "id": "art_1793180880750_cjj24",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "1"
   },
   {
     "sku": "ARAB-P1",
@@ -48,7 +49,8 @@
     "active": true,
     "id": "art_1793180880750_8w4jo",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "1"
   },
   {
     "sku": "MATH-P2",
@@ -74,7 +76,8 @@
     "active": true,
     "id": "art_1793180880750_mth02",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "2"
   },
   {
     "sku": "ARAB-P2",
@@ -99,7 +102,8 @@
     "active": true,
     "id": "art_1793180880750_arb02",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "2"
   },
   {
     "sku": "SCI-P2",
@@ -113,7 +117,7 @@
       "fr": "Activités d'exploration de l'environnement et du corps humain",
       "en": "Exploration of nature, science, and the human body"
     },
-    "price": 14.0,
+    "price": 14,
     "stock": 35,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -124,7 +128,8 @@
     "active": true,
     "id": "art_1793180880750_sci02",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "2"
   },
   {
     "sku": "MATH-P3",
@@ -138,8 +143,8 @@
       "fr": "Opérations de calcul, géométrie et résolution de problèmes",
       "en": "Basic mathematical operations, geometry and problem solving"
     },
-    "price": 19.0,
-    "discountPrice": 16.0,
+    "price": 19,
+    "discountPrice": 16,
     "stock": 50,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -150,7 +155,8 @@
     "active": true,
     "id": "art_1793180880750_mth03",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "3"
   },
   {
     "sku": "FRAN-P3",
@@ -164,7 +170,7 @@
       "fr": "Initiation à la langue française: lecture, phonétique et dialogue",
       "en": "Introductory French language: phonetics, reading and conversations"
     },
-    "price": 18.0,
+    "price": 18,
     "stock": 45,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -175,7 +181,8 @@
     "active": true,
     "id": "art_1793180880750_frn03",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "3"
   },
   {
     "sku": "SCI-P3",
@@ -189,7 +196,7 @@
       "fr": "Sciences de la vie et de la terre: respiration, alimentation et matière",
       "en": "Life and earth sciences: respiration, nutrition and matter"
     },
-    "price": 15.0,
+    "price": 15,
     "stock": 35,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -200,7 +207,8 @@
     "active": true,
     "id": "art_1793180880750_sci03",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "3"
   },
   {
     "sku": "MATH-P4",
@@ -226,7 +234,8 @@
     "active": true,
     "id": "art_1793180880750_mth04",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "4"
   },
   {
     "sku": "ARAB-P4",
@@ -240,7 +249,7 @@
       "fr": "Textes littéraires choisis, grammaire et exercices d'expression",
       "en": "Selected literary texts, grammar rules, and composition exercises"
     },
-    "price": 17.0,
+    "price": 17,
     "stock": 40,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -251,7 +260,8 @@
     "active": true,
     "id": "art_1793180880750_arb04",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "4"
   },
   {
     "sku": "FRAN-P4",
@@ -276,7 +286,8 @@
     "active": true,
     "id": "art_1793180880750_frn04",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "4"
   },
   {
     "sku": "MATH-P5",
@@ -290,8 +301,8 @@
       "fr": "Fractions, nombres décimaux, pourcentages et calcul d'aires",
       "en": "Fractions, decimals, percentages, and area calculations"
     },
-    "price": 20.0,
-    "discountPrice": 17.0,
+    "price": 20,
+    "discountPrice": 17,
     "stock": 50,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -302,7 +313,8 @@
     "active": true,
     "id": "art_1793180880750_mth05",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "5"
   },
   {
     "sku": "SCI-P5",
@@ -316,7 +328,7 @@
       "fr": "Énergie, électricité, écosystèmes et biologie humaine",
       "en": "Energy, electricity, ecosystems and human physiology"
     },
-    "price": 16.0,
+    "price": 16,
     "stock": 38,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -327,7 +339,8 @@
     "active": true,
     "id": "art_1793180880750_sci05",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "5"
   },
   {
     "sku": "ENG-P5",
@@ -352,7 +365,8 @@
     "active": true,
     "id": "art_1793180880750_eng05",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "5"
   },
   {
     "sku": "MATH-P6",
@@ -366,8 +380,8 @@
       "fr": "Préparation complète au concours d'accès aux collèges pilotes",
       "en": "Comprehensive preparation guide for 6th grade pilot entrance exam"
     },
-    "price": 21.0,
-    "discountPrice": 18.0,
+    "price": 21,
+    "discountPrice": 18,
     "stock": 60,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -378,7 +392,8 @@
     "active": true,
     "id": "art_1793180880750_mth06",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "6"
   },
   {
     "sku": "ARAB-P6",
@@ -403,7 +418,8 @@
     "active": true,
     "id": "art_1793180880750_arb06",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "6"
   },
   {
     "sku": "SCI-P6",
@@ -418,7 +434,7 @@
       "en": "Physical and natural sciences with exam-oriented problems"
     },
     "price": 17.5,
-    "discountPrice": 15.0,
+    "discountPrice": 15,
     "stock": 40,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -429,7 +445,8 @@
     "active": true,
     "id": "art_1793180880750_sci06",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "6"
   },
   {
     "sku": "FRAN-P6",
@@ -443,7 +460,7 @@
       "fr": "Compréhension de l'écrit, grammaire approfondie et production écrite",
       "en": "Reading comprehension, in-depth grammar and written composition"
     },
-    "price": 19.0,
+    "price": 19,
     "stock": 45,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -454,7 +471,8 @@
     "active": true,
     "id": "art_1793180880750_frn06",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "6"
   },
   {
     "sku": "ENG-P6",
@@ -468,7 +486,7 @@
       "fr": "Développement des compétences orales et écrites en anglais",
       "en": "Development of listening, speaking and writing skills in English"
     },
-    "price": 18.0,
+    "price": 18,
     "stock": 40,
     "educationLevelId": "ed_1793180880749_a0mwr",
     "quarter": "ALL_YEAR",
@@ -479,6 +497,7 @@
     "active": true,
     "id": "art_1793180880750_eng06",
     "createdAt": "2026-10-28T09:48:00.750Z",
-    "updatedAt": "2026-10-28T09:48:00.750Z"
+    "updatedAt": "2026-10-28T09:48:00.750Z",
+    "educationSubLevel": "6"
   }
 ]

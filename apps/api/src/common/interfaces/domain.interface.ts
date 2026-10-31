@@ -26,6 +26,7 @@ export interface Article {
   discountPrice?: number;
   stock?: number;
   educationLevelId: string;
+  educationSubLevel?: string;
   quarter?: 'Q1' | 'Q2' | 'Q3' | 'ALL_YEAR';
   posterUrl?: string;
   samplePdfUrl?: string;

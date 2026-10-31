@@ -66,6 +66,11 @@ export class CreateArticleDto {
   @IsString()
   educationLevelId!: string;
 
+  @ApiPropertyOptional({ description: 'Education sub-level / academic year e.g. 1 to 6' })
+  @IsOptional()
+  @IsString()
+  educationSubLevel?: string;
+
   @ApiPropertyOptional({ enum: ['Q1', 'Q2', 'Q3', 'ALL_YEAR'] })
   @IsOptional()
   @IsEnum(['Q1', 'Q2', 'Q3', 'ALL_YEAR'])

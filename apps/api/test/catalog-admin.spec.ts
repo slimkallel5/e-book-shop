@@ -70,6 +70,7 @@ describe('Catalog Admin Business Rules & Validation Tests', () => {
       price: 15.5,
       discountPrice: 12.0,
       educationLevelId: level.id,
+      educationSubLevel: '3',
       quarter: 'Q1',
       active: true,
     });
@@ -77,14 +78,17 @@ describe('Catalog Admin Business Rules & Validation Tests', () => {
     expect(article.id).toBeDefined();
     expect(article.price).toBe(15.5);
     expect(article.discountPrice).toBe(12.0);
+    expect(article.educationSubLevel).toBe('3');
 
     const updated = await articlesController.update(article.id, {
       price: 18.0,
       discountPrice: 14.0,
+      educationSubLevel: '4',
     });
 
     expect(updated?.price).toBe(18.0);
     expect(updated?.discountPrice).toBe(14.0);
+    expect(updated?.educationSubLevel).toBe('4');
 
     const deleteRes = await articlesController.delete(article.id);
     expect(deleteRes.success).toBe(true);
