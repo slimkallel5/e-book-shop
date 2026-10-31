@@ -8,7 +8,6 @@ import {
   Platform,
 } from 'react-native';
 import {
-  Eye,
   ShoppingCart,
   ChevronLeft,
   ChevronRight,
@@ -135,8 +134,13 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
                       : [{ scale }],
                   },
                 ]}
-                onPress={() => setSelectedIndex(idx)}
+                onPress={() => {
+                  setSelectedIndex(idx);
+                  onPreviewBook(book);
+                }}
                 activeOpacity={0.9}
+                accessibilityRole="button"
+                accessibilityLabel={title}
               >
                 <Image source={{ uri: book.coverUrl }} style={styles.coverImage} resizeMode="cover" />
 
@@ -212,20 +216,12 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
 
               <View style={[styles.btnRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                 <Button
-                  title={t('app.previewBook')}
-                  icon={<Eye size={16} color={colors.primary} />}
-                  tooltip={t('app.previewBook')}
-                  onPress={() => onPreviewBook(activeBook)}
-                  variant="outline"
-                  size="sm"
-                />
-                <Button
                   title={t('app.addToCart')}
                   icon={<ShoppingCart size={16} color={colors.textLight} />}
                   tooltip={t('app.addToCart')}
                   onPress={() => addToCart(activeBook)}
                   variant="primary"
-                  size="sm"
+                  size="md"
                 />
               </View>
             </View>

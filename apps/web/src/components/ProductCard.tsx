@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native';
-import { ShoppingCart, Eye, Heart, Star, GraduationCap } from 'lucide-react-native';
+import { ShoppingCart, Heart, Star, GraduationCap } from 'lucide-react-native';
 import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { useStore } from '../context/StoreContext';
@@ -34,7 +34,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
 
   return (
     <View style={[styles.card3DWrapper, prefersReducedMotion && { transform: [] }]}>
-      <View style={styles.cardContainer}>
+      <TouchableOpacity
+        style={styles.cardContainer}
+        onPress={() => onPreview(book)}
+        activeOpacity={0.92}
+        accessibilityRole="button"
+        accessibilityLabel={title}
+      >
         {/* Cover Image Wrapper with A4 Aspect Ratio and 3D Spine Shadow */}
         <View style={styles.coverWrapper}>
           <Image
@@ -62,7 +68,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
           <Tooltip content={favorited ? t('app.favourites') : t('app.favourites')}>
             <TouchableOpacity
               style={[styles.favBtn, isRTL ? { left: 8 } : { right: 8 }]}
-              onPress={() => toggleFavourite(book.id)}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                toggleFavourite(book.id);
+              }}
               activeOpacity={0.8}
               accessibilityLabel={t('app.favourites')}
             >
@@ -71,19 +80,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
                 color={favorited ? colors.error : colors.textMuted}
                 fill={favorited ? colors.error : 'transparent'}
               />
-            </TouchableOpacity>
-          </Tooltip>
-
-          {/* Quick Preview Hover Overlay / Button with Lucide Icon and Tooltip */}
-          <Tooltip content={t('app.previewBook')}>
-            <TouchableOpacity
-              style={styles.previewOverlayBtn}
-              onPress={() => onPreview(book)}
-              activeOpacity={0.85}
-              accessibilityLabel={t('app.previewBook')}
-            >
-              <Eye size={18} color={colors.textLight} style={styles.previewBtnIcon} />
-              <Text style={styles.previewBtnText}>{t('app.previewBook')}</Text>
             </TouchableOpacity>
           </Tooltip>
         </View>
@@ -143,7 +139,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
             style={styles.cartBtn}
           />
         </View>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };
