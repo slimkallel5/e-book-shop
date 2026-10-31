@@ -7,10 +7,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  Star,
+  RefreshCw,
+  User,
+  Calendar,
+  EyeOff,
+  CheckCircle2,
+} from 'lucide-react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
+import { Tooltip } from './ui/Tooltip';
 
 export interface AdminReview {
   id: string;
@@ -107,15 +116,22 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
       {/* Top Header */}
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View>
-          <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-            ⭐ {t('admin.reviewsManagementTitle')}
-          </Text>
+          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+            <Star size={22} color={colors.accent} fill={colors.accent} />
+            <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('admin.reviewsManagementTitle')}
+            </Text>
+          </View>
           <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.reviewsManagementSub')}
           </Text>
         </View>
-        <TouchableOpacity style={styles.refreshBtn} onPress={fetchReviews}>
-          <Text style={styles.refreshBtnText}>🔄 {t('admin.refresh')}</Text>
+        <TouchableOpacity
+          style={[styles.refreshBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+          onPress={fetchReviews}
+        >
+          <RefreshCw size={14} color={colors.primary} />
+          <Text style={styles.refreshBtnText}>{t('admin.refresh')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -149,7 +165,10 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
               <View key={rev.id} style={styles.card}>
                 <View style={[styles.cardHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <View>
-                    <Text style={styles.authorName}>👤 {rev.authorName}</Text>
+                    <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
+                      <User size={15} color={colors.primary} />
+                      <Text style={styles.authorName}>{rev.authorName}</Text>
+                    </View>
                     <Text style={styles.starsText}>{renderStars(rev.rating)} ({rev.rating}/5)</Text>
                   </View>
                   <Badge
@@ -163,18 +182,25 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
                 </Text>
 
                 <View style={[styles.cardFooter, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  <Text style={styles.dateText}>
-                    📅 {new Date(rev.createdAt).toLocaleDateString()} {rev.articleId ? `| ${t('admin.bookId')}: ${rev.articleId}` : `| ${t('admin.storeReview')}`}
-                  </Text>
-
-                  <TouchableOpacity
-                    style={[styles.actionBtn, rev.published ? styles.hideBtn : styles.publishBtn]}
-                    onPress={() => togglePublish(rev.id, rev.published)}
-                  >
-                    <Text style={[styles.actionBtnText, rev.published ? styles.hideBtnText : styles.publishBtnText]}>
-                      {rev.published ? `👁️‍🗨️ ${t('admin.hide')}` : `✅ ${t('admin.approveAndPublish')}`}
+                  <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}>
+                    <Calendar size={13} color={colors.textMuted} />
+                    <Text style={styles.dateText}>
+                      {new Date(rev.createdAt).toLocaleDateString()} {rev.articleId ? `| ${t('admin.bookId')}: ${rev.articleId}` : `| ${t('admin.storeReview')}`}
                     </Text>
-                  </TouchableOpacity>
+                  </View>
+
+                  <Tooltip content={rev.published ? t('admin.hide') : t('admin.approveAndPublish')}>
+                    <TouchableOpacity
+                      style={[styles.actionBtn, rev.published ? styles.hideBtn : styles.publishBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+                      onPress={() => togglePublish(rev.id, rev.published)}
+                      accessibilityLabel={rev.published ? t('admin.hide') : t('admin.approveAndPublish')}
+                    >
+                      {rev.published ? <EyeOff size={14} color="#6B7280" /> : <CheckCircle2 size={14} color="#FFFFFF" />}
+                      <Text style={[styles.actionBtnText, rev.published ? styles.hideBtnText : styles.publishBtnText]}>
+                        {rev.published ? t('admin.hide') : t('admin.approveAndPublish')}
+                      </Text>
+                    </TouchableOpacity>
+                  </Tooltip>
                 </View>
               </View>
             ))

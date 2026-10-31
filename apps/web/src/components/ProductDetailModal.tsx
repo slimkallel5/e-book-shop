@@ -8,6 +8,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  ShoppingCart,
+  FileText,
+  Heart,
+  Star,
+  CheckCircle2,
+  AlertCircle,
+} from 'lucide-react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { useStore } from '../context/StoreContext';
 import { Book } from '../mock/data';
@@ -16,6 +24,7 @@ import { colors, layout, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
+import { Tooltip } from './ui/Tooltip';
 
 interface ProductDetailModalProps {
   book: Book | null;
@@ -126,13 +135,20 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           <View style={styles.detailsContent}>
             <View style={[styles.titleRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>{title}</Text>
-              <TouchableOpacity
-                onPress={() => toggleFavourite(book.id)}
-                style={styles.favBtn}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.favIcon}>{isFav ? '❤️' : '🤍'}</Text>
-              </TouchableOpacity>
+              <Tooltip content={isFav ? t('app.favourites') : t('app.favourites')}>
+                <TouchableOpacity
+                  onPress={() => toggleFavourite(book.id)}
+                  style={styles.favBtn}
+                  activeOpacity={0.7}
+                  accessibilityLabel={t('app.favourites')}
+                >
+                  <Heart
+                    size={20}
+                    color={isFav ? colors.error : colors.textMuted}
+                    fill={isFav ? colors.error : 'transparent'}
+                  />
+                </TouchableOpacity>
+              </Tooltip>
             </View>
 
             {book.author && (
@@ -175,10 +191,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </Text>
             </View>
 
-            {/* Action Buttons */}
+            {/* Action Buttons with Lucide Icons and Tooltips */}
             <View style={[styles.actionRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Button
                 title={t('app.addToCart')}
+                icon={<ShoppingCart size={18} color={colors.primaryDark} />}
+                tooltip={t('app.addToCart')}
                 onPress={handleAddToCart}
                 disabled={!book.inStock}
                 variant="accent"
@@ -187,6 +205,8 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               {book.samplePages && book.samplePages.length > 0 && onPreviewBook && (
                 <Button
                   title={t('app.previewSample')}
+                  icon={<FileText size={18} color={colors.textLight} />}
+                  tooltip={t('app.previewSample')}
                   onPress={() => {
                     onClose();
                     onPreviewBook(book);
@@ -213,27 +233,40 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
         {/* Customer Review Submission Form */}
         <View style={styles.sectionBlock}>
-          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            ⭐ {t('app.addReviewTitle')}
-          </Text>
+          <View style={[styles.sectionTitleRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+            <Star size={18} color={colors.accent} fill={colors.accent} />
+            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('app.addReviewTitle')}
+            </Text>
+          </View>
 
           {reviewSuccess ? (
             <View style={styles.reviewSuccessBox}>
-              <Text style={styles.reviewSuccessText}>
-                ✅ {t('app.reviewSuccess')}
-              </Text>
+              <View style={[styles.successRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <CheckCircle2 size={18} color="#059669" />
+                <Text style={styles.reviewSuccessText}>
+                  {t('app.reviewSuccess')}
+                </Text>
+              </View>
             </View>
           ) : (
             <View style={styles.reviewForm}>
               {reviewError ? (
-                <Text style={styles.reviewErrorText}>⚠️ {reviewError}</Text>
+                <View style={[styles.errorRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <AlertCircle size={16} color="#D32F2F" />
+                  <Text style={styles.reviewErrorText}>{reviewError}</Text>
+                </View>
               ) : null}
 
               <Text style={styles.fieldLabel}>{t('app.reviews')}:</Text>
               <View style={styles.starRow}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <TouchableOpacity key={star} onPress={() => setReviewRating(star)}>
-                    <Text style={styles.starIcon}>{star <= reviewRating ? '⭐' : '☆'}</Text>
+                    <Star
+                      size={24}
+                      color={colors.secondary}
+                      fill={star <= reviewRating ? colors.secondary : 'transparent'}
+                    />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -257,6 +290,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <Button
                 title={reviewSubmitting ? t('app.submitting') : t('app.submitReview')}
                 onPress={handleReviewSubmit}
+                tooltip={t('app.submitReview')}
                 variant="accent"
                 size="sm"
                 disabled={reviewSubmitting}
@@ -332,7 +366,7 @@ const styles = StyleSheet.create({
   },
   coverWrapper: {
     width: 160,
-    height: 226, // Aspect ratio ~ 1:1.414
+    height: 226,
     position: 'relative',
     backgroundColor: colors.background,
     borderRadius: layout.borderRadius.md,
@@ -367,9 +401,6 @@ const styles = StyleSheet.create({
   },
   favBtn: {
     padding: 4,
-  },
-  favIcon: {
-    fontSize: 20,
   },
   author: {
     fontSize: typography.fontSize.sm,
@@ -412,6 +443,10 @@ const styles = StyleSheet.create({
     paddingTop: 14,
     gap: 8,
   },
+  sectionTitleRow: {
+    alignItems: 'center',
+    gap: 6,
+  },
   sectionTitle: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
@@ -427,6 +462,10 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: layout.borderRadius.md,
   },
+  successRow: {
+    alignItems: 'center',
+    gap: 8,
+  },
   reviewSuccessText: {
     color: '#059669',
     fontSize: typography.fontSize.xs,
@@ -434,6 +473,10 @@ const styles = StyleSheet.create({
   },
   reviewForm: {
     gap: 8,
+  },
+  errorRow: {
+    alignItems: 'center',
+    gap: 6,
   },
   reviewErrorText: {
     color: '#D32F2F',
@@ -445,11 +488,7 @@ const styles = StyleSheet.create({
   },
   starRow: {
     flexDirection: 'row',
-    gap: 6,
-  },
-  starIcon: {
-    fontSize: 22,
-    color: colors.secondary,
+    gap: 8,
   },
   reviewInput: {
     backgroundColor: colors.cardBg,

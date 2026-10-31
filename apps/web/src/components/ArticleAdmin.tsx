@@ -8,9 +8,19 @@ import {
   TextInput,
 } from 'react-native';
 import { useLanguage } from '../context/LanguageContext';
+import {
+  Package,
+  Plus,
+  Pencil,
+  Trash2,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+} from 'lucide-react-native';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
+import { Tooltip } from './ui/Tooltip';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 
 export interface AdminArticle {
@@ -382,15 +392,20 @@ export const ArticleAdmin: React.FC = () => {
       {/* Top Header & Actions */}
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View style={styles.titleGroup}>
-          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            📦 {t('admin.articlesManagementTitle')}
-          </Text>
+          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+            <Package size={22} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('admin.articlesManagementTitle')}
+            </Text>
+          </View>
           <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.articlesManagementSub')}
           </Text>
         </View>
         <Button
-          title={`➕ ${t('admin.addNewArticle')}`}
+          title={t('admin.addNewArticle')}
+          icon={<Plus size={18} color={colors.primaryDark} />}
+          tooltip={t('admin.addNewArticle')}
           onPress={() => openModal()}
           variant="accent"
           size="md"
@@ -444,18 +459,26 @@ export const ArticleAdmin: React.FC = () => {
 
             {/* Actions Footer */}
             <View style={[styles.cardActions, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <TouchableOpacity
-                style={styles.editBtn}
-                onPress={() => openModal(art)}
-              >
-                <Text style={styles.editBtnText}>✏️ تعديل</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.deleteBtn}
-                onPress={() => handleDelete(art.id)}
-              >
-                <Text style={styles.deleteBtnText}>🗑 حذف</Text>
-              </TouchableOpacity>
+              <Tooltip content={t('admin.edit')}>
+                <TouchableOpacity
+                  style={[styles.editBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+                  onPress={() => openModal(art)}
+                  accessibilityLabel={t('admin.edit')}
+                >
+                  <Pencil size={14} color={colors.primary} />
+                  <Text style={styles.editBtnText}>{t('admin.edit')}</Text>
+                </TouchableOpacity>
+              </Tooltip>
+              <Tooltip content={t('admin.delete')}>
+                <TouchableOpacity
+                  style={[styles.deleteBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+                  onPress={() => handleDelete(art.id)}
+                  accessibilityLabel={t('admin.delete')}
+                >
+                  <Trash2 size={14} color={colors.error} />
+                  <Text style={styles.deleteBtnText}>{t('admin.delete')}</Text>
+                </TouchableOpacity>
+              </Tooltip>
             </View>
           </View>
         ))}
@@ -469,8 +492,9 @@ export const ArticleAdmin: React.FC = () => {
       >
         <ScrollView style={styles.formScroll}>
           {errorMessage ? (
-            <View style={styles.errorBanner}>
-              <Text style={styles.errorText}>⚠️ {errorMessage}</Text>
+            <View style={[styles.errorBanner, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+              <AlertCircle size={16} color="#D32F2F" />
+              <Text style={styles.errorText}>{errorMessage}</Text>
             </View>
           ) : null}
 
@@ -557,16 +581,18 @@ export const ArticleAdmin: React.FC = () => {
           />
 
           <TouchableOpacity
-            style={[styles.toggleBtn, active && styles.toggleBtnActive]}
+            style={[styles.toggleBtn, active && styles.toggleBtnActive, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}
             onPress={() => setActive(!active)}
           >
+            {active ? <CheckCircle2 size={16} color="#059669" /> : <XCircle size={16} color="#DC2626" />}
             <Text style={styles.toggleText}>
-              الحالة: {active ? '✅ مفعل للبيع' : '❌ معطل'}
+              {t('admin.status')}: {active ? t('admin.statusEnabled') : t('admin.statusDisabled')}
             </Text>
           </TouchableOpacity>
 
           <Button
-            title={editingArticle ? 'حفظ التغييرات' : 'إضافة الكتاب'}
+            title={editingArticle ? t('admin.saveChanges') : t('admin.addArticleBtn')}
+            tooltip={editingArticle ? t('admin.saveChanges') : t('admin.addArticleBtn')}
             onPress={handleSave}
             variant="accent"
             size="lg"

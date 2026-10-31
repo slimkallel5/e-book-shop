@@ -10,9 +10,24 @@ import {
 } from 'react-native';
 import { LanguageProvider, useLanguage } from './src/context/LanguageContext';
 import { StoreProvider, useStore } from './src/context/StoreContext';
+import {
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  BarChart3,
+  ShoppingCart,
+  Package,
+  Gift,
+  Star,
+  Mail,
+  Plus,
+  Minus,
+  Trash2,
+} from 'lucide-react-native';
 import { Header, Footer } from './src/components/Header';
 import { Bookshelf, NavCategory } from './src/components/Bookshelf';
 import { ProductCard } from './src/components/ProductCard';
+import { Tooltip } from './src/components/ui/Tooltip';
 import { BookViewer } from './src/components/BookViewer';
 import { ProductDetailModal } from './src/components/ProductDetailModal';
 import { ArticleAdmin } from './src/components/ArticleAdmin';
@@ -130,9 +145,13 @@ function StorefrontContent() {
                 onPress={() => setMobileMenuOpen(!mobileMenuOpen)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.triggerIcon}>📚</Text>
+                <BookOpen size={20} color={colors.textLight} />
                 <Text style={styles.triggerText}>{t('app.menuToggle')}</Text>
-                <Text style={styles.triggerArrow}>{mobileMenuOpen ? '▲' : '▼'}</Text>
+                {mobileMenuOpen ? (
+                  <ChevronUp size={20} color={colors.accent} />
+                ) : (
+                  <ChevronDown size={20} color={colors.accent} />
+                )}
               </TouchableOpacity>
             )}
 
@@ -156,51 +175,57 @@ function StorefrontContent() {
                 {/* Admin Sub-navigation Tabs */}
                 <View style={[styles.adminTabRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <TouchableOpacity
-                    style={[styles.adminTabBtn, adminTab === 'dashboard' && styles.adminTabBtnActive]}
+                    style={[styles.adminTabBtn, adminTab === 'dashboard' && styles.adminTabBtnActive, { flexDirection: isRTL ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }]}
                     onPress={() => setAdminTab('dashboard')}
                   >
+                    <BarChart3 size={16} color={adminTab === 'dashboard' ? colors.textLight : colors.textSecondary} />
                     <Text style={[styles.adminTabText, adminTab === 'dashboard' && styles.adminTabTextActive]}>
-                      📊 {t('admin.dashboardTab')}
+                      {t('admin.dashboardTab')}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.adminTabBtn, adminTab === 'orders' && styles.adminTabBtnActive]}
+                    style={[styles.adminTabBtn, adminTab === 'orders' && styles.adminTabBtnActive, { flexDirection: isRTL ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }]}
                     onPress={() => setAdminTab('orders')}
                   >
+                    <ShoppingCart size={16} color={adminTab === 'orders' ? colors.textLight : colors.textSecondary} />
                     <Text style={[styles.adminTabText, adminTab === 'orders' && styles.adminTabTextActive]}>
-                      🛒 {t('admin.ordersTab')}
+                      {t('admin.ordersTab')}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.adminTabBtn, adminTab === 'articles' && styles.adminTabBtnActive]}
+                    style={[styles.adminTabBtn, adminTab === 'articles' && styles.adminTabBtnActive, { flexDirection: isRTL ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }]}
                     onPress={() => setAdminTab('articles')}
                   >
+                    <Package size={16} color={adminTab === 'articles' ? colors.textLight : colors.textSecondary} />
                     <Text style={[styles.adminTabText, adminTab === 'articles' && styles.adminTabTextActive]}>
-                      📦 {t('admin.articlesTab')}
+                      {t('admin.articlesTab')}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.adminTabBtn, adminTab === 'packs' && styles.adminTabBtnActive]}
+                    style={[styles.adminTabBtn, adminTab === 'packs' && styles.adminTabBtnActive, { flexDirection: isRTL ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }]}
                     onPress={() => setAdminTab('packs')}
                   >
+                    <Gift size={16} color={adminTab === 'packs' ? colors.textLight : colors.textSecondary} />
                     <Text style={[styles.adminTabText, adminTab === 'packs' && styles.adminTabTextActive]}>
-                      🎁 {t('admin.packsTab')}
+                      {t('admin.packsTab')}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.adminTabBtn, adminTab === 'reviews' && styles.adminTabBtnActive]}
+                    style={[styles.adminTabBtn, adminTab === 'reviews' && styles.adminTabBtnActive, { flexDirection: isRTL ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }]}
                     onPress={() => setAdminTab('reviews')}
                   >
+                    <Star size={16} color={adminTab === 'reviews' ? colors.textLight : colors.textSecondary} />
                     <Text style={[styles.adminTabText, adminTab === 'reviews' && styles.adminTabTextActive]}>
-                      ⭐ {t('admin.reviewsTab')}
+                      {t('admin.reviewsTab')}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.adminTabBtn, adminTab === 'contact' && styles.adminTabBtnActive]}
+                    style={[styles.adminTabBtn, adminTab === 'contact' && styles.adminTabBtnActive, { flexDirection: isRTL ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }]}
                     onPress={() => setAdminTab('contact')}
                   >
+                    <Mail size={16} color={adminTab === 'contact' ? colors.textLight : colors.textSecondary} />
                     <Text style={[styles.adminTabText, adminTab === 'contact' && styles.adminTabTextActive]}>
-                      📩 {t('admin.contactTab')}
+                      {t('admin.contactTab')}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -343,25 +368,34 @@ function StorefrontContent() {
                   </View>
 
                   <View style={styles.cartQtyControls}>
-                    <TouchableOpacity
-                      style={styles.qtyBtn}
-                      onPress={() => updateQuantity(item.book.id, item.quantity - 1)}
-                    >
-                      <Text style={styles.qtyBtnText}>-</Text>
-                    </TouchableOpacity>
+                    <Tooltip content="-1">
+                      <TouchableOpacity
+                        style={styles.qtyBtn}
+                        onPress={() => updateQuantity(item.book.id, item.quantity - 1)}
+                        accessibilityLabel="Decrease quantity"
+                      >
+                        <Minus size={14} color={colors.textPrimary} />
+                      </TouchableOpacity>
+                    </Tooltip>
                     <Text style={styles.qtyValue}>{item.quantity}</Text>
-                    <TouchableOpacity
-                      style={styles.qtyBtn}
-                      onPress={() => updateQuantity(item.book.id, item.quantity + 1)}
-                    >
-                      <Text style={styles.qtyBtnText}>+</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.removeBtn}
-                      onPress={() => removeFromCart(item.book.id)}
-                    >
-                      <Text style={styles.removeBtnText}>🗑</Text>
-                    </TouchableOpacity>
+                    <Tooltip content="+1">
+                      <TouchableOpacity
+                        style={styles.qtyBtn}
+                        onPress={() => updateQuantity(item.book.id, item.quantity + 1)}
+                        accessibilityLabel="Increase quantity"
+                      >
+                        <Plus size={14} color={colors.textPrimary} />
+                      </TouchableOpacity>
+                    </Tooltip>
+                    <Tooltip content={t('admin.delete')}>
+                      <TouchableOpacity
+                        style={styles.removeBtn}
+                        onPress={() => removeFromCart(item.book.id)}
+                        accessibilityLabel={t('admin.delete')}
+                      >
+                        <Trash2 size={16} color={colors.error} />
+                      </TouchableOpacity>
+                    </Tooltip>
                   </View>
                 </View>
               ))}
@@ -375,6 +409,8 @@ function StorefrontContent() {
                 </View>
                 <Button
                   title={t('app.checkout')}
+                  icon={<ShoppingCart size={18} color={colors.primaryDark} />}
+                  tooltip={t('app.checkout')}
                   onPress={() => {
                     setCartModalOpen(false);
                     setCheckoutModalOpen(true);

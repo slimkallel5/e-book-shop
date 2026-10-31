@@ -8,9 +8,20 @@ import {
   TextInput,
 } from 'react-native';
 import { useLanguage } from '../context/LanguageContext';
+import {
+  Gift,
+  Plus,
+  Pencil,
+  Trash2,
+  AlertCircle,
+  X,
+  CheckCircle2,
+  XCircle,
+} from 'lucide-react-native';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
+import { Tooltip } from './ui/Tooltip';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 
 export interface AdminPackItem {
@@ -208,15 +219,20 @@ export const PackAdmin: React.FC = () => {
       {/* Top Header & Actions */}
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View style={styles.titleGroup}>
-          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            🎁 {t('admin.packsManagementTitle')}
-          </Text>
+          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+            <Gift size={22} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('admin.packsManagementTitle')}
+            </Text>
+          </View>
           <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.packsManagementSub')}
           </Text>
         </View>
         <Button
-          title={`➕ ${t('admin.addNewPack')}`}
+          title={t('admin.addNewPack')}
+          icon={<Plus size={18} color={colors.primaryDark} />}
+          tooltip={t('admin.addNewPack')}
           onPress={() => openModal()}
           variant="accent"
           size="md"
@@ -268,18 +284,26 @@ export const PackAdmin: React.FC = () => {
 
             {/* Actions Footer */}
             <View style={[styles.cardActions, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <TouchableOpacity
-                style={styles.editBtn}
-                onPress={() => openModal(pack)}
-              >
-                <Text style={styles.editBtnText}>✏️ {t('admin.editPack')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.deleteBtn}
-                onPress={() => handleDelete(pack.id)}
-              >
-                <Text style={styles.deleteBtnText}>🗑 {t('admin.delete')}</Text>
-              </TouchableOpacity>
+              <Tooltip content={t('admin.editPack')}>
+                <TouchableOpacity
+                  style={[styles.editBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+                  onPress={() => openModal(pack)}
+                  accessibilityLabel={t('admin.editPack')}
+                >
+                  <Pencil size={14} color={colors.primary} />
+                  <Text style={styles.editBtnText}>{t('admin.editPack')}</Text>
+                </TouchableOpacity>
+              </Tooltip>
+              <Tooltip content={t('admin.delete')}>
+                <TouchableOpacity
+                  style={[styles.deleteBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+                  onPress={() => handleDelete(pack.id)}
+                  accessibilityLabel={t('admin.delete')}
+                >
+                  <Trash2 size={14} color={colors.error} />
+                  <Text style={styles.deleteBtnText}>{t('admin.delete')}</Text>
+                </TouchableOpacity>
+              </Tooltip>
             </View>
           </View>
         ))}
@@ -293,8 +317,9 @@ export const PackAdmin: React.FC = () => {
       >
         <ScrollView style={styles.formScroll}>
           {errorMessage ? (
-            <View style={styles.errorBanner}>
-              <Text style={styles.errorText}>⚠️ {errorMessage}</Text>
+            <View style={[styles.errorBanner, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+              <AlertCircle size={16} color="#D32F2F" />
+              <Text style={styles.errorText}>{errorMessage}</Text>
             </View>
           ) : null}
 
@@ -359,18 +384,25 @@ export const PackAdmin: React.FC = () => {
               </ScrollView>
 
               <View style={styles.qtyRow}>
-                <TouchableOpacity
-                  style={styles.removeRowBtn}
-                  onPress={() => removeItemRow(index)}
-                >
-                  <Text style={styles.removeRowText}>✕</Text>
-                </TouchableOpacity>
+                <Tooltip content={t('admin.delete')}>
+                  <TouchableOpacity
+                    style={styles.removeRowBtn}
+                    onPress={() => removeItemRow(index)}
+                    accessibilityLabel={t('admin.delete')}
+                  >
+                    <X size={16} color={colors.error} />
+                  </TouchableOpacity>
+                </Tooltip>
               </View>
             </View>
           ))}
 
-          <TouchableOpacity style={styles.addItemBtn} onPress={addItemRow}>
-            <Text style={styles.addItemBtnText}>➕ {t('admin.addAnotherBook')}</Text>
+          <TouchableOpacity
+            style={[styles.addItemBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }]}
+            onPress={addItemRow}
+          >
+            <Plus size={16} color={colors.primary} />
+            <Text style={styles.addItemBtnText}>{t('admin.addAnotherBook')}</Text>
           </TouchableOpacity>
 
           <Text style={styles.fieldLabel}>{t('admin.packCoverUrl')}:</Text>
@@ -382,16 +414,18 @@ export const PackAdmin: React.FC = () => {
           />
 
           <TouchableOpacity
-            style={[styles.toggleBtn, active && styles.toggleBtnActive]}
+            style={[styles.toggleBtn, active && styles.toggleBtnActive, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}
             onPress={() => setActive(!active)}
           >
+            {active ? <CheckCircle2 size={16} color="#059669" /> : <XCircle size={16} color="#DC2626" />}
             <Text style={styles.toggleText}>
-              {t('admin.status')}: {active ? `✅ ${t('admin.statusEnabled')}` : `❌ ${t('admin.statusDisabled')}`}
+              {t('admin.status')}: {active ? t('admin.statusEnabled') : t('admin.statusDisabled')}
             </Text>
           </TouchableOpacity>
 
           <Button
             title={editingPack ? t('admin.saveChanges') : t('admin.addPackBtn')}
+            tooltip={editingPack ? t('admin.saveChanges') : t('admin.addPackBtn')}
             onPress={handleSave}
             variant="accent"
             size="lg"
