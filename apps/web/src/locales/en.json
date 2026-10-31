@@ -227,5 +227,15 @@
     "packPricePositiveRequired": "Pack price must be a positive number",
     "minOneBookError": "Pack must contain at least one book",
     "noDuplicateBooksError": "Cannot add the same book multiple times in a pack"
+  },
+  "bookshelf": {
+    "rotate360": "Drag with mouse/touch to rotate book 360°",
+    "openBook": "Open book & browse pages",
+    "closeBook": "Close book cover",
+    "preview3D": "Interactive 360° 3D",
+    "previewSample": "Open 360° Book"
+  },
+  "common": {
+    "preview": "3D Preview"
   }
 }

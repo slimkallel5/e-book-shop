@@ -227,5 +227,15 @@
     "packPricePositiveRequired": "Le prix du pack doit être positif",
     "minOneBookError": "Le pack doit contenir au moins un livre",
     "noDuplicateBooksError": "Impossible d'ajouter deux fois le même livre dans un pack"
+  },
+  "bookshelf": {
+    "rotate360": "Faites glisser pour faire pivoter le livre à 360°",
+    "openBook": "Ouvrir le livre et tourner les pages",
+    "closeBook": "Fermer le livre",
+    "preview3D": "Aperçu 3D 360°",
+    "previewSample": "Ouvrir le livre 360°"
+  },
+  "common": {
+    "preview": "Aperçu 3D"
   }
 }

@@ -22,6 +22,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
+import { Real3DBook } from './3d/Real3DBook';
 
 interface BookViewerProps {
   book: Book | null;
@@ -84,6 +85,8 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
   const { language, isRTL, t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [is3DMode, setIs3DMode] = useState<boolean>(true);
+  const [isBookOpen, setIsBookOpen] = useState<boolean>(true);
 
   // PDF rendering state
   const [pdfDoc, setPdfDoc] = useState<any>(null);
@@ -268,6 +271,17 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
             </View>
 
             <View style={[styles.actionsGroup, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              {/* 3D 360 Mode Toggle */}
+              <TouchableOpacity
+                style={[styles.modeBtn, is3DMode && styles.modeBtnActive]}
+                onPress={() => setIs3DMode(!is3DMode)}
+                accessibilityRole="button"
+              >
+                <Text style={[styles.modeBtnText, is3DMode && styles.modeBtnTextActive]}>
+                  {is3DMode ? '🔄 3D 360°' : '📄 2D'}
+                </Text>
+              </TouchableOpacity>
+
               {hasPages && (
                 <Tooltip content={isZoomed ? t('app.zoomOut') : t('app.zoomIn')}>
                   <TouchableOpacity
@@ -301,7 +315,29 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
 
           {/* 3D Realistic Book Stage */}
           <View style={styles.stage}>
-            {hasPages ? (
+            {is3DMode && Platform.OS === 'web' ? (
+              <Real3DBook
+                coverUrl={
+                  (book as any).posterUrl ||
+                  book.coverUrl ||
+                  '/assets/covers/arabic1.jpg'
+                }
+                currentPage={currentPage + 1}
+                totalPages={totalPages}
+                isOpen={isBookOpen}
+                onToggleOpen={() => setIsBookOpen(!isBookOpen)}
+                pageImages={
+                  Object.keys(pdfRenderedPages).length > 0
+                    ? Object.values(pdfRenderedPages)
+                    : rawSamplePages.filter((p) => !p.endsWith('.pdf'))
+                }
+                pageContent={{
+                  title: title,
+                  subtitle: book.levelName?.[language] || book.levelName?.ar || '',
+                  text: book.description?.[language] || book.description?.ar || '',
+                }}
+              />
+            ) : hasPages ? (
               <View style={styles.book3DWrapper}>
                 {/* Left Navigation Arrow */}
                 <Tooltip content={isRTL ? t('app.nextPage') : t('app.prevPage')}>
@@ -453,6 +489,26 @@ const styles = StyleSheet.create({
   actionsGroup: {
     alignItems: 'center',
     gap: 10,
+  },
+  modeBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+  },
+  modeBtnActive: {
+    backgroundColor: '#f59e0b',
+    borderColor: '#d97706',
+  },
+  modeBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  modeBtnTextActive: {
+    color: '#064e3b',
   },
   iconBtn: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',

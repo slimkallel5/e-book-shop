@@ -38,6 +38,7 @@ import { ContactAdmin } from './src/components/ContactAdmin';
 import { AdminDashboard } from './src/components/AdminDashboard';
 import { AdminLoginModal } from './src/components/AdminLoginModal';
 import { BookLookbookGallery } from './src/components/BookLookbookGallery';
+import { ThreeBookCarousel } from './src/components/3d/ThreeBookCarousel';
 import { ArticleLookbookGallery } from './src/components/ArticleLookbookGallery';
 import { ImmersiveBackground } from './src/components/ImmersiveBackground';
 import { CheckoutModal } from './src/components/CheckoutModal';
@@ -283,6 +284,15 @@ function StorefrontContent() {
                           ))}
                         </View>
                       </View>
+
+                      {/* 3D Curved Book Carousel Showcase */}
+                      {filteredBooks.length > 0 && (
+                        <ThreeBookCarousel
+                          books={filteredBooks}
+                          onOpenViewer={(b) => setPreviewBook(b)}
+                          onSelectBook={(b) => setDetailBook(b)}
+                        />
+                      )}
 
                       {/* Interactive 3D Motion UI Lookbook Reveal Book Showcase */}
                       {filteredBooks.length > 0 && (

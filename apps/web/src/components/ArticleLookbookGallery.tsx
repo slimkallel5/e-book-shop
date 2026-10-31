@@ -22,6 +22,7 @@ import {
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
+import { Real3DBook } from './3d/Real3DBook';
 
 interface ArticleLookbookGalleryProps {
   articles?: Article[];
@@ -221,6 +222,23 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
             </View>
 
             <ScrollView contentContainerStyle={styles.readerScrollBody}>
+              {/* 3D 360° Book Preview of the Article Guide */}
+              {Platform.OS === 'web' && (
+                <View style={{ marginBottom: 20 }}>
+                  <Real3DBook
+                    coverUrl={expandedArticle.coverUrl || '/assets/covers/arabic1.jpg'}
+                    currentPage={1}
+                    totalPages={3}
+                    isOpen={true}
+                    pageContent={{
+                      title: expandedArticle.title[language] || expandedArticle.title.ar,
+                      subtitle: expandedArticle.category[language] || expandedArticle.category.ar,
+                      text: expandedArticle.excerpt[language] || expandedArticle.excerpt.ar,
+                    }}
+                  />
+                </View>
+              )}
+
               <Text style={[styles.readerTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
                 {expandedArticle.title[language] || expandedArticle.title.ar}
               </Text>

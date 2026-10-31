@@ -128,16 +128,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
             )}
           </View>
 
-          {/* Add to Basket Action using Lucide Icon and Tooltip */}
-          <Button
-            title={t('app.addToCart')}
-            icon={<ShoppingCart size={16} color={colors.textLight} />}
-            tooltip={t('app.addToCart')}
-            onPress={() => addToCart(book)}
-            variant="primary"
-            size="sm"
-            style={styles.cartBtn}
-          />
+          {/* 3D 360 preview trigger button & Add to Basket */}
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            <TouchableOpacity
+              style={styles.preview3DBtn}
+              onPress={() => onPreview(book)}
+              accessibilityRole="button"
+            >
+              <Text style={styles.preview3DBtnText}>360°</Text>
+            </TouchableOpacity>
+
+            <Button
+              title={t('app.addToCart')}
+              icon={<ShoppingCart size={16} color={colors.textLight} />}
+              tooltip={t('app.addToCart')}
+              onPress={() => addToCart(book)}
+              variant="primary"
+              size="sm"
+              style={styles.cartBtn}
+            />
+          </View>
         </View>
       </TouchableOpacity>
     </View>
@@ -145,6 +155,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
 };
 
 const styles = StyleSheet.create({
+  preview3DBtn: {
+    backgroundColor: '#064e3b',
+    borderWidth: 1,
+    borderColor: '#f59e0b',
+    borderRadius: layout.borderRadius.md,
+    paddingHorizontal: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  preview3DBtnText: {
+    color: '#fbbf24',
+    fontSize: 11,
+    fontWeight: '700',
+  },
   card3DWrapper: {
     margin: 8,
     transform: Platform.OS === 'web' ? ([{ perspective: 1000 }] as any) : [],
