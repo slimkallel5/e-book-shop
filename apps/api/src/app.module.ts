@@ -24,6 +24,11 @@ import { RepositoryModule } from './repositories/repository.module';
       serveRoot: '/uploads',
       serveStaticOptions: { fallthrough: true },
     }),
+    ServeStaticModule.forRoot({
+      rootPath: path.resolve(process.cwd(), '../web/assets'),
+      serveRoot: '/assets',
+      serveStaticOptions: { fallthrough: true },
+    }),
   ],
   controllers: [
     AppController,
