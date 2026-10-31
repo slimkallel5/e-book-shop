@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from '
 import { EDUCATION_LEVELS } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
+import { LottieIcon, LottieIconName } from './icons';
 
 export type NavCategory = 'all' | 'primary' | 'middle' | 'secondary' | 'packs' | 'articles';
 
@@ -19,33 +20,33 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
 }) => {
   const { language, isRTL, t } = useLanguage();
 
-  const navItems: { id: NavCategory; titleKey: string; color: string; icon: string; subtitleKey?: string }[] = [
+  const navItems: { id: NavCategory; titleKey: string; color: string; icon: LottieIconName; subtitleKey?: string }[] = [
     {
       id: 'all',
       titleKey: 'app.allLevels',
       color: colors.primaryDark,
-      icon: '🏛️',
+      icon: 'building',
       subtitleKey: 'app.catalogTitle',
     },
     ...EDUCATION_LEVELS.map((level) => ({
       id: level.id as NavCategory,
       titleKey: level.title[language] || level.title.ar,
       color: level.spineColor,
-      icon: level.id === 'primary' ? '✏️' : level.id === 'middle' ? '📐' : '🎓',
+      icon: (level.id === 'primary' ? 'pencil' : level.id === 'middle' ? 'ruler' : 'grad-cap') as LottieIconName,
       subtitleKey: level.subTitle[language] || level.subTitle.ar,
     })),
     {
       id: 'packs',
       titleKey: 'app.featuredPacks',
       color: colors.badgePack,
-      icon: '🎁',
+      icon: 'gift',
       subtitleKey: 'app.packBadge',
     },
     {
       id: 'articles',
       titleKey: 'app.articlesGalleryTitle',
       color: colors.secondary,
-      icon: '📰',
+      icon: 'newspaper',
       subtitleKey: 'app.articlesGallerySub',
     },
   ];
@@ -54,7 +55,7 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
     <View style={[styles.shelfContainer, isCompact && styles.shelfContainerCompact]}>
       {/* Wooden Header Bar */}
       <View style={[styles.headerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <Text style={styles.headerIcon}>📚</Text>
+        <LottieIcon name="book" size={22} />
         <Text style={[styles.shelfTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
           {t('app.shelfOverview')}
         </Text>
@@ -90,7 +91,7 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
               <View style={styles.spineGoldFoil} />
 
               {/* Book Spine Icon & Content */}
-              <Text style={styles.spineItemIcon}>{item.icon}</Text>
+              <LottieIcon name={item.icon} size={22} />
               <View style={[styles.spineTextCol, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
                 <Text style={[styles.spineTitleText, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
                   {displayTitle}
@@ -105,7 +106,7 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
               {/* Active Golden Bookmark Ribbon Indicator */}
               {isSelected && (
                 <View style={styles.activeRibbonBookmark}>
-                  <Text style={styles.ribbonText}>★</Text>
+                  <LottieIcon name="star" size={12} />
                 </View>
               )}
             </TouchableOpacity>

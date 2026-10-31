@@ -12,6 +12,7 @@ import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { colors, layout, shadows, typography } from '../theme/tokens';
+import { LottieIcon } from './icons';
 
 export interface AdminArticle {
   id: string;
@@ -382,10 +383,13 @@ export const ArticleAdmin: React.FC = () => {
       {/* Top Header & Actions */}
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View style={styles.titleGroup}>
-          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            📦 {t('admin.articlesManagementTitle')}
-          </Text>
-          <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
+          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+            <LottieIcon name="package" size={24} />
+            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('admin.articlesManagementTitle')}
+            </Text>
+          </View>
+          <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left', marginTop: 2 }]}>
             {t('admin.articlesManagementSub')}
           </Text>
         </View>
@@ -445,16 +449,18 @@ export const ArticleAdmin: React.FC = () => {
             {/* Actions Footer */}
             <View style={[styles.cardActions, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <TouchableOpacity
-                style={styles.editBtn}
+                style={[styles.editBtn, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}
                 onPress={() => openModal(art)}
               >
-                <Text style={styles.editBtnText}>✏️ تعديل</Text>
+                <LottieIcon name="pencil" size={14} />
+                <Text style={styles.editBtnText}>تعديل</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.deleteBtn}
+                style={[styles.deleteBtn, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}
                 onPress={() => handleDelete(art.id)}
               >
-                <Text style={styles.deleteBtnText}>🗑 حذف</Text>
+                <LottieIcon name="trash" size={14} />
+                <Text style={styles.deleteBtnText}>حذف</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -557,11 +563,12 @@ export const ArticleAdmin: React.FC = () => {
           />
 
           <TouchableOpacity
-            style={[styles.toggleBtn, active && styles.toggleBtnActive]}
+            style={[styles.toggleBtn, active && styles.toggleBtnActive, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }]}
             onPress={() => setActive(!active)}
           >
+            <LottieIcon name={active ? 'check' : 'close'} size={18} />
             <Text style={styles.toggleText}>
-              الحالة: {active ? '✅ مفعل للبيع' : '❌ معطل'}
+              الحالة: {active ? 'مفعل للبيع' : 'معطل'}
             </Text>
           </TouchableOpacity>
 

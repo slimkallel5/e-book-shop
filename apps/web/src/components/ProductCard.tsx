@@ -6,6 +6,7 @@ import { useStore } from '../context/StoreContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
+import { LottieIcon } from './icons';
 
 interface ProductCardProps {
   book: Book;
@@ -62,7 +63,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
             onPress={() => toggleFavourite(book.id)}
             activeOpacity={0.8}
           >
-            <Text style={styles.favIcon}>{favorited ? '❤️' : '🤍'}</Text>
+            <LottieIcon name={favorited ? 'heart' : 'heart-outline'} size={18} />
           </TouchableOpacity>
 
           {/* Quick Preview Hover Overlay / Button */}
@@ -71,7 +72,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
             onPress={() => onPreview(book)}
             activeOpacity={0.85}
           >
-            <Text style={styles.previewBtnText}>📖 {t('app.previewBook')}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <LottieIcon name="book" size={16} />
+              <Text style={styles.previewBtnText}>{t('app.previewBook')}</Text>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -79,7 +83,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
         <View style={styles.contentContainer}>
           {/* Education Level Badge */}
           <View style={[styles.levelRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <Text style={styles.levelText}>🎓 {levelName}</Text>
+            <LottieIcon name="grad-cap" size={14} />
+            <Text style={styles.levelText}>{levelName}</Text>
             {book.quarter && book.quarter !== 'full' && (
               <Text style={styles.quarterText}>• {t(`app.${book.quarter}`)}</Text>
             )}
@@ -95,7 +100,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
 
           {/* Rating Stars */}
           <View style={[styles.ratingRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <Text style={styles.stars}>★ {book.rating.toFixed(1)}</Text>
+            <LottieIcon name="star" size={14} />
+            <Text style={styles.stars}>{book.rating.toFixed(1)}</Text>
             <Text style={styles.reviewsCount}>({book.reviewCount} {t('app.reviews')})</Text>
           </View>
 
