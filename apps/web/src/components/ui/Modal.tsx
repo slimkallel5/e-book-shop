@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal as RNModal, Platform } from 'react-native';
 import { colors, layout, shadows, typography } from '../../theme/tokens';
-import { LottieIcon } from '../icons';
 
 interface ModalProps {
   visible: boolean;
@@ -58,7 +57,7 @@ export const Modal: React.FC<ModalProps> = ({
               accessibilityRole="button"
               accessibilityLabel="Close dialog"
             >
-              <LottieIcon name="close" size={16} />
+              <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.body}>{children}</View>

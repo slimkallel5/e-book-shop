@@ -12,7 +12,6 @@ import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { colors, layout, shadows, typography } from '../theme/tokens';
-import { LottieIcon } from './icons';
 
 export interface AdminPackItem {
   articleId: string;
@@ -209,13 +208,10 @@ export const PackAdmin: React.FC = () => {
       {/* Top Header & Actions */}
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View style={styles.titleGroup}>
-          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-            <LottieIcon name="gift" size={24} />
-            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('admin.packsManagementTitle')}
-            </Text>
-          </View>
-          <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left', marginTop: 2 }]}>
+          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+            🎁 {t('admin.packsManagementTitle')}
+          </Text>
+          <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.packsManagementSub')}
           </Text>
         </View>
@@ -273,18 +269,16 @@ export const PackAdmin: React.FC = () => {
             {/* Actions Footer */}
             <View style={[styles.cardActions, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <TouchableOpacity
-                style={[styles.editBtn, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}
+                style={styles.editBtn}
                 onPress={() => openModal(pack)}
               >
-                <LottieIcon name="pencil" size={14} />
-                <Text style={styles.editBtnText}>{t('admin.editPack')}</Text>
+                <Text style={styles.editBtnText}>✏️ {t('admin.editPack')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.deleteBtn, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}
+                style={styles.deleteBtn}
                 onPress={() => handleDelete(pack.id)}
               >
-                <LottieIcon name="trash" size={14} />
-                <Text style={styles.deleteBtnText}>{t('admin.delete')}</Text>
+                <Text style={styles.deleteBtnText}>🗑 {t('admin.delete')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -388,12 +382,11 @@ export const PackAdmin: React.FC = () => {
           />
 
           <TouchableOpacity
-            style={[styles.toggleBtn, active && styles.toggleBtnActive, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }]}
+            style={[styles.toggleBtn, active && styles.toggleBtnActive]}
             onPress={() => setActive(!active)}
           >
-            <LottieIcon name={active ? 'check' : 'close'} size={18} />
             <Text style={styles.toggleText}>
-              {t('admin.status')}: {active ? t('admin.statusEnabled') : t('admin.statusDisabled')}
+              {t('admin.status')}: {active ? `✅ ${t('admin.statusEnabled')}` : `❌ ${t('admin.statusDisabled')}`}
             </Text>
           </TouchableOpacity>
 

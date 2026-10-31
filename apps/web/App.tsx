@@ -30,7 +30,6 @@ import { OrderLookupModal } from './src/components/OrderLookupModal';
 import { ContactModal } from './src/components/ContactModal';
 import { Modal } from './src/components/ui/Modal';
 import { Button } from './src/components/ui/Button';
-import { LottieIcon } from './src/components/icons';
 import { Book, MOCK_BOOKS } from './src/mock/data';
 import { fetchCatalogBooks } from './src/services/api';
 import { colors, layout, shadows, typography } from './src/theme/tokens';
@@ -360,9 +359,8 @@ function StorefrontContent() {
                     <TouchableOpacity
                       style={styles.removeBtn}
                       onPress={() => removeFromCart(item.book.id)}
-                      accessibilityLabel="Remove item"
                     >
-                      <LottieIcon name="trash" size={18} />
+                      <Text style={styles.removeBtnText}>🗑</Text>
                     </TouchableOpacity>
                   </View>
                 </View>

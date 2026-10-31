@@ -13,7 +13,6 @@ import { useStore } from '../context/StoreContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
-import { LottieIcon } from './icons';
 
 interface BookLookbookGalleryProps {
   books: Book[];
@@ -56,7 +55,7 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
               onPress={isRTL ? handleNext : handlePrev}
               activeOpacity={0.8}
             >
-              <LottieIcon name={isRTL ? 'arrow-right' : 'arrow-left'} size={18} />
+              <Text style={styles.arrowText}>{isRTL ? '▶' : '◀'}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -64,7 +63,7 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
               onPress={isRTL ? handlePrev : handleNext}
               activeOpacity={0.8}
             >
-              <LottieIcon name={isRTL ? 'arrow-left' : 'arrow-right'} size={18} />
+              <Text style={styles.arrowText}>{isRTL ? '◀' : '▶'}</Text>
             </TouchableOpacity>
           </>
         )}
@@ -131,10 +130,7 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
 
                 {/* Bottom Overlay Info */}
                 <View style={styles.cardGradient}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-                    <LottieIcon name="grad-cap" size={12} />
-                    <Text style={styles.levelBadge}>{level}</Text>
-                  </View>
+                  <Text style={styles.levelBadge}>🎓 {level}</Text>
                   <Text style={[styles.cardTitle, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={2}>
                     {title}
                   </Text>
@@ -156,17 +152,13 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
           <View style={[styles.detailHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             <View style={styles.detailInfoCol}>
               <View style={[styles.metaBadgesRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <LottieIcon name="grad-cap" size={14} />
                 <Text style={styles.detailLevel}>
-                  {activeBook.levelName[language] || activeBook.levelName.ar}
+                  🎓 {activeBook.levelName[language] || activeBook.levelName.ar}
                 </Text>
                 {activeBook.quarter && activeBook.quarter !== 'full' && (
                   <Text style={styles.detailQuarter}>• {t(`app.${activeBook.quarter}`)}</Text>
                 )}
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <LottieIcon name="star" size={14} />
-                  <Text style={styles.detailStars}>{activeBook.rating.toFixed(1)}</Text>
-                </View>
+                <Text style={styles.detailStars}>★ {activeBook.rating.toFixed(1)}</Text>
               </View>
 
               <Text style={[styles.detailTitle, { textAlign: isRTL ? 'right' : 'left' }]}>

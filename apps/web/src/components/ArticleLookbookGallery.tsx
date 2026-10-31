@@ -13,7 +13,6 @@ import { MOCK_ARTICLES, Article } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
-import { LottieIcon } from './icons';
 
 interface ArticleLookbookGalleryProps {
   articles?: Article[];
@@ -69,12 +68,9 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
     <View style={styles.sectionContainer}>
       {/* Section Header */}
       <View style={[styles.sectionHeader, { alignItems: isRTL ? 'flex-start' : 'flex-end' }]}>
-        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-          <LottieIcon name="newspaper" size={24} />
-          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            {t('app.articlesGalleryTitle')}
-          </Text>
-        </View>
+        <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+          📰 {t('app.articlesGalleryTitle')}
+        </Text>
         <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
           {t('app.articlesGallerySub')}
         </Text>
@@ -90,7 +86,7 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
           accessibilityRole="button"
           activeOpacity={0.8}
         >
-          <LottieIcon name={isRTL ? 'arrow-right' : 'arrow-left'} size={18} />
+          <Text style={styles.arrowIcon}>{isRTL ? '▶' : '◀'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -100,7 +96,7 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
           accessibilityRole="button"
           activeOpacity={0.8}
         >
-          <LottieIcon name={isRTL ? 'arrow-left' : 'arrow-right'} size={18} />
+          <Text style={styles.arrowIcon}>{isRTL ? '◀' : '▶'}</Text>
         </TouchableOpacity>
 
         {/* Curved Row of Image Cards */}
@@ -212,14 +208,13 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
                 {expandedArticle.category[language] || expandedArticle.category.ar}
               </Text>
               <TouchableOpacity
-                style={[styles.closeBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+                style={styles.closeBtn}
                 onPress={() => setExpandedArticle(null)}
                 accessibilityLabel={t('app.closeArticle')}
                 accessibilityRole="button"
                 activeOpacity={0.8}
               >
-                <LottieIcon name="close" size={14} />
-                <Text style={styles.closeBtnText}>{t('app.closeArticle')}</Text>
+                <Text style={styles.closeBtnText}>✕ {t('app.closeArticle')}</Text>
               </TouchableOpacity>
             </View>
 

@@ -11,7 +11,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
-import { LottieIcon } from './icons';
 
 export interface AdminContactMessage {
   id: string;
@@ -86,12 +85,9 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
       {/* Top Header */}
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View>
-          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
-            <LottieIcon name="mail" size={20} />
-            <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('admin.contactMessagesTitle')}
-            </Text>
-          </View>
+          <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+            📩 {t('admin.contactMessagesTitle')}
+          </Text>
           <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.contactMessagesSub')}
           </Text>
@@ -113,17 +109,9 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
                 <View style={[styles.cardHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <View>
                     <Text style={styles.senderName}>👤 {msg.name}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2, flexWrap: 'wrap' }}>
-                      <LottieIcon name="mail" size={14} />
-                      <Text style={styles.contactDetails}>{msg.email}</Text>
-                      {msg.phone ? (
-                        <>
-                          <Text style={styles.contactDetails}>|</Text>
-                          <LottieIcon name="phone" size={14} />
-                          <Text style={styles.contactDetails}>{msg.phone}</Text>
-                        </>
-                      ) : null}
-                    </View>
+                    <Text style={styles.contactDetails}>
+                      ✉️ {msg.email} {msg.phone ? `| 📞 ${msg.phone}` : ''}
+                    </Text>
                   </View>
                   <Badge
                     label={msg.read ? t('admin.readStatus') : t('admin.newStatus')}
@@ -146,11 +134,10 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
 
                   {!msg.read && (
                     <TouchableOpacity
-                      style={[styles.readBtn, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}
+                      style={styles.readBtn}
                       onPress={() => markAsRead(msg.id)}
                     >
-                      <LottieIcon name="check" size={14} />
-                      <Text style={styles.readBtnText}>{t('admin.markAsRead')}</Text>
+                      <Text style={styles.readBtnText}>✅ {t('admin.markAsRead')}</Text>
                     </TouchableOpacity>
                   )}
                 </View>

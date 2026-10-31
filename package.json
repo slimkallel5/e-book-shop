@@ -15,9 +15,5 @@
   },
   "devDependencies": {
     "typescript": "^5.3.3"
-  },
-  "dependencies": {
-    "@dotlottie/react-player": "^1.6.19",
-    "@lottiefiles/react-lottie-player": "^3.6.0"
   }
 }

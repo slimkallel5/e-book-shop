@@ -13,7 +13,6 @@ import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
-import { LottieIcon } from './icons';
 
 interface BookViewerProps {
   book: Book | null;
@@ -265,9 +264,8 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   style={styles.iconBtn}
                   onPress={() => setIsZoomed(!isZoomed)}
                   activeOpacity={0.8}
-                  accessibilityLabel={isZoomed ? 'Zoom out' : 'Zoom in'}
                 >
-                  <LottieIcon name={isZoomed ? 'zoom-out' : 'zoom-in'} size={18} />
+                  <Text style={styles.iconBtnText}>{isZoomed ? '🔍-' : '🔍+'}</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -277,7 +275,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                 accessibilityRole="button"
                 accessibilityLabel="Close book preview"
               >
-                <LottieIcon name="close" size={16} />
+                <Text style={styles.closeBtnText}>✕</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -295,7 +293,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   accessibilityRole="button"
                   accessibilityLabel="Previous Page"
                 >
-                  <LottieIcon name={isRTL ? 'arrow-right' : 'arrow-left'} size={20} />
+                  <Text style={styles.navArrowText}>{isRTL ? '▶' : '◀'}</Text>
                 </TouchableOpacity>
 
                 {/* Simulated Interactive 3D Open Page Spread */}
@@ -338,12 +336,12 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   accessibilityRole="button"
                   accessibilityLabel="Next Page"
                 >
-                  <LottieIcon name={isRTL ? 'arrow-left' : 'arrow-right'} size={20} />
+                  <Text style={styles.navArrowText}>{isRTL ? '◀' : '▶'}</Text>
                 </TouchableOpacity>
               </View>
             ) : (
               <View style={styles.emptyState}>
-                <LottieIcon name="book" size={48} style={{ marginBottom: 12 }} />
+                <Text style={styles.emptyStateIcon}>📭</Text>
                 <Text style={styles.emptyStateText}>{t('app.noPreview')}</Text>
               </View>
             )}

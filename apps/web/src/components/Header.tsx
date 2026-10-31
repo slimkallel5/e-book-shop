@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { useLanguage, Language } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
-import { LottieIcon } from './icons';
 
 interface HeaderProps {
   cartCount?: number;
@@ -53,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Brand Logo & Name */}
         <View style={[styles.brandContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <View style={styles.logoBadge}>
-            <LottieIcon name="book" size={28} />
+            <Text style={styles.logoBadgeText}>📚</Text>
           </View>
           <View style={styles.brandTextCol}>
             <Text style={[styles.brandTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
@@ -68,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Search Bar */}
         <View style={styles.searchWrapper}>
           <View style={[styles.searchBox, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <LottieIcon name="search" size={18} style={styles.searchIcon} />
+            <Text style={styles.searchIcon}>🔍</Text>
             <TextInput
               style={[
                 styles.searchInput,
@@ -94,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({
               onPress={onToggleAdminMode}
               activeOpacity={0.8}
             >
-              <LottieIcon name="settings" size={18} />
+              <Text style={styles.actionIcon}>⚙️</Text>
               <Text style={[styles.cartLabel, isAdminMode && { color: colors.textLight }]}>
                 {isAdminMode ? t('app.storefront') : t('app.administrator')}
               </Text>
@@ -107,7 +106,7 @@ export const Header: React.FC<HeaderProps> = ({
               onPress={onOpenOrderLookup}
               activeOpacity={0.7}
             >
-              <LottieIcon name="package" size={18} />
+              <Text style={styles.actionIcon}>📦</Text>
             </TouchableOpacity>
           )}
 
@@ -118,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
               onPress={onOpenContact}
               activeOpacity={0.7}
             >
-              <LottieIcon name="mail" size={18} />
+              <Text style={styles.actionIcon}>📩</Text>
             </TouchableOpacity>
           )}
 
@@ -128,7 +127,7 @@ export const Header: React.FC<HeaderProps> = ({
             onPress={onOpenFavourites}
             activeOpacity={0.7}
           >
-            <LottieIcon name="heart" size={18} />
+            <Text style={styles.actionIcon}>❤️</Text>
             {favouritesCount > 0 && (
               <View style={styles.badgeCount}>
                 <Text style={styles.badgeCountText}>{favouritesCount}</Text>
@@ -142,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
             onPress={onOpenCart}
             activeOpacity={0.7}
           >
-            <LottieIcon name="cart" size={18} />
+            <Text style={styles.actionIcon}>🛒</Text>
             <Text style={styles.cartLabel}>{t('app.cart')}</Text>
             {cartCount > 0 && (
               <View style={[styles.badgeCount, styles.cartBadge]}>
@@ -160,7 +159,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Text style={styles.langFlag}>{activeLang.flag}</Text>
               <Text style={styles.langCode}>{activeLang.code.toUpperCase()}</Text>
-              <LottieIcon name="arrow-down" size={12} />
+              <Text style={styles.dropdownArrow}>▾</Text>
             </TouchableOpacity>
 
             {langDropdownOpen && (

@@ -11,7 +11,6 @@ import { colors, layout, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Modal } from './ui/Modal';
-import { LottieIcon } from './icons';
 
 export interface ContactModalProps {
   visible: boolean;
@@ -78,11 +77,11 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
   };
 
   return (
-    <Modal visible={visible} onClose={handleClose} title={t('app.contactModalTitle')}>
+    <Modal visible={visible} onClose={handleClose} title={`📩 ${t('app.contactModalTitle')}`}>
       <ScrollView contentContainerStyle={styles.container}>
         {success ? (
           <View style={styles.successBox}>
-            <LottieIcon name="check" size={54} />
+            <Text style={styles.successBadge}>✅</Text>
 
             <Text style={styles.successTitle}>{t('app.messageSuccessTitle')}</Text>
             <Text style={styles.successSub}>
@@ -99,9 +98,8 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
         ) : (
           <View style={styles.form}>
             {errorMsg && (
-              <View style={[styles.errorBox, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}>
-                <LottieIcon name="alert" size={16} />
-                <Text style={styles.errorText}>{errorMsg}</Text>
+              <View style={styles.errorBox}>
+                <Text style={styles.errorText}>⚠️ {errorMsg}</Text>
               </View>
             )}
 
