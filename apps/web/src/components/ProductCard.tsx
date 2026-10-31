@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native';
+import { ShoppingCart, Eye, Heart, Star, GraduationCap } from 'lucide-react-native';
 import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { useStore } from '../context/StoreContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
+import { Tooltip } from './ui/Tooltip';
 
 interface ProductCardProps {
   book: Book;
@@ -56,30 +58,42 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
             )}
           </View>
 
-          {/* Favourite Button */}
-          <TouchableOpacity
-            style={[styles.favBtn, isRTL ? { left: 8 } : { right: 8 }]}
-            onPress={() => toggleFavourite(book.id)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.favIcon}>{favorited ? '❤️' : '🤍'}</Text>
-          </TouchableOpacity>
+          {/* Favourite Button with Tooltip */}
+          <Tooltip content={favorited ? t('app.favourites') : t('app.favourites')}>
+            <TouchableOpacity
+              style={[styles.favBtn, isRTL ? { left: 8 } : { right: 8 }]}
+              onPress={() => toggleFavourite(book.id)}
+              activeOpacity={0.8}
+              accessibilityLabel={t('app.favourites')}
+            >
+              <Heart
+                size={16}
+                color={favorited ? colors.error : colors.textMuted}
+                fill={favorited ? colors.error : 'transparent'}
+              />
+            </TouchableOpacity>
+          </Tooltip>
 
-          {/* Quick Preview Hover Overlay / Button */}
-          <TouchableOpacity
-            style={styles.previewOverlayBtn}
-            onPress={() => onPreview(book)}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.previewBtnText}>📖 {t('app.previewBook')}</Text>
-          </TouchableOpacity>
+          {/* Quick Preview Hover Overlay / Button with Lucide Icon and Tooltip */}
+          <Tooltip content={t('app.previewBook')}>
+            <TouchableOpacity
+              style={styles.previewOverlayBtn}
+              onPress={() => onPreview(book)}
+              activeOpacity={0.85}
+              accessibilityLabel={t('app.previewBook')}
+            >
+              <Eye size={18} color={colors.textLight} style={styles.previewBtnIcon} />
+              <Text style={styles.previewBtnText}>{t('app.previewBook')}</Text>
+            </TouchableOpacity>
+          </Tooltip>
         </View>
 
         {/* Book Content Details */}
         <View style={styles.contentContainer}>
           {/* Education Level Badge */}
           <View style={[styles.levelRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <Text style={styles.levelText}>🎓 {levelName}</Text>
+            <GraduationCap size={14} color={colors.textSecondary} />
+            <Text style={styles.levelText}>{levelName}</Text>
             {book.quarter && book.quarter !== 'full' && (
               <Text style={styles.quarterText}>• {t(`app.${book.quarter}`)}</Text>
             )}
@@ -95,7 +109,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
 
           {/* Rating Stars */}
           <View style={[styles.ratingRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <Text style={styles.stars}>★ {book.rating.toFixed(1)}</Text>
+            <Star size={13} color={colors.accent} fill={colors.accent} />
+            <Text style={styles.stars}>{book.rating.toFixed(1)}</Text>
             <Text style={styles.reviewsCount}>({book.reviewCount} {t('app.reviews')})</Text>
           </View>
 
@@ -117,9 +132,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
             )}
           </View>
 
-          {/* Add to Basket Action */}
+          {/* Add to Basket Action using Lucide Icon and Tooltip */}
           <Button
             title={t('app.addToCart')}
+            icon={<ShoppingCart size={16} color={colors.textLight} />}
+            tooltip={t('app.addToCart')}
             onPress={() => addToCart(book)}
             variant="primary"
             size="sm"
@@ -182,9 +199,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
     ...shadows.sm,
   },
-  favIcon: {
-    fontSize: 16,
-  },
   previewOverlayBtn: {
     position: 'absolute',
     bottom: 8,
@@ -193,8 +207,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(18, 59, 43, 0.92)',
     borderRadius: layout.borderRadius.sm,
     paddingVertical: 6,
+    paddingHorizontal: 8,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 6,
+  },
+  previewBtnIcon: {
+    marginRight: 4,
   },
   previewBtnText: {
     color: colors.textLight,

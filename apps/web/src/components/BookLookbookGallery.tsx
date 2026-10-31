@@ -7,12 +7,21 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
+import {
+  Eye,
+  ShoppingCart,
+  ChevronLeft,
+  ChevronRight,
+  GraduationCap,
+  Star,
+} from 'lucide-react-native';
 import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { useStore } from '../context/StoreContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
+import { Tooltip } from './ui/Tooltip';
 
 interface BookLookbookGalleryProps {
   books: Book[];
@@ -50,21 +59,35 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
         {/* Navigation Control Arrows */}
         {books.length > 1 && (
           <>
-            <TouchableOpacity
-              style={[styles.stageArrow, styles.arrowLeft]}
-              onPress={isRTL ? handleNext : handlePrev}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.arrowText}>{isRTL ? '▶' : '◀'}</Text>
-            </TouchableOpacity>
+            <Tooltip content={isRTL ? t('app.nextPage') : t('app.prevPage')}>
+              <TouchableOpacity
+                style={[styles.stageArrow, styles.arrowLeft]}
+                onPress={isRTL ? handleNext : handlePrev}
+                activeOpacity={0.8}
+                accessibilityLabel={isRTL ? t('app.nextPage') : t('app.prevPage')}
+              >
+                {isRTL ? (
+                  <ChevronRight size={22} color={colors.textLight} />
+                ) : (
+                  <ChevronLeft size={22} color={colors.textLight} />
+                )}
+              </TouchableOpacity>
+            </Tooltip>
 
-            <TouchableOpacity
-              style={[styles.stageArrow, styles.arrowRight]}
-              onPress={isRTL ? handlePrev : handleNext}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.arrowText}>{isRTL ? '◀' : '▶'}</Text>
-            </TouchableOpacity>
+            <Tooltip content={isRTL ? t('app.prevPage') : t('app.nextPage')}>
+              <TouchableOpacity
+                style={[styles.stageArrow, styles.arrowRight]}
+                onPress={isRTL ? handlePrev : handleNext}
+                activeOpacity={0.8}
+                accessibilityLabel={isRTL ? t('app.prevPage') : t('app.nextPage')}
+              >
+                {isRTL ? (
+                  <ChevronLeft size={22} color={colors.textLight} />
+                ) : (
+                  <ChevronRight size={22} color={colors.textLight} />
+                )}
+              </TouchableOpacity>
+            </Tooltip>
           </>
         )}
 
@@ -130,7 +153,10 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
 
                 {/* Bottom Overlay Info */}
                 <View style={styles.cardGradient}>
-                  <Text style={styles.levelBadge}>🎓 {level}</Text>
+                  <View style={styles.levelRow}>
+                    <GraduationCap size={12} color={colors.accent} />
+                    <Text style={styles.levelBadge}>{level}</Text>
+                  </View>
                   <Text style={[styles.cardTitle, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={2}>
                     {title}
                   </Text>
@@ -152,13 +178,15 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
           <View style={[styles.detailHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             <View style={styles.detailInfoCol}>
               <View style={[styles.metaBadgesRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <GraduationCap size={14} color={colors.primary} />
                 <Text style={styles.detailLevel}>
-                  🎓 {activeBook.levelName[language] || activeBook.levelName.ar}
+                  {activeBook.levelName[language] || activeBook.levelName.ar}
                 </Text>
                 {activeBook.quarter && activeBook.quarter !== 'full' && (
                   <Text style={styles.detailQuarter}>• {t(`app.${activeBook.quarter}`)}</Text>
                 )}
-                <Text style={styles.detailStars}>★ {activeBook.rating.toFixed(1)}</Text>
+                <Star size={13} color={colors.accent} fill={colors.accent} />
+                <Text style={styles.detailStars}>{activeBook.rating.toFixed(1)}</Text>
               </View>
 
               <Text style={[styles.detailTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
@@ -185,12 +213,16 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
               <View style={[styles.btnRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                 <Button
                   title={t('app.previewBook')}
+                  icon={<Eye size={16} color={colors.primary} />}
+                  tooltip={t('app.previewBook')}
                   onPress={() => onPreviewBook(activeBook)}
                   variant="outline"
                   size="sm"
                 />
                 <Button
                   title={t('app.addToCart')}
+                  icon={<ShoppingCart size={16} color={colors.textLight} />}
+                  tooltip={t('app.addToCart')}
                   onPress={() => addToCart(activeBook)}
                   variant="primary"
                   size="sm"
@@ -235,11 +267,6 @@ const styles = StyleSheet.create({
   },
   arrowRight: {
     right: 12,
-  },
-  arrowText: {
-    color: colors.textLight,
-    fontSize: 16,
-    fontWeight: typography.fontWeight.bold,
   },
   cardsArcWrapper: {
     width: '100%',
@@ -291,11 +318,16 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: 'rgba(10, 35, 25, 0.88)',
   },
+  levelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 2,
+  },
   levelBadge: {
     color: colors.accent,
     fontSize: 10,
     fontWeight: typography.fontWeight.bold,
-    marginBottom: 2,
   },
   cardTitle: {
     color: colors.textLight,
@@ -338,7 +370,7 @@ const styles = StyleSheet.create({
   },
   metaBadgesRow: {
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     marginBottom: 4,
   },
   detailLevel: {

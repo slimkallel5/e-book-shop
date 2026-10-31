@@ -11,8 +11,19 @@ import {
 } from 'react-native';
 import { MOCK_ARTICLES, Article } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
+import {
+  Newspaper,
+  ChevronLeft,
+  ChevronRight,
+  User,
+  Clock,
+  Calendar,
+  X,
+  BookOpen,
+} from 'lucide-react-native';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
+import { Tooltip } from './ui/Tooltip';
 
 interface ArticleLookbookGalleryProps {
   articles?: Article[];
@@ -68,9 +79,12 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
     <View style={styles.sectionContainer}>
       {/* Section Header */}
       <View style={[styles.sectionHeader, { alignItems: isRTL ? 'flex-start' : 'flex-end' }]}>
-        <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-          📰 {t('app.articlesGalleryTitle')}
-        </Text>
+        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+          <Newspaper size={24} color={colors.accent} />
+          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {t('app.articlesGalleryTitle')}
+          </Text>
+        </View>
         <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
           {t('app.articlesGallerySub')}
         </Text>
@@ -79,25 +93,37 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
       {/* Horizontally Arranged Curved 3D Lookbook Stage */}
       <View style={styles.perspectiveStage}>
         {/* Navigation Arrows */}
-        <TouchableOpacity
-          style={[styles.navArrow, styles.arrowLeft]}
-          onPress={isRTL ? handleNext : handlePrev}
-          accessibilityLabel="Previous article"
-          accessibilityRole="button"
-          activeOpacity={0.8}
-        >
-          <Text style={styles.arrowIcon}>{isRTL ? '▶' : '◀'}</Text>
-        </TouchableOpacity>
+        <Tooltip content={isRTL ? t('app.nextPage') : t('app.prevPage')}>
+          <TouchableOpacity
+            style={[styles.navArrow, styles.arrowLeft]}
+            onPress={isRTL ? handleNext : handlePrev}
+            accessibilityLabel={isRTL ? t('app.nextPage') : t('app.prevPage')}
+            accessibilityRole="button"
+            activeOpacity={0.8}
+          >
+            {isRTL ? (
+              <ChevronRight size={22} color={colors.textLight} />
+            ) : (
+              <ChevronLeft size={22} color={colors.textLight} />
+            )}
+          </TouchableOpacity>
+        </Tooltip>
 
-        <TouchableOpacity
-          style={[styles.navArrow, styles.arrowRight]}
-          onPress={isRTL ? handlePrev : handleNext}
-          accessibilityLabel="Next article"
-          accessibilityRole="button"
-          activeOpacity={0.8}
-        >
-          <Text style={styles.arrowIcon}>{isRTL ? '◀' : '▶'}</Text>
-        </TouchableOpacity>
+        <Tooltip content={isRTL ? t('app.prevPage') : t('app.nextPage')}>
+          <TouchableOpacity
+            style={[styles.navArrow, styles.arrowRight]}
+            onPress={isRTL ? handlePrev : handleNext}
+            accessibilityLabel={isRTL ? t('app.prevPage') : t('app.nextPage')}
+            accessibilityRole="button"
+            activeOpacity={0.8}
+          >
+            {isRTL ? (
+              <ChevronLeft size={22} color={colors.textLight} />
+            ) : (
+              <ChevronRight size={22} color={colors.textLight} />
+            )}
+          </TouchableOpacity>
+        </Tooltip>
 
         {/* Curved Row of Image Cards */}
         <View style={styles.cardsRowWrapper}>
@@ -159,8 +185,14 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
                     {title}
                   </Text>
                   <View style={[styles.metaRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                    <Text style={styles.metaText}>⏱ {article.readTime}</Text>
-                    <Text style={styles.metaText}>👤 {article.author}</Text>
+                    <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}>
+                      <Clock size={12} color={colors.accentLight} />
+                      <Text style={styles.metaText}>{article.readTime}</Text>
+                    </View>
+                    <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}>
+                      <User size={12} color={colors.accentLight} />
+                      <Text style={styles.metaText}>{article.author}</Text>
+                    </View>
                   </View>
                 </View>
 
@@ -190,6 +222,8 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
             <View style={styles.storyActionCol}>
               <Button
                 title={t('app.readArticle')}
+                icon={<BookOpen size={18} color={colors.textLight} />}
+                tooltip={t('app.readArticle')}
                 onPress={() => setExpandedArticle(activeArticle)}
                 variant="primary"
                 size="md"
@@ -207,15 +241,18 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
               <Text style={styles.readerCategory}>
                 {expandedArticle.category[language] || expandedArticle.category.ar}
               </Text>
-              <TouchableOpacity
-                style={styles.closeBtn}
-                onPress={() => setExpandedArticle(null)}
-                accessibilityLabel={t('app.closeArticle')}
-                accessibilityRole="button"
-                activeOpacity={0.8}
-              >
-                <Text style={styles.closeBtnText}>✕ {t('app.closeArticle')}</Text>
-              </TouchableOpacity>
+              <Tooltip content={t('app.closeArticle')}>
+                <TouchableOpacity
+                  style={[styles.closeBtn, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}
+                  onPress={() => setExpandedArticle(null)}
+                  accessibilityLabel={t('app.closeArticle')}
+                  accessibilityRole="button"
+                  activeOpacity={0.8}
+                >
+                  <X size={16} color={colors.textLight} />
+                  <Text style={styles.closeBtnText}>{t('app.closeArticle')}</Text>
+                </TouchableOpacity>
+              </Tooltip>
             </View>
 
             <ScrollView contentContainerStyle={styles.readerScrollBody}>
@@ -223,10 +260,19 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
                 {expandedArticle.title[language] || expandedArticle.title.ar}
               </Text>
 
-              <View style={[styles.readerMetaRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Text style={styles.readerMetaText}>✍️ {expandedArticle.author}</Text>
-                <Text style={styles.readerMetaText}>📅 {expandedArticle.date}</Text>
-                <Text style={styles.readerMetaText}>⏱ {expandedArticle.readTime}</Text>
+              <View style={[styles.readerMetaRow, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 12 }]}>
+                <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}>
+                  <User size={14} color={colors.primary} />
+                  <Text style={styles.readerMetaText}>{expandedArticle.author}</Text>
+                </View>
+                <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}>
+                  <Calendar size={14} color={colors.primary} />
+                  <Text style={styles.readerMetaText}>{expandedArticle.date}</Text>
+                </View>
+                <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}>
+                  <Clock size={14} color={colors.primary} />
+                  <Text style={styles.readerMetaText}>{expandedArticle.readTime}</Text>
+                </View>
               </View>
 
               <Image source={{ uri: expandedArticle.coverUrl }} style={styles.readerImage} resizeMode="cover" />

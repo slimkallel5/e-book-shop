@@ -8,11 +8,26 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  ShoppingCart,
+  RefreshCw,
+  User,
+  Phone,
+  Mail,
+  MapPin,
+  XCircle,
+  Eye,
+  Check,
+  AlertCircle,
+  BookOpen,
+  DollarSign,
+} from 'lucide-react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
+import { Tooltip } from './ui/Tooltip';
 import { Modal } from './ui/Modal';
 
 export interface AdminOrderItem {
@@ -193,15 +208,22 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
       {/* Header & Filter Controls */}
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View>
-          <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-            🛒 {t('admin.orderManagement')}
-          </Text>
+          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+            <ShoppingCart size={22} color={colors.primary} />
+            <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('admin.orderManagement')}
+            </Text>
+          </View>
           <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.orderManagementSub')}
           </Text>
         </View>
-        <TouchableOpacity style={styles.refreshBtn} onPress={fetchOrders}>
-          <Text style={styles.refreshBtnText}>🔄 {t('admin.refreshData')}</Text>
+        <TouchableOpacity
+          style={[styles.refreshBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+          onPress={fetchOrders}
+        >
+          <RefreshCw size={14} color={colors.primary} />
+          <Text style={styles.refreshBtnText}>{t('admin.refreshData')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -263,14 +285,26 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
 
                   {/* Customer Info */}
                   <View style={[styles.customerInfoBox, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
-                    <Text style={styles.customerName}>👤 {ord.customer.fullName}</Text>
-                    <Text style={styles.customerDetail}>📞 {ord.customer.phone} | ✉️ {ord.customer.email}</Text>
-                    <Text style={styles.customerDetail}>📍 {ord.customer.address}, {ord.customer.city}</Text>
+                    <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
+                      <User size={14} color={colors.primary} />
+                      <Text style={styles.customerName}>{ord.customer.fullName}</Text>
+                    </View>
+                    <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
+                      <Phone size={13} color={colors.textSecondary} />
+                      <Text style={styles.customerDetail}>{ord.customer.phone} | </Text>
+                      <Mail size={13} color={colors.textSecondary} />
+                      <Text style={styles.customerDetail}>{ord.customer.email}</Text>
+                    </View>
+                    <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
+                      <MapPin size={13} color={colors.textSecondary} />
+                      <Text style={styles.customerDetail}>{ord.customer.address}, {ord.customer.city}</Text>
+                    </View>
                   </View>
 
                   {ord.status === 'rejected' && ord.rejectionReason && (
-                    <View style={styles.rejectionBox}>
-                      <Text style={styles.rejectionText}>❌ {t('admin.rejectionReasonLabel')}: {ord.rejectionReason}</Text>
+                    <View style={[styles.rejectionBox, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
+                      <XCircle size={15} color="#DC2626" />
+                      <Text style={styles.rejectionText}>{t('admin.rejectionReasonLabel')}: {ord.rejectionReason}</Text>
                     </View>
                   )}
 
@@ -282,29 +316,41 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
                     </View>
 
                     <View style={[styles.actionBtns, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                      <TouchableOpacity
-                        style={styles.detailsBtn}
-                        onPress={() => setSelectedOrder(ord)}
-                      >
-                        <Text style={styles.detailsBtnText}>👁 التفاصيل</Text>
-                      </TouchableOpacity>
+                      <Tooltip content={t('admin.details')}>
+                        <TouchableOpacity
+                          style={[styles.detailsBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}
+                          onPress={() => setSelectedOrder(ord)}
+                          accessibilityLabel={t('admin.details')}
+                        >
+                          <Eye size={14} color={colors.primary} />
+                          <Text style={styles.detailsBtnText}>{t('admin.details')}</Text>
+                        </TouchableOpacity>
+                      </Tooltip>
 
                       {ord.status !== 'delivered' && (
-                        <TouchableOpacity
-                          style={styles.deliverBtn}
-                          onPress={() => handleUpdateStatus(ord.id, 'delivered')}
-                        >
-                          <Text style={styles.deliverBtnText}>✅ تسليم</Text>
-                        </TouchableOpacity>
+                        <Tooltip content={t('admin.deliver')}>
+                          <TouchableOpacity
+                            style={[styles.deliverBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}
+                            onPress={() => handleUpdateStatus(ord.id, 'delivered')}
+                            accessibilityLabel={t('admin.deliver')}
+                          >
+                            <Check size={14} color="#059669" />
+                            <Text style={styles.deliverBtnText}>{t('admin.deliver')}</Text>
+                          </TouchableOpacity>
+                        </Tooltip>
                       )}
 
                       {ord.status !== 'rejected' && (
-                        <TouchableOpacity
-                          style={styles.rejectBtn}
-                          onPress={() => openRejectModal(ord.id)}
-                        >
-                          <Text style={styles.rejectBtnText}>❌ رفض</Text>
-                        </TouchableOpacity>
+                        <Tooltip content={t('admin.reject')}>
+                          <TouchableOpacity
+                            style={[styles.rejectBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}
+                            onPress={() => openRejectModal(ord.id)}
+                            accessibilityLabel={t('admin.reject')}
+                          >
+                            <XCircle size={14} color={colors.error} />
+                            <Text style={styles.rejectBtnText}>{t('admin.reject')}</Text>
+                          </TouchableOpacity>
+                        </Tooltip>
                       )}
                     </View>
                   </View>
@@ -334,11 +380,15 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
             numberOfLines={3}
           />
           {rejectionError ? (
-            <Text style={styles.errorText}>⚠️ {rejectionError}</Text>
+            <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginVertical: 6 }]}>
+              <AlertCircle size={14} color="#D32F2F" />
+              <Text style={styles.errorText}>{rejectionError}</Text>
+            </View>
           ) : null}
 
           <Button
-            title="تأكيد رفض الطلب"
+            title={t('admin.confirmReject')}
+            tooltip={t('admin.confirmReject')}
             onPress={confirmRejection}
             variant="accent"
             size="md"
@@ -352,32 +402,41 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
         <Modal
           visible={!!selectedOrder}
           onClose={() => setSelectedOrder(null)}
-          title={`تفاصيل الطلب: ${selectedOrder.reference}`}
+          title={`${t('admin.orderDetailsTitle')}: ${selectedOrder.reference}`}
         >
           <ScrollView contentContainerStyle={styles.detailScroll}>
             <View style={styles.detailBox}>
-              <Text style={styles.detailTitle}>📍 معلومات الحريف</Text>
-              <Text style={styles.detailLine}>الاسم: {selectedOrder.customer.fullName}</Text>
-              <Text style={styles.detailLine}>الهاتف: {selectedOrder.customer.phone}</Text>
-              <Text style={styles.detailLine}>العنوان: {selectedOrder.customer.address}, {selectedOrder.customer.city}</Text>
+              <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 8 }]}>
+                <MapPin size={16} color={colors.primary} />
+                <Text style={styles.detailTitle}>{t('admin.customerInfo')}</Text>
+              </View>
+              <Text style={styles.detailLine}>{t('app.fullName')}: {selectedOrder.customer.fullName}</Text>
+              <Text style={styles.detailLine}>{t('app.phone')}: {selectedOrder.customer.phone}</Text>
+              <Text style={styles.detailLine}>{t('app.address')}: {selectedOrder.customer.address}, {selectedOrder.customer.city}</Text>
             </View>
 
             <View style={styles.detailBox}>
-              <Text style={styles.detailTitle}>📚 عناصر الطلب</Text>
+              <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 8 }]}>
+                <BookOpen size={16} color={colors.primary} />
+                <Text style={styles.detailTitle}>{t('admin.orderItems')}</Text>
+              </View>
               {selectedOrder.items.map((item, i) => (
                 <View key={i} style={[styles.itemRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <Text style={styles.itemName}>{item.name[language] || item.name.ar} × {item.quantity}</Text>
-                  <Text style={styles.itemVal}>{item.subtotal.toFixed(2)} د.ت</Text>
+                  <Text style={styles.itemVal}>{item.subtotal.toFixed(2)} {t('app.currency')}</Text>
                 </View>
               ))}
             </View>
 
             <View style={styles.detailBox}>
-              <Text style={styles.detailTitle}>💰 المجموع المالي</Text>
-              <Text style={styles.detailLine}>المجموع الفرعي: {selectedOrder.subtotal.toFixed(2)} د.ت</Text>
-              <Text style={styles.detailLine}>رسوم التوصيل: {selectedOrder.deliveryFee.toFixed(2)} د.ت</Text>
+              <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 8 }]}>
+                <DollarSign size={16} color={colors.primary} />
+                <Text style={styles.detailTitle}>{t('admin.financialSummary')}</Text>
+              </View>
+              <Text style={styles.detailLine}>{t('app.subtotal')}: {selectedOrder.subtotal.toFixed(2)} {t('app.currency')}</Text>
+              <Text style={styles.detailLine}>{t('app.delivery')}: {selectedOrder.deliveryFee.toFixed(2)} {t('app.currency')}</Text>
               <Text style={[styles.detailLine, { fontWeight: typography.fontWeight.bold, color: colors.primary }]}>
-                الإجمالي: {selectedOrder.total.toFixed(2)} د.ت
+                {t('app.total')}: {selectedOrder.total.toFixed(2)} {t('app.currency')}
               </Text>
             </View>
           </ScrollView>

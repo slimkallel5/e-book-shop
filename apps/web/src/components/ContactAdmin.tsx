@@ -7,10 +7,20 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  Mail,
+  RefreshCw,
+  User,
+  Phone,
+  Pin,
+  Calendar,
+  CheckCircle2,
+} from 'lucide-react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
+import { Tooltip } from './ui/Tooltip';
 
 export interface AdminContactMessage {
   id: string;
@@ -85,15 +95,22 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
       {/* Top Header */}
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View>
-          <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-            📩 {t('admin.contactMessagesTitle')}
-          </Text>
+          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+            <Mail size={22} color={colors.primary} />
+            <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('admin.contactMessagesTitle')}
+            </Text>
+          </View>
           <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.contactMessagesSub')}
           </Text>
         </View>
-        <TouchableOpacity style={styles.refreshBtn} onPress={fetchMessages}>
-          <Text style={styles.refreshBtnText}>🔄 {t('admin.refresh')}</Text>
+        <TouchableOpacity
+          style={[styles.refreshBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+          onPress={fetchMessages}
+        >
+          <RefreshCw size={14} color={colors.primary} />
+          <Text style={styles.refreshBtnText}>{t('admin.refresh')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -108,10 +125,21 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
               <View key={msg.id} style={[styles.card, !msg.read && styles.unreadCard]}>
                 <View style={[styles.cardHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <View>
-                    <Text style={styles.senderName}>👤 {msg.name}</Text>
-                    <Text style={styles.contactDetails}>
-                      ✉️ {msg.email} {msg.phone ? `| 📞 ${msg.phone}` : ''}
-                    </Text>
+                    <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
+                      <User size={15} color={colors.primary} />
+                      <Text style={styles.senderName}>{msg.name}</Text>
+                    </View>
+                    <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginTop: 2 }]}>
+                      <Mail size={13} color={colors.textSecondary} />
+                      <Text style={styles.contactDetails}>{msg.email}</Text>
+                      {msg.phone ? (
+                        <>
+                          <Text style={styles.contactDetails}> | </Text>
+                          <Phone size={13} color={colors.textSecondary} />
+                          <Text style={styles.contactDetails}>{msg.phone}</Text>
+                        </>
+                      ) : null}
+                    </View>
                   </View>
                   <Badge
                     label={msg.read ? t('admin.readStatus') : t('admin.newStatus')}
@@ -119,26 +147,36 @@ export const ContactAdmin: React.FC<ContactAdminProps> = ({ token }) => {
                   />
                 </View>
 
-                <Text style={[styles.subjectText, { textAlign: isRTL ? 'right' : 'left' }]}>
-                  📌 {t('app.subject')}: {msg.subject}
-                </Text>
+                <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginVertical: 4 }]}>
+                  <Pin size={14} color={colors.accent} />
+                  <Text style={[styles.subjectText, { textAlign: isRTL ? 'right' : 'left' }]}>
+                    {t('app.subject')}: {msg.subject}
+                  </Text>
+                </View>
 
                 <Text style={[styles.messageText, { textAlign: isRTL ? 'right' : 'left' }]}>
                   {msg.message}
                 </Text>
 
                 <View style={[styles.cardFooter, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  <Text style={styles.dateText}>
-                    📅 {new Date(msg.createdAt).toLocaleDateString()}
-                  </Text>
+                  <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}>
+                    <Calendar size={13} color={colors.textMuted} />
+                    <Text style={styles.dateText}>
+                      {new Date(msg.createdAt).toLocaleDateString()}
+                    </Text>
+                  </View>
 
                   {!msg.read && (
-                    <TouchableOpacity
-                      style={styles.readBtn}
-                      onPress={() => markAsRead(msg.id)}
-                    >
-                      <Text style={styles.readBtnText}>✅ {t('admin.markAsRead')}</Text>
-                    </TouchableOpacity>
+                    <Tooltip content={t('admin.markAsRead')}>
+                      <TouchableOpacity
+                        style={[styles.readBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}
+                        onPress={() => markAsRead(msg.id)}
+                        accessibilityLabel={t('admin.markAsRead')}
+                      >
+                        <CheckCircle2 size={14} color="#059669" />
+                        <Text style={styles.readBtnText}>{t('admin.markAsRead')}</Text>
+                      </TouchableOpacity>
+                    </Tooltip>
                   )}
                 </View>
               </View>

@@ -8,10 +8,19 @@ import {
   Modal,
   Platform,
 } from 'react-native';
+import {
+  ZoomIn,
+  ZoomOut,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  FileQuestion,
+} from 'lucide-react-native';
 import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
+import { Tooltip } from './ui/Tooltip';
 
 interface BookViewerProps {
   book: Book | null;
@@ -93,23 +102,33 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
 
             <View style={[styles.actionsGroup, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               {hasPages && (
-                <TouchableOpacity
-                  style={styles.iconBtn}
-                  onPress={() => setIsZoomed(!isZoomed)}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.iconBtnText}>{isZoomed ? '🔍-' : '🔍+'}</Text>
-                </TouchableOpacity>
+                <Tooltip content={isZoomed ? t('app.zoomOut') : t('app.zoomIn')}>
+                  <TouchableOpacity
+                    style={styles.iconBtn}
+                    onPress={() => setIsZoomed(!isZoomed)}
+                    activeOpacity={0.8}
+                    accessibilityRole="button"
+                    accessibilityLabel={isZoomed ? t('app.zoomOut') : t('app.zoomIn')}
+                  >
+                    {isZoomed ? (
+                      <ZoomOut size={18} color={colors.textLight} />
+                    ) : (
+                      <ZoomIn size={18} color={colors.textLight} />
+                    )}
+                  </TouchableOpacity>
+                </Tooltip>
               )}
-              <TouchableOpacity
-                style={styles.closeBtn}
-                onPress={onClose}
-                activeOpacity={0.8}
-                accessibilityRole="button"
-                accessibilityLabel="Close book preview"
-              >
-                <Text style={styles.closeBtnText}>✕</Text>
-              </TouchableOpacity>
+              <Tooltip content={t('app.close')}>
+                <TouchableOpacity
+                  style={styles.closeBtn}
+                  onPress={onClose}
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('app.closeConfirmation')}
+                >
+                  <X size={18} color={colors.textLight} />
+                </TouchableOpacity>
+              </Tooltip>
             </View>
           </View>
 
@@ -118,16 +137,22 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
             {hasPages ? (
               <View style={styles.book3DWrapper}>
                 {/* Left Navigation Arrow */}
-                <TouchableOpacity
-                  style={[styles.navArrow, styles.navArrowLeft]}
-                  onPress={onLeftArrow}
-                  disabled={isRTL ? currentPage === samplePages.length - 1 : currentPage === 0}
-                  activeOpacity={0.7}
-                  accessibilityRole="button"
-                  accessibilityLabel="Previous Page"
-                >
-                  <Text style={styles.navArrowText}>{isRTL ? '▶' : '◀'}</Text>
-                </TouchableOpacity>
+                <Tooltip content={isRTL ? t('app.nextPage') : t('app.prevPage')}>
+                  <TouchableOpacity
+                    style={[styles.navArrow, styles.navArrowLeft]}
+                    onPress={onLeftArrow}
+                    disabled={isRTL ? currentPage === samplePages.length - 1 : currentPage === 0}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel={isRTL ? t('app.nextPage') : t('app.prevPage')}
+                  >
+                    {isRTL ? (
+                      <ChevronRight size={24} color={colors.textLight} />
+                    ) : (
+                      <ChevronLeft size={24} color={colors.textLight} />
+                    )}
+                  </TouchableOpacity>
+                </Tooltip>
 
                 {/* Simulated Interactive 3D Open Page Spread */}
                 <View style={[styles.spreadContainer, isZoomed && (prefersReducedMotion ? styles.zoomedContainerReduced : styles.zoomedContainer)]}>
@@ -143,20 +168,26 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                 </View>
 
                 {/* Right Navigation Arrow */}
-                <TouchableOpacity
-                  style={[styles.navArrow, styles.navArrowRight]}
-                  onPress={onRightArrow}
-                  disabled={isRTL ? currentPage === 0 : currentPage === samplePages.length - 1}
-                  activeOpacity={0.7}
-                  accessibilityRole="button"
-                  accessibilityLabel="Next Page"
-                >
-                  <Text style={styles.navArrowText}>{isRTL ? '◀' : '▶'}</Text>
-                </TouchableOpacity>
+                <Tooltip content={isRTL ? t('app.prevPage') : t('app.nextPage')}>
+                  <TouchableOpacity
+                    style={[styles.navArrow, styles.navArrowRight]}
+                    onPress={onRightArrow}
+                    disabled={isRTL ? currentPage === 0 : currentPage === samplePages.length - 1}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel={isRTL ? t('app.prevPage') : t('app.nextPage')}
+                  >
+                    {isRTL ? (
+                      <ChevronLeft size={24} color={colors.textLight} />
+                    ) : (
+                      <ChevronRight size={24} color={colors.textLight} />
+                    )}
+                  </TouchableOpacity>
+                </Tooltip>
               </View>
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyStateIcon}>📭</Text>
+                <FileQuestion size={48} color={colors.textMuted} style={styles.emptyStateIcon} />
                 <Text style={styles.emptyStateText}>{t('app.noPreview')}</Text>
               </View>
             )}
@@ -167,6 +198,8 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
             <View style={[styles.footerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Button
                 title={t('app.prevPage')}
+                icon={isRTL ? <ChevronRight size={16} color={colors.primary} /> : <ChevronLeft size={16} color={colors.primary} />}
+                tooltip={t('app.prevPage')}
                 onPress={handlePrevPage}
                 disabled={currentPage === 0}
                 variant="outline"
@@ -177,6 +210,8 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
               </Text>
               <Button
                 title={t('app.nextPage')}
+                icon={isRTL ? <ChevronLeft size={16} color={colors.textLight} /> : <ChevronRight size={16} color={colors.textLight} />}
+                tooltip={t('app.nextPage')}
                 onPress={handleNextPage}
                 disabled={currentPage === samplePages.length - 1}
                 variant="primary"
@@ -240,11 +275,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: layout.borderRadius.sm,
   },
-  iconBtnText: {
-    color: colors.textLight,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.bold,
-  },
   closeBtn: {
     backgroundColor: colors.error,
     width: 32,
@@ -252,10 +282,6 @@ const styles = StyleSheet.create({
     borderRadius: layout.borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  closeBtnText: {
-    color: colors.textLight,
-    fontWeight: typography.fontWeight.bold,
   },
   stage: {
     flex: 1,
@@ -286,11 +312,6 @@ const styles = StyleSheet.create({
   },
   navArrowRight: {
     marginLeft: 8,
-  },
-  navArrowText: {
-    color: colors.textLight,
-    fontSize: 18,
-    fontWeight: typography.fontWeight.bold,
   },
   spreadContainer: {
     flex: 1,
@@ -331,7 +352,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyStateIcon: {
-    fontSize: 48,
     marginBottom: 12,
   },
   emptyStateText: {
