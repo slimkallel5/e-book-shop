@@ -6,6 +6,12 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import {
+  BarChart3,
+  Package,
+  AlertTriangle,
+  ShoppingCart,
+} from 'lucide-react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
@@ -107,9 +113,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-        📊 {t('admin.dashboardTitle')}
-      </Text>
+      <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, marginBottom: 16 }]}>
+        <BarChart3 size={24} color={colors.primary} />
+        <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left', marginBottom: 0 }]}>
+          {t('admin.dashboardTitle')}
+        </Text>
+      </View>
 
       {/* KPI Cards Grid */}
       <View style={[styles.kpiGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
@@ -145,9 +154,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
 
       {/* Order Status Breakdown Section */}
       <View style={styles.sectionCard}>
-        <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-          📦 {t('admin.statusBreakdown')}
-        </Text>
+        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, marginBottom: 12 }]}>
+          <Package size={20} color={colors.primary} />
+          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {t('admin.statusBreakdown')}
+          </Text>
+        </View>
         <View style={[styles.statusRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <View style={[styles.statusBadge, { backgroundColor: '#FEF3C7' }]}>
             <Text style={[styles.statusText, { color: '#D97706' }]}>
@@ -174,9 +186,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
 
       {/* Low-Stock Alerts Section */}
       <View style={styles.sectionCard}>
-        <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-          ⚠️ {t('admin.lowStockAlerts')}
-        </Text>
+        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, marginBottom: 12 }]}>
+          <AlertTriangle size={20} color="#D97706" />
+          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {t('admin.lowStockAlerts')}
+          </Text>
+        </View>
         {stats.lowStockArticles.length === 0 ? (
           <Text style={styles.emptyText}>جميع الكتب متوفرة بمخزون جيد</Text>
         ) : (
@@ -203,9 +218,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
 
       {/* Recent Orders Section */}
       <View style={styles.sectionCard}>
-        <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-          🛒 {t('admin.recentOrders')}
-        </Text>
+        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, marginBottom: 12 }]}>
+          <ShoppingCart size={20} color={colors.primary} />
+          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {t('admin.recentOrders')}
+          </Text>
+        </View>
         <View style={styles.table}>
           {stats.recentOrders.map((ord) => (
             <View

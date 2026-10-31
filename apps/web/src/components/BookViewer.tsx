@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,21 @@ import {
   TouchableOpacity,
   Modal,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
+import {
+  ZoomIn,
+  ZoomOut,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  FileQuestion,
+} from 'lucide-react-native';
 import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
+import { Tooltip } from './ui/Tooltip';
 
 interface BookViewerProps {
   book: Book | null;
@@ -19,22 +29,189 @@ interface BookViewerProps {
   onClose: () => void;
 }
 
+// Global helper to load PDF.js dynamically on web
+let pdfjsPromise: Promise<any> | null = null;
+function loadPdfJs(): Promise<any> {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') {
+    return Promise.reject(new Error('PDF.js is only supported on web'));
+  }
+
+  const win = window as any;
+  if (win.pdfjsLib) {
+    return Promise.resolve(win.pdfjsLib);
+  }
+
+  if (pdfjsPromise) {
+    return pdfjsPromise;
+  }
+
+  pdfjsPromise = new Promise((resolve, reject) => {
+    const existing = document.querySelector('script[data-pdfjs-lib]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve((window as any).pdfjsLib));
+      existing.addEventListener('error', (err) => reject(err));
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    script.async = true;
+    script.setAttribute('data-pdfjs-lib', 'true');
+    script.onload = () => {
+      const pdfjs = (window as any).pdfjsLib;
+      if (pdfjs) {
+        pdfjs.GlobalWorkerOptions.workerSrc =
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        resolve(pdfjs);
+      } else {
+        reject(new Error('PDF.js failed to initialize'));
+      }
+    };
+    script.onerror = (e) => reject(new Error('Failed to load PDF.js script: ' + e));
+    document.head.appendChild(script);
+  });
+
+  return pdfjsPromise;
+}
+
+function isPdfUrl(url?: string): boolean {
+  if (!url) return false;
+  const cleanUrl = url.split('?')[0].toLowerCase();
+  return cleanUrl.endsWith('.pdf');
+}
+
 export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }) => {
   const { language, isRTL, t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
+
+  // PDF rendering state
+  const [pdfDoc, setPdfDoc] = useState<any>(null);
+  const [pdfTotalPages, setPdfTotalPages] = useState<number>(0);
+  const [pdfRenderedPages, setPdfRenderedPages] = useState<Record<number, string>>({});
+  const [isLoadingPdf, setIsLoadingPdf] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const prefersReducedMotion =
     Platform.OS === 'web' &&
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-  const samplePages = book?.samplePages || [];
-  const hasPages = samplePages.length > 0;
+  const rawSamplePages = book?.samplePages || [];
+  const firstSample = rawSamplePages[0];
+  const isPdf = isPdfUrl(firstSample);
+
+  // If it's a PDF, total pages is determined by pdfDoc (or fallback to 1 while loading)
+  const totalPages = isPdf ? (pdfTotalPages || 1) : rawSamplePages.length;
+  const hasPages = rawSamplePages.length > 0;
   const title = book ? (book.title[language] || book.title.ar) : '';
 
+  // Reset state when book or visible modal state changes
+  useEffect(() => {
+    setCurrentPage(0);
+    setIsZoomed(false);
+    setPdfDoc(null);
+    setPdfTotalPages(0);
+    setPdfRenderedPages({});
+    setPdfError(null);
+    setIsLoadingPdf(false);
+  }, [book?.id, visible]);
+
+  // Load PDF Document when modal opens with a PDF sample
+  useEffect(() => {
+    if (!visible || !book || !firstSample || !isPdf) {
+      return;
+    }
+
+    let isCancelled = false;
+    setIsLoadingPdf(true);
+    setPdfError(null);
+
+    loadPdfJs()
+      .then((pdfjs) => {
+        if (isCancelled) return;
+        return pdfjs.getDocument(firstSample).promise;
+      })
+      .then((loadedDoc) => {
+        if (isCancelled || !loadedDoc) return;
+        if (isMountedRef.current) {
+          setPdfDoc(loadedDoc);
+          setPdfTotalPages(loadedDoc.numPages);
+          setIsLoadingPdf(false);
+        }
+      })
+      .catch((err) => {
+        if (isCancelled) return;
+        console.warn('PDF loading error:', err);
+        if (isMountedRef.current) {
+          setPdfError(err?.message || 'Error loading PDF sample');
+          setIsLoadingPdf(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [visible, book?.id, firstSample, isPdf]);
+
+  // Render the current PDF page to data URL when currentPage or pdfDoc changes
+  useEffect(() => {
+    if (!pdfDoc || !isPdf) return;
+
+    const pageNumber = currentPage + 1; // PDF.js is 1-indexed
+    if (pageNumber > pdfDoc.numPages || pageNumber < 1) return;
+
+    // Check if we already rendered this page
+    if (pdfRenderedPages[currentPage]) return;
+
+    let isCancelled = false;
+
+    pdfDoc
+      .getPage(pageNumber)
+      .then(async (page: any) => {
+        if (isCancelled) return;
+        // Standard high-DPI rendering for clarity
+        const scale = 2.0;
+        const viewport = page.getViewport({ scale });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) return;
+        await page.render({ canvasContext: ctx, viewport }).promise;
+
+        if (isCancelled) return;
+        const dataUrl = canvas.toDataURL('image/png');
+        if (isMountedRef.current) {
+          setPdfRenderedPages((prev) => ({
+            ...prev,
+            [currentPage]: dataUrl,
+          }));
+        }
+      })
+      .catch((err: any) => {
+        if (!isCancelled) {
+          console.warn(`Error rendering PDF page ${pageNumber}:`, err);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [pdfDoc, currentPage, isPdf, pdfRenderedPages]);
+
   const handleNextPage = () => {
-    if (currentPage < samplePages.length - 1) {
+    if (currentPage < totalPages - 1) {
       setCurrentPage((prev) => prev + 1);
     }
   };
@@ -48,12 +225,6 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
   // In RTL mode (Arabic), next page goes left-to-right structurally
   const onRightArrow = isRTL ? handlePrevPage : handleNextPage;
   const onLeftArrow = isRTL ? handleNextPage : handlePrevPage;
-
-  // Reset page when book changes
-  useEffect(() => {
-    setCurrentPage(0);
-    setIsZoomed(false);
-  }, [book?.id]);
 
   useEffect(() => {
     if (!visible || !book || Platform.OS !== 'web' || typeof window === 'undefined') return;
@@ -72,9 +243,14 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [visible, book, currentPage, isRTL, samplePages.length]);
+  }, [visible, book, currentPage, isRTL, totalPages]);
 
   if (!book) return null;
+
+  // Active page image uri: if PDF, use rendered dataUrl; otherwise image URL
+  const activeImageUri = isPdf
+    ? pdfRenderedPages[currentPage]
+    : rawSamplePages[currentPage];
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -87,29 +263,39 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                 {title}
               </Text>
               <Text style={styles.pageCounter}>
-                {hasPages ? `${t('app.page')} ${currentPage + 1} ${t('app.of')} ${samplePages.length}` : t('app.noPreview')}
+                {hasPages ? `${t('app.page')} ${currentPage + 1} ${t('app.of')} ${totalPages}` : t('app.noPreview')}
               </Text>
             </View>
 
             <View style={[styles.actionsGroup, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               {hasPages && (
-                <TouchableOpacity
-                  style={styles.iconBtn}
-                  onPress={() => setIsZoomed(!isZoomed)}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.iconBtnText}>{isZoomed ? '🔍-' : '🔍+'}</Text>
-                </TouchableOpacity>
+                <Tooltip content={isZoomed ? t('app.zoomOut') : t('app.zoomIn')}>
+                  <TouchableOpacity
+                    style={styles.iconBtn}
+                    onPress={() => setIsZoomed(!isZoomed)}
+                    activeOpacity={0.8}
+                    accessibilityRole="button"
+                    accessibilityLabel={isZoomed ? t('app.zoomOut') : t('app.zoomIn')}
+                  >
+                    {isZoomed ? (
+                      <ZoomOut size={18} color={colors.textLight} />
+                    ) : (
+                      <ZoomIn size={18} color={colors.textLight} />
+                    )}
+                  </TouchableOpacity>
+                </Tooltip>
               )}
-              <TouchableOpacity
-                style={styles.closeBtn}
-                onPress={onClose}
-                activeOpacity={0.8}
-                accessibilityRole="button"
-                accessibilityLabel="Close book preview"
-              >
-                <Text style={styles.closeBtnText}>✕</Text>
-              </TouchableOpacity>
+              <Tooltip content={t('app.close')}>
+                <TouchableOpacity
+                  style={styles.closeBtn}
+                  onPress={onClose}
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('app.closeConfirmation')}
+                >
+                  <X size={18} color={colors.textLight} />
+                </TouchableOpacity>
+              </Tooltip>
             </View>
           </View>
 
@@ -118,45 +304,75 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
             {hasPages ? (
               <View style={styles.book3DWrapper}>
                 {/* Left Navigation Arrow */}
-                <TouchableOpacity
-                  style={[styles.navArrow, styles.navArrowLeft]}
-                  onPress={onLeftArrow}
-                  disabled={isRTL ? currentPage === samplePages.length - 1 : currentPage === 0}
-                  activeOpacity={0.7}
-                  accessibilityRole="button"
-                  accessibilityLabel="Previous Page"
-                >
-                  <Text style={styles.navArrowText}>{isRTL ? '▶' : '◀'}</Text>
-                </TouchableOpacity>
+                <Tooltip content={isRTL ? t('app.nextPage') : t('app.prevPage')}>
+                  <TouchableOpacity
+                    style={[styles.navArrow, styles.navArrowLeft]}
+                    onPress={onLeftArrow}
+                    disabled={isRTL ? currentPage === samplePages.length - 1 : currentPage === 0}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel={isRTL ? t('app.nextPage') : t('app.prevPage')}
+                  >
+                    {isRTL ? (
+                      <ChevronRight size={24} color={colors.textLight} />
+                    ) : (
+                      <ChevronLeft size={24} color={colors.textLight} />
+                    )}
+                  </TouchableOpacity>
+                </Tooltip>
 
                 {/* Simulated Interactive 3D Open Page Spread */}
                 <View style={[styles.spreadContainer, isZoomed && (prefersReducedMotion ? styles.zoomedContainerReduced : styles.zoomedContainer)]}>
                   {/* Spine Depth Shadow */}
                   <View style={styles.spineShadow} />
 
-                  <Image
-                    source={{ uri: samplePages[currentPage] }}
-                    style={styles.pageImage}
-                    resizeMode="contain"
-                    accessibilityLabel={`${title} - ${t('app.page')} ${currentPage + 1}`}
-                  />
+                  {isLoadingPdf && !activeImageUri ? (
+                    <View style={styles.loadingContainer}>
+                      <ActivityIndicator size="large" color={colors.accent} />
+                      <Text style={styles.loadingText}>
+                        {isRTL ? 'جاري تحميل عينة الكتاب...' : 'Loading sample preview...'}
+                      </Text>
+                    </View>
+                  ) : pdfError && !activeImageUri ? (
+                    <View style={styles.emptyState}>
+                      <Text style={styles.emptyStateIcon}>⚠️</Text>
+                      <Text style={styles.emptyStateText}>{pdfError}</Text>
+                    </View>
+                  ) : activeImageUri ? (
+                    <Image
+                      source={{ uri: activeImageUri }}
+                      style={styles.pageImage}
+                      resizeMode="contain"
+                      accessibilityLabel={`${title} - ${t('app.page')} ${currentPage + 1}`}
+                    />
+                  ) : (
+                    <View style={styles.loadingContainer}>
+                      <ActivityIndicator size="small" color={colors.accent} />
+                    </View>
+                  )}
                 </View>
 
                 {/* Right Navigation Arrow */}
-                <TouchableOpacity
-                  style={[styles.navArrow, styles.navArrowRight]}
-                  onPress={onRightArrow}
-                  disabled={isRTL ? currentPage === 0 : currentPage === samplePages.length - 1}
-                  activeOpacity={0.7}
-                  accessibilityRole="button"
-                  accessibilityLabel="Next Page"
-                >
-                  <Text style={styles.navArrowText}>{isRTL ? '◀' : '▶'}</Text>
-                </TouchableOpacity>
+                <Tooltip content={isRTL ? t('app.prevPage') : t('app.nextPage')}>
+                  <TouchableOpacity
+                    style={[styles.navArrow, styles.navArrowRight]}
+                    onPress={onRightArrow}
+                    disabled={isRTL ? currentPage === 0 : currentPage === samplePages.length - 1}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel={isRTL ? t('app.prevPage') : t('app.nextPage')}
+                  >
+                    {isRTL ? (
+                      <ChevronLeft size={24} color={colors.textLight} />
+                    ) : (
+                      <ChevronRight size={24} color={colors.textLight} />
+                    )}
+                  </TouchableOpacity>
+                </Tooltip>
               </View>
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyStateIcon}>📭</Text>
+                <FileQuestion size={48} color={colors.textMuted} style={styles.emptyStateIcon} />
                 <Text style={styles.emptyStateText}>{t('app.noPreview')}</Text>
               </View>
             )}
@@ -167,18 +383,22 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
             <View style={[styles.footerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Button
                 title={t('app.prevPage')}
+                icon={isRTL ? <ChevronRight size={16} color={colors.primary} /> : <ChevronLeft size={16} color={colors.primary} />}
+                tooltip={t('app.prevPage')}
                 onPress={handlePrevPage}
                 disabled={currentPage === 0}
                 variant="outline"
                 size="sm"
               />
               <Text style={styles.footerPageInfo}>
-                {currentPage + 1} / {samplePages.length}
+                {currentPage + 1} / {totalPages}
               </Text>
               <Button
                 title={t('app.nextPage')}
+                icon={isRTL ? <ChevronLeft size={16} color={colors.textLight} /> : <ChevronRight size={16} color={colors.textLight} />}
+                tooltip={t('app.nextPage')}
                 onPress={handleNextPage}
-                disabled={currentPage === samplePages.length - 1}
+                disabled={currentPage === totalPages - 1}
                 variant="primary"
                 size="sm"
               />
@@ -240,11 +460,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: layout.borderRadius.sm,
   },
-  iconBtnText: {
-    color: colors.textLight,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.bold,
-  },
   closeBtn: {
     backgroundColor: colors.error,
     width: 32,
@@ -252,10 +467,6 @@ const styles = StyleSheet.create({
     borderRadius: layout.borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  closeBtnText: {
-    color: colors.textLight,
-    fontWeight: typography.fontWeight.bold,
   },
   stage: {
     flex: 1,
@@ -286,11 +497,6 @@ const styles = StyleSheet.create({
   },
   navArrowRight: {
     marginLeft: 8,
-  },
-  navArrowText: {
-    color: colors.textLight,
-    fontSize: 18,
-    fontWeight: typography.fontWeight.bold,
   },
   spreadContainer: {
     flex: 1,
@@ -326,12 +532,21 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    gap: 12,
+  },
+  loadingText: {
+    color: colors.textLight,
+    fontSize: typography.fontSize.sm,
+  },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyStateIcon: {
-    fontSize: 48,
     marginBottom: 12,
   },
   emptyStateText: {

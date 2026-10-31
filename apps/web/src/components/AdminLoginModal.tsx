@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
+import { LogIn } from 'lucide-react-native';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { colors, layout, typography } from '../theme/tokens';
@@ -112,6 +113,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
         <Button
           title={loading ? '...' : t('admin.loginBtn')}
+          icon={<LogIn size={18} color={colors.textLight} />}
+          tooltip={t('admin.loginBtn')}
           onPress={handleLogin}
           variant="primary"
           size="lg"

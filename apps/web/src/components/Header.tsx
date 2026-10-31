@@ -5,10 +5,21 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Image,
 } from 'react-native';
+import {
+  BookOpen,
+  Search,
+  Settings,
+  Store,
+  Package,
+  Mail,
+  Heart,
+  ShoppingCart,
+  ChevronDown,
+} from 'lucide-react-native';
 import { useLanguage, Language } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
+import { Tooltip } from './ui/Tooltip';
 
 interface HeaderProps {
   cartCount?: number;
@@ -52,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Brand Logo & Name */}
         <View style={[styles.brandContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <View style={styles.logoBadge}>
-            <Text style={styles.logoBadgeText}>📚</Text>
+            <BookOpen size={24} color={colors.primaryDark} />
           </View>
           <View style={styles.brandTextCol}>
             <Text style={[styles.brandTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
@@ -67,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Search Bar */}
         <View style={styles.searchWrapper}>
           <View style={[styles.searchBox, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <Text style={styles.searchIcon}>🔍</Text>
+            <Search size={18} color="rgba(255, 255, 255, 0.7)" style={styles.searchIcon} />
             <TextInput
               style={[
                 styles.searchInput,
@@ -85,82 +96,109 @@ export const Header: React.FC<HeaderProps> = ({
         <View style={[styles.actionsRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           {/* Admin Toggle Button */}
           {onToggleAdminMode && (
-            <TouchableOpacity
-              style={[
-                styles.actionBtn,
-                isAdminMode ? styles.adminActiveBtn : styles.adminBtn,
-              ]}
-              onPress={onToggleAdminMode}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.actionIcon}>⚙️</Text>
-              <Text style={[styles.cartLabel, isAdminMode && { color: colors.textLight }]}>
-                {isAdminMode ? t('app.storefront') : t('app.administrator')}
-              </Text>
-            </TouchableOpacity>
+            <Tooltip content={isAdminMode ? t('app.storefront') : t('app.administrator')}>
+              <TouchableOpacity
+                style={[
+                  styles.actionBtn,
+                  isAdminMode ? styles.adminActiveBtn : styles.adminBtn,
+                ]}
+                onPress={onToggleAdminMode}
+                activeOpacity={0.8}
+                accessibilityLabel={isAdminMode ? t('app.storefront') : t('app.administrator')}
+              >
+                {isAdminMode ? (
+                  <Store size={18} color={colors.textLight} />
+                ) : (
+                  <Settings size={18} color={colors.textLight} />
+                )}
+                <Text style={[styles.cartLabel, isAdminMode && { color: colors.textLight }]}>
+                  {isAdminMode ? t('app.storefront') : t('app.administrator')}
+                </Text>
+              </TouchableOpacity>
+            </Tooltip>
           )}
+
           {/* Order Tracking Lookup Button */}
           {onOpenOrderLookup && (
-            <TouchableOpacity
-              style={styles.actionBtn}
-              onPress={onOpenOrderLookup}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.actionIcon}>📦</Text>
-            </TouchableOpacity>
+            <Tooltip content={t('app.lookupOrderTitle')}>
+              <TouchableOpacity
+                style={styles.actionBtn}
+                onPress={onOpenOrderLookup}
+                activeOpacity={0.7}
+                accessibilityLabel={t('app.lookupOrderTitle')}
+              >
+                <Package size={18} color={colors.textLight} />
+              </TouchableOpacity>
+            </Tooltip>
           )}
 
           {/* Contact Us Button */}
           {onOpenContact && (
-            <TouchableOpacity
-              style={styles.actionBtn}
-              onPress={onOpenContact}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.actionIcon}>📩</Text>
-            </TouchableOpacity>
+            <Tooltip content={t('app.contactUs')}>
+              <TouchableOpacity
+                style={styles.actionBtn}
+                onPress={onOpenContact}
+                activeOpacity={0.7}
+                accessibilityLabel={t('app.contactUs')}
+              >
+                <Mail size={18} color={colors.textLight} />
+              </TouchableOpacity>
+            </Tooltip>
           )}
 
           {/* Favourites Button */}
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={onOpenFavourites}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.actionIcon}>❤️</Text>
-            {favouritesCount > 0 && (
-              <View style={styles.badgeCount}>
-                <Text style={styles.badgeCountText}>{favouritesCount}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
+          <Tooltip content={t('app.favourites')}>
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={onOpenFavourites}
+              activeOpacity={0.7}
+              accessibilityLabel={t('app.favourites')}
+            >
+              <Heart
+                size={18}
+                color={favouritesCount > 0 ? colors.error : colors.textLight}
+                fill={favouritesCount > 0 ? colors.error : 'transparent'}
+              />
+              {favouritesCount > 0 && (
+                <View style={styles.badgeCount}>
+                  <Text style={styles.badgeCountText}>{favouritesCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </Tooltip>
 
           {/* Cart Button */}
-          <TouchableOpacity
-            style={[styles.actionBtn, styles.cartBtn]}
-            onPress={onOpenCart}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.actionIcon}>🛒</Text>
-            <Text style={styles.cartLabel}>{t('app.cart')}</Text>
-            {cartCount > 0 && (
-              <View style={[styles.badgeCount, styles.cartBadge]}>
-                <Text style={styles.badgeCountText}>{cartCount}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
+          <Tooltip content={t('app.cart')}>
+            <TouchableOpacity
+              style={[styles.actionBtn, styles.cartBtn]}
+              onPress={onOpenCart}
+              activeOpacity={0.7}
+              accessibilityLabel={t('app.cart')}
+            >
+              <ShoppingCart size={18} color={colors.primaryDark} />
+              <Text style={styles.cartLabel}>{t('app.cart')}</Text>
+              {cartCount > 0 && (
+                <View style={[styles.badgeCount, styles.cartBadge]}>
+                  <Text style={styles.badgeCountText}>{cartCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </Tooltip>
 
           {/* Language Selector */}
           <View style={styles.langSelectorContainer}>
-            <TouchableOpacity
-              style={styles.langBtn}
-              onPress={() => setLangDropdownOpen(!langDropdownOpen)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.langFlag}>{activeLang.flag}</Text>
-              <Text style={styles.langCode}>{activeLang.code.toUpperCase()}</Text>
-              <Text style={styles.dropdownArrow}>▾</Text>
-            </TouchableOpacity>
+            <Tooltip content={t('app.language')}>
+              <TouchableOpacity
+                style={styles.langBtn}
+                onPress={() => setLangDropdownOpen(!langDropdownOpen)}
+                activeOpacity={0.8}
+                accessibilityLabel={t('app.language')}
+              >
+                <Text style={styles.langFlag}>{activeLang.flag}</Text>
+                <Text style={styles.langCode}>{activeLang.code.toUpperCase()}</Text>
+                <ChevronDown size={14} color={colors.textLight} />
+              </TouchableOpacity>
+            </Tooltip>
 
             {langDropdownOpen && (
               <View
@@ -245,9 +283,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoBadgeText: {
-    fontSize: typography.fontSize.xl,
-  },
   brandTextCol: {
     justifyContent: 'center',
   },
@@ -275,7 +310,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.25)',
   },
   searchIcon: {
-    fontSize: 14,
     marginRight: 6,
     marginLeft: 6,
   },
@@ -308,9 +342,6 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold,
     fontSize: typography.fontSize.sm,
   },
-  actionIcon: {
-    fontSize: 16,
-  },
   badgeCount: {
     position: 'absolute',
     top: -4,
@@ -333,7 +364,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    gap: 4,
+    gap: 6,
   },
   adminActiveBtn: {
     flexDirection: 'row',
@@ -341,7 +372,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryDark,
     borderColor: colors.accent,
     borderWidth: 1,
-    gap: 4,
+    gap: 6,
   },
   badgeCountText: {
     color: colors.textLight,
@@ -369,10 +400,6 @@ const styles = StyleSheet.create({
     color: colors.textLight,
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-  },
-  dropdownArrow: {
-    color: colors.textLight,
-    fontSize: 10,
   },
   dropdownMenu: {
     position: 'absolute',

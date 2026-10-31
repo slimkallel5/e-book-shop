@@ -7,6 +7,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import {
+  Search,
+  AlertCircle,
+  XCircle,
+  MapPin,
+} from 'lucide-react-native';
 import { Modal } from './ui/Modal';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
@@ -119,6 +125,8 @@ export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ visible, onC
           />
           <Button
             title={loading ? 'جاري البحث...' : t('app.searchOrder')}
+            icon={<Search size={18} color={colors.primaryDark} />}
+            tooltip={t('app.searchOrder')}
             onPress={handleSearch}
             variant="accent"
             size="md"
@@ -127,8 +135,9 @@ export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ visible, onC
         </View>
 
         {errorMsg && (
-          <View style={styles.errorCard}>
-            <Text style={styles.errorText}>⚠️ {errorMsg}</Text>
+          <View style={[styles.errorCard, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+            <AlertCircle size={16} color="#D32F2F" />
+            <Text style={styles.errorText}>{errorMsg}</Text>
           </View>
         )}
 
@@ -160,18 +169,22 @@ export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ visible, onC
             </View>
 
             {orderData.status === 'rejected' && orderData.rejectionReason && (
-              <View style={styles.rejectionBox}>
+              <View style={[styles.rejectionBox, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
+                <XCircle size={16} color="#DC2626" />
                 <Text style={styles.rejectionText}>
-                  ❌ سبب الرفض: {orderData.rejectionReason}
+                  {t('admin.rejectionReasonLabel')}: {orderData.rejectionReason}
                 </Text>
               </View>
             )}
 
             {/* Delivery Details */}
             <View style={styles.detailsBox}>
-              <Text style={[styles.detailsHeading, { textAlign: isRTL ? 'right' : 'left' }]}>
-                📍 {t('app.customerDetails')}
-              </Text>
+              <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 4 }]}>
+                <MapPin size={16} color={colors.primary} />
+                <Text style={[styles.detailsHeading, { textAlign: isRTL ? 'right' : 'left', marginBottom: 0 }]}>
+                  {t('app.customerDetails')}
+                </Text>
+              </View>
               <Text style={[styles.detailText, { textAlign: isRTL ? 'right' : 'left' }]}>
                 {orderData.customer.fullName} ({orderData.customer.phone})
               </Text>

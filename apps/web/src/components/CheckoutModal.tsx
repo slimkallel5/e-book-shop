@@ -6,9 +6,19 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import {
+  CheckCircle2,
+  AlertCircle,
+  User,
+  Truck,
+  Banknote,
+  Copy,
+  Check,
+} from 'lucide-react-native';
 import { Modal } from './ui/Modal';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
+import { Tooltip } from './ui/Tooltip';
 import { useLanguage } from '../context/LanguageContext';
 import { CartItem } from '../context/StoreContext';
 import { getApiUrl } from '../services/api';
@@ -165,24 +175,28 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         {confirmedOrder ? (
           /* Order Confirmation Screen */
           <View style={styles.successContainer}>
-            <Text style={styles.successBadge}>✅</Text>
+            <CheckCircle2 size={54} color="#059669" style={{ alignSelf: 'center', marginBottom: 12 }} />
             <Text style={styles.successTitle}>{t('app.orderSuccessTitle')}</Text>
             <Text style={styles.successSub}>{t('app.orderSuccessSub')}</Text>
 
             <View style={styles.referenceBox}>
               <Text style={styles.referenceLabel}>{t('app.orderRefLabel')}:</Text>
               <Text style={styles.referenceCode}>{confirmedOrder.reference}</Text>
-              <TouchableOpacity
-                style={styles.copyBtn}
-                onPress={() => {
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }}
-              >
-                <Text style={styles.copyBtnText}>
-                  {copied ? t('app.copied') : t('app.copyRef')}
-                </Text>
-              </TouchableOpacity>
+              <Tooltip content={copied ? t('app.copied') : t('app.copyRef')}>
+                <TouchableOpacity
+                  style={[styles.copyBtn, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}
+                  onPress={() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  accessibilityLabel={t('app.copyRef')}
+                >
+                  {copied ? <Check size={14} color={colors.primaryDark} /> : <Copy size={14} color={colors.primaryDark} />}
+                  <Text style={styles.copyBtnText}>
+                    {copied ? t('app.copied') : t('app.copyRef')}
+                  </Text>
+                </TouchableOpacity>
+              </Tooltip>
             </View>
 
             <View style={styles.orderSummaryBox}>
@@ -202,6 +216,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
             <Button
               title={t('app.closeConfirmation')}
+              tooltip={t('app.closeConfirmation')}
               onPress={handleClose}
               variant="accent"
               size="lg"
@@ -212,15 +227,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           /* Customer Checkout Form */
           <View style={styles.formContent}>
             {errorMsg && (
-              <View style={styles.errorBox}>
-                <Text style={styles.errorText}>⚠️ {errorMsg}</Text>
+              <View style={[styles.errorBox, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+                <AlertCircle size={16} color="#D32F2F" />
+                <Text style={styles.errorText}>{errorMsg}</Text>
               </View>
             )}
 
             {/* Customer Details */}
-            <Text style={[styles.sectionHeading, { textAlign: isRTL ? 'right' : 'left' }]}>
-              👤 {t('app.customerDetails')}
-            </Text>
+            <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 12 }]}>
+              <User size={18} color={colors.primary} />
+              <Text style={[styles.sectionHeading, { textAlign: isRTL ? 'right' : 'left', marginBottom: 0 }]}>
+                {t('app.customerDetails')}
+              </Text>
+            </View>
 
             <Input
               label={t('app.fullName')}
@@ -276,12 +295,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             />
 
             {/* Payment & Delivery Summary */}
-            <Text style={[styles.sectionHeading, { textAlign: isRTL ? 'right' : 'left' }, { marginTop: 16 }]}>
-              🚚 {t('app.paymentMethodLabel')}
-            </Text>
+            <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginTop: 16, marginBottom: 8 }]}>
+              <Truck size={18} color={colors.primary} />
+              <Text style={[styles.sectionHeading, { textAlign: isRTL ? 'right' : 'left', marginBottom: 0 }]}>
+                {t('app.paymentMethodLabel')}
+              </Text>
+            </View>
 
             <View style={styles.paymentMethodBox}>
-              <Text style={styles.paymentMethodTitle}>💵 {t('app.cashOnDelivery')}</Text>
+              <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
+                <Banknote size={18} color={colors.primaryDark} />
+                <Text style={styles.paymentMethodTitle}>{t('app.cashOnDelivery')}</Text>
+              </View>
               <Text style={styles.paymentMethodSub}>
                 {t('app.cashOnDeliverySub')}
               </Text>
@@ -309,6 +334,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
             <Button
               title={loading ? t('app.submittingOrder') : t('app.submitOrder')}
+              icon={<Truck size={18} color={colors.primaryDark} />}
+              tooltip={t('app.submitOrder')}
               onPress={handleSubmit}
               variant="accent"
               size="lg"

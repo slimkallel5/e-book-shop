@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal as RNModal, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal as RNModal } from 'react-native';
+import { X } from 'lucide-react-native';
 import { colors, layout, shadows, typography } from '../../theme/tokens';
+import { useLanguage } from '../../context/LanguageContext';
+import { Tooltip } from './Tooltip';
 
 interface ModalProps {
   visible: boolean;
   onClose: () => void;
-  title?: string;
+  title: string;
   children: React.ReactNode;
-  maxWidth?: number;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -15,22 +17,10 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   title,
   children,
-  maxWidth = 700,
 }) => {
-  useEffect(() => {
-    if (!visible || Platform.OS !== 'web' || typeof window === 'undefined') return;
+  const { isRTL, t } = useLanguage();
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [visible, onClose]);
+  if (!visible) return null;
 
   return (
     <RNModal
@@ -39,30 +29,40 @@ export const Modal: React.FC<ModalProps> = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <TouchableOpacity
-        style={styles.overlay}
-        activeOpacity={1}
-        onPress={onClose}
-      >
+      <View style={styles.overlay}>
+        {/* Backdrop dismiss */}
         <TouchableOpacity
+          style={styles.backdrop}
           activeOpacity={1}
-          style={[styles.modalContent, { maxWidth }]}
-          onPress={(e) => e.stopPropagation()}
-        >
-          <View style={styles.header}>
-            {title ? <Text style={styles.title}>{title}</Text> : <View />}
-            <TouchableOpacity
-              onPress={onClose}
-              style={styles.closeBtn}
-              accessibilityRole="button"
-              accessibilityLabel="Close dialog"
-            >
-              <Text style={styles.closeText}>✕</Text>
-            </TouchableOpacity>
+          onPress={onClose}
+        />
+
+        {/* Modal Window Container */}
+        <View style={styles.modalContainer}>
+          {/* Header */}
+          <View style={[styles.header, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+            <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {title}
+            </Text>
+            <Tooltip content={t('app.close')}>
+              <TouchableOpacity
+                onPress={onClose}
+                style={styles.closeBtn}
+                accessibilityRole="button"
+                accessibilityLabel={t('app.closeConfirmation')}
+                activeOpacity={0.7}
+              >
+                <X size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </Tooltip>
           </View>
-          <View style={styles.body}>{children}</View>
-        </TouchableOpacity>
-      </TouchableOpacity>
+
+          {/* Body Content */}
+          <View style={styles.content}>
+            {children}
+          </View>
+        </View>
+      </View>
     </RNModal>
   );
 };
@@ -70,25 +70,32 @@ export const Modal: React.FC<ModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(10, 35, 25, 0.65)',
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+    zIndex: 1000,
   },
-  modalContent: {
-    width: '100%',
-    maxHeight: '90%',
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  modalContainer: {
     backgroundColor: colors.cardBg,
     borderRadius: layout.borderRadius.xl,
-    overflow: 'hidden',
+    width: '100%',
+    maxWidth: 650,
+    maxHeight: '90%',
     ...shadows.lg,
+    overflow: 'hidden',
+    zIndex: 1001,
+    borderWidth: 1,
+    borderColor: colors.borderDark,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     backgroundColor: colors.background,
@@ -96,20 +103,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.primaryDark,
+    flex: 1,
   },
   closeBtn: {
     padding: 6,
     borderRadius: layout.borderRadius.full,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    backgroundColor: 'rgba(0,0,0,0.05)',
   },
-  closeText: {
-    fontSize: typography.fontSize.md,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.textSecondary,
-  },
-  body: {
+  content: {
     padding: 20,
-    flexShrink: 1,
   },
 });

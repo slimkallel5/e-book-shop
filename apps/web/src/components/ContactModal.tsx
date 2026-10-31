@@ -8,6 +8,12 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, typography } from '../theme/tokens';
+import {
+  Mail,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+} from 'lucide-react-native';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Modal } from './ui/Modal';
@@ -77,11 +83,11 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
   };
 
   return (
-    <Modal visible={visible} onClose={handleClose} title={`📩 ${t('app.contactModalTitle')}`}>
+    <Modal visible={visible} onClose={handleClose} title={t('app.contactModalTitle')}>
       <ScrollView contentContainerStyle={styles.container}>
         {success ? (
           <View style={styles.successBox}>
-            <Text style={styles.successBadge}>✅</Text>
+            <CheckCircle2 size={50} color="#059669" style={{ alignSelf: 'center', marginBottom: 12 }} />
 
             <Text style={styles.successTitle}>{t('app.messageSuccessTitle')}</Text>
             <Text style={styles.successSub}>
@@ -89,6 +95,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
             </Text>
             <Button
               title={t('app.closeConfirmation')}
+              tooltip={t('app.closeConfirmation')}
               onPress={handleClose}
               variant="accent"
               size="md"
@@ -98,8 +105,9 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
         ) : (
           <View style={styles.form}>
             {errorMsg && (
-              <View style={styles.errorBox}>
-                <Text style={styles.errorText}>⚠️ {errorMsg}</Text>
+              <View style={[styles.errorBox, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+                <AlertCircle size={16} color="#D32F2F" />
+                <Text style={styles.errorText}>{errorMsg}</Text>
               </View>
             )}
 
@@ -154,6 +162,8 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
 
             <Button
               title={loading ? t('app.sending') : t('app.sendMessage')}
+              icon={<Send size={18} color={colors.primaryDark} />}
+              tooltip={t('app.sendMessage')}
               onPress={handleSubmit}
               variant="accent"
               size="lg"

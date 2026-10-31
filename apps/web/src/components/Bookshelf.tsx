@@ -1,8 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import {
+  BookOpen,
+  Library,
+  GraduationCap,
+  Compass,
+  Gift,
+  Newspaper,
+  Star,
+} from 'lucide-react-native';
 import { EDUCATION_LEVELS } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
+import { Tooltip } from './ui/Tooltip';
 
 export type NavCategory = 'all' | 'primary' | 'middle' | 'secondary' | 'packs' | 'articles';
 
@@ -19,33 +29,48 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
 }) => {
   const { language, isRTL, t } = useLanguage();
 
-  const navItems: { id: NavCategory; titleKey: string; color: string; icon: string; subtitleKey?: string }[] = [
+  const renderCategoryIcon = (id: NavCategory) => {
+    switch (id) {
+      case 'all':
+        return <Library size={18} color={colors.accent} />;
+      case 'primary':
+        return <GraduationCap size={18} color={colors.accent} />;
+      case 'middle':
+        return <Compass size={18} color={colors.accent} />;
+      case 'secondary':
+        return <GraduationCap size={18} color={colors.accent} />;
+      case 'packs':
+        return <Gift size={18} color={colors.accent} />;
+      case 'articles':
+        return <Newspaper size={18} color={colors.accent} />;
+      default:
+        return <BookOpen size={18} color={colors.accent} />;
+    }
+  };
+
+  const navItems: { id: NavCategory; titleKey: string; color: string; subtitleKey?: string }[] = [
     {
       id: 'all',
       titleKey: 'app.allLevels',
       color: colors.primaryDark,
-      icon: '🏛️',
       subtitleKey: 'app.catalogTitle',
     },
     ...EDUCATION_LEVELS.map((level) => ({
       id: level.id as NavCategory,
       titleKey: level.title[language] || level.title.ar,
       color: level.spineColor,
-      icon: level.id === 'primary' ? '✏️' : level.id === 'middle' ? '📐' : '🎓',
       subtitleKey: level.subTitle[language] || level.subTitle.ar,
     })),
     {
       id: 'packs',
       titleKey: 'app.featuredPacks',
       color: colors.badgePack,
-      icon: '🎁',
       subtitleKey: 'app.packBadge',
     },
     {
       id: 'articles',
       titleKey: 'app.articlesGalleryTitle',
       color: colors.secondary,
-      icon: '📰',
       subtitleKey: 'app.articlesGallerySub',
     },
   ];
@@ -54,7 +79,7 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
     <View style={[styles.shelfContainer, isCompact && styles.shelfContainerCompact]}>
       {/* Wooden Header Bar */}
       <View style={[styles.headerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <Text style={styles.headerIcon}>📚</Text>
+        <BookOpen size={20} color={colors.accent} />
         <Text style={[styles.shelfTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
           {t('app.shelfOverview')}
         </Text>
@@ -71,44 +96,45 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
           const displaySub = item.subtitleKey && item.subtitleKey.startsWith('app.') ? t(item.subtitleKey) : item.subtitleKey;
 
           return (
-            <TouchableOpacity
-              key={item.id}
-              style={[
-                styles.spine3DCard,
-                { backgroundColor: item.color },
-                isSelected && styles.spine3DCardSelected,
-                { flexDirection: isRTL ? 'row-reverse' : 'row' },
-              ]}
-              onPress={() => onSelectCategory(item.id)}
-              activeOpacity={0.88}
-              accessibilityRole="button"
-              accessibilityLabel={displayTitle}
-              accessibilityState={{ selected: isSelected }}
-            >
-              {/* Spine 3D Left Edge Shadow & Ribbing */}
-              <View style={styles.spineRibEdge} />
-              <View style={styles.spineGoldFoil} />
+            <Tooltip key={item.id} content={displayTitle} position="right">
+              <TouchableOpacity
+                style={[
+                  styles.spine3DCard,
+                  { backgroundColor: item.color },
+                  isSelected && styles.spine3DCardSelected,
+                  { flexDirection: isRTL ? 'row-reverse' : 'row' },
+                ]}
+                onPress={() => onSelectCategory(item.id)}
+                activeOpacity={0.88}
+                accessibilityRole="button"
+                accessibilityLabel={displayTitle}
+                accessibilityState={{ selected: isSelected }}
+              >
+                {/* Spine 3D Left Edge Shadow & Ribbing */}
+                <View style={styles.spineRibEdge} />
+                <View style={styles.spineGoldFoil} />
 
-              {/* Book Spine Icon & Content */}
-              <Text style={styles.spineItemIcon}>{item.icon}</Text>
-              <View style={[styles.spineTextCol, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
-                <Text style={[styles.spineTitleText, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
-                  {displayTitle}
-                </Text>
-                {displaySub && (
-                  <Text style={[styles.spineSubText, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
-                    {displaySub}
+                {/* Book Spine Icon & Content */}
+                <View style={styles.spineItemIcon}>{renderCategoryIcon(item.id)}</View>
+                <View style={[styles.spineTextCol, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
+                  <Text style={[styles.spineTitleText, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
+                    {displayTitle}
                   </Text>
-                )}
-              </View>
-
-              {/* Active Golden Bookmark Ribbon Indicator */}
-              {isSelected && (
-                <View style={styles.activeRibbonBookmark}>
-                  <Text style={styles.ribbonText}>★</Text>
+                  {displaySub && (
+                    <Text style={[styles.spineSubText, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
+                      {displaySub}
+                    </Text>
+                  )}
                 </View>
-              )}
-            </TouchableOpacity>
+
+                {/* Active Golden Bookmark Ribbon Indicator */}
+                {isSelected && (
+                  <View style={styles.activeRibbonBookmark}>
+                    <Star size={11} color={colors.primaryDark} fill={colors.primaryDark} />
+                  </View>
+                )}
+              </TouchableOpacity>
+            </Tooltip>
           );
         })}
       </ScrollView>
@@ -143,9 +169,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#523223',
     paddingBottom: 12,
     marginBottom: 16,
-  },
-  headerIcon: {
-    fontSize: 20,
   },
   shelfTitle: {
     color: '#E8D8C8',
@@ -198,7 +221,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 215, 0, 0.25)',
   },
   spineItemIcon: {
-    fontSize: 18,
+    width: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   spineTextCol: {
     flex: 1,
@@ -225,11 +250,6 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.3,
     shadowRadius: 3,
-  },
-  ribbonText: {
-    color: colors.primaryDark,
-    fontSize: 10,
-    fontWeight: typography.fontWeight.bold,
   },
   woodenPlatform: {
     marginTop: 12,
