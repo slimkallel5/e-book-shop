@@ -11,7 +11,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
-import { LottieIcon } from './icons';
 
 export interface AdminReview {
   id: string;
@@ -100,13 +99,7 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
   });
 
   const renderStars = (rating: number) => {
-    return (
-      <View style={{ flexDirection: 'row', gap: 2 }}>
-        {[1, 2, 3, 4, 5].map((i) => (
-          <LottieIcon key={i} name={i <= rating ? 'star' : 'star-outline'} size={14} />
-        ))}
-      </View>
-    );
+    return '⭐'.repeat(rating);
   };
 
   return (
@@ -114,12 +107,9 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
       {/* Top Header */}
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View>
-          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
-            <LottieIcon name="star" size={20} />
-            <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('admin.reviewsManagementTitle')}
-            </Text>
-          </View>
+          <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+            ⭐ {t('admin.reviewsManagementTitle')}
+          </Text>
           <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.reviewsManagementSub')}
           </Text>
@@ -160,10 +150,7 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
                 <View style={[styles.cardHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <View>
                     <Text style={styles.authorName}>👤 {rev.authorName}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                      {renderStars(rev.rating)}
-                      <Text style={styles.starsText}>({rev.rating}/5)</Text>
-                    </View>
+                    <Text style={styles.starsText}>{renderStars(rev.rating)} ({rev.rating}/5)</Text>
                   </View>
                   <Badge
                     label={rev.published ? t('admin.publishedSingle') : t('admin.underReview')}
@@ -181,12 +168,11 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
                   </Text>
 
                   <TouchableOpacity
-                    style={[styles.actionBtn, rev.published ? styles.hideBtn : styles.publishBtn, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}
+                    style={[styles.actionBtn, rev.published ? styles.hideBtn : styles.publishBtn]}
                     onPress={() => togglePublish(rev.id, rev.published)}
                   >
-                    <LottieIcon name={rev.published ? 'eye' : 'check'} size={14} />
                     <Text style={[styles.actionBtnText, rev.published ? styles.hideBtnText : styles.publishBtnText]}>
-                      {rev.published ? t('admin.hide') : t('admin.approveAndPublish')}
+                      {rev.published ? `👁️‍🗨️ ${t('admin.hide')}` : `✅ ${t('admin.approveAndPublish')}`}
                     </Text>
                   </TouchableOpacity>
                 </View>

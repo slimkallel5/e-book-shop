@@ -16,7 +16,6 @@ import { colors, layout, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
-import { LottieIcon } from './icons';
 
 interface ProductDetailModalProps {
   book: Book | null;
@@ -132,7 +131,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 style={styles.favBtn}
                 activeOpacity={0.7}
               >
-                <LottieIcon name={isFav ? 'heart' : 'heart-outline'} size={22} />
+                <Text style={styles.favIcon}>{isFav ? '❤️' : '🤍'}</Text>
               </TouchableOpacity>
             </View>
 
@@ -214,34 +213,27 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
         {/* Customer Review Submission Form */}
         <View style={styles.sectionBlock}>
-          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
-            <LottieIcon name="star" size={20} />
-            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('app.addReviewTitle')}
-            </Text>
-          </View>
+          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+            ⭐ {t('app.addReviewTitle')}
+          </Text>
 
           {reviewSuccess ? (
-            <View style={[styles.reviewSuccessBox, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-              <LottieIcon name="check" size={18} />
+            <View style={styles.reviewSuccessBox}>
               <Text style={styles.reviewSuccessText}>
-                {t('app.reviewSuccess')}
+                ✅ {t('app.reviewSuccess')}
               </Text>
             </View>
           ) : (
             <View style={styles.reviewForm}>
               {reviewError ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <LottieIcon name="alert" size={16} />
-                  <Text style={styles.reviewErrorText}>{reviewError}</Text>
-                </View>
+                <Text style={styles.reviewErrorText}>⚠️ {reviewError}</Text>
               ) : null}
 
               <Text style={styles.fieldLabel}>{t('app.reviews')}:</Text>
               <View style={styles.starRow}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <TouchableOpacity key={star} onPress={() => setReviewRating(star)}>
-                    <LottieIcon name={star <= reviewRating ? 'star' : 'star-outline'} size={24} />
+                    <Text style={styles.starIcon}>{star <= reviewRating ? '⭐' : '☆'}</Text>
                   </TouchableOpacity>
                 ))}
               </View>

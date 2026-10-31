@@ -14,7 +14,6 @@ import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
-import { LottieIcon } from './icons';
 
 export interface AdminOrderItem {
   type: 'article' | 'pack';
@@ -194,13 +193,10 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
       {/* Header & Filter Controls */}
       <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View>
-          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
-            <LottieIcon name="cart" size={20} />
-            <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('admin.orderManagement')}
-            </Text>
-          </View>
-          <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left', marginTop: 2 }]}>
+          <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+            🛒 {t('admin.orderManagement')}
+          </Text>
+          <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.orderManagementSub')}
           </Text>
         </View>
@@ -268,20 +264,13 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
                   {/* Customer Info */}
                   <View style={[styles.customerInfoBox, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
                     <Text style={styles.customerName}>👤 {ord.customer.fullName}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                      <LottieIcon name="phone" size={14} />
-                      <Text style={styles.customerDetail}>{ord.customer.phone}</Text>
-                      <Text style={styles.customerDetail}>|</Text>
-                      <LottieIcon name="mail" size={14} />
-                      <Text style={styles.customerDetail}>{ord.customer.email}</Text>
-                    </View>
+                    <Text style={styles.customerDetail}>📞 {ord.customer.phone} | ✉️ {ord.customer.email}</Text>
                     <Text style={styles.customerDetail}>📍 {ord.customer.address}, {ord.customer.city}</Text>
                   </View>
 
                   {ord.status === 'rejected' && ord.rejectionReason && (
-                    <View style={[styles.rejectionBox, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}>
-                      <LottieIcon name="close" size={14} />
-                      <Text style={styles.rejectionText}>{t('admin.rejectionReasonLabel')}: {ord.rejectionReason}</Text>
+                    <View style={styles.rejectionBox}>
+                      <Text style={styles.rejectionText}>❌ {t('admin.rejectionReasonLabel')}: {ord.rejectionReason}</Text>
                     </View>
                   )}
 
@@ -294,30 +283,27 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
 
                     <View style={[styles.actionBtns, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                       <TouchableOpacity
-                        style={[styles.detailsBtn, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}
+                        style={styles.detailsBtn}
                         onPress={() => setSelectedOrder(ord)}
                       >
-                        <LottieIcon name="eye" size={14} />
-                        <Text style={styles.detailsBtnText}>التفاصيل</Text>
+                        <Text style={styles.detailsBtnText}>👁 التفاصيل</Text>
                       </TouchableOpacity>
 
                       {ord.status !== 'delivered' && (
                         <TouchableOpacity
-                          style={[styles.deliverBtn, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}
+                          style={styles.deliverBtn}
                           onPress={() => handleUpdateStatus(ord.id, 'delivered')}
                         >
-                          <LottieIcon name="check" size={14} />
-                          <Text style={styles.deliverBtnText}>تسليم</Text>
+                          <Text style={styles.deliverBtnText}>✅ تسليم</Text>
                         </TouchableOpacity>
                       )}
 
                       {ord.status !== 'rejected' && (
                         <TouchableOpacity
-                          style={[styles.rejectBtn, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}
+                          style={styles.rejectBtn}
                           onPress={() => openRejectModal(ord.id)}
                         >
-                          <LottieIcon name="close" size={14} />
-                          <Text style={styles.rejectBtnText}>رفض</Text>
+                          <Text style={styles.rejectBtnText}>❌ رفض</Text>
                         </TouchableOpacity>
                       )}
                     </View>

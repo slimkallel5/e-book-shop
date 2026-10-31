@@ -9,7 +9,6 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
-import { LottieIcon } from './icons';
 
 interface DashboardStats {
   totalArticles: number;
@@ -108,12 +107,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, marginBottom: 8 }]}>
-        <LottieIcon name="chart" size={24} />
-        <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left', marginBottom: 0 }]}>
-          {t('admin.dashboardTitle')}
-        </Text>
-      </View>
+      <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+        📊 {t('admin.dashboardTitle')}
+      </Text>
 
       {/* KPI Cards Grid */}
       <View style={[styles.kpiGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
@@ -149,12 +145,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
 
       {/* Order Status Breakdown Section */}
       <View style={styles.sectionCard}>
-        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-          <LottieIcon name="package" size={20} />
-          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            {t('admin.statusBreakdown')}
-          </Text>
-        </View>
+        <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+          📦 {t('admin.statusBreakdown')}
+        </Text>
         <View style={[styles.statusRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <View style={[styles.statusBadge, { backgroundColor: '#FEF3C7' }]}>
             <Text style={[styles.statusText, { color: '#D97706' }]}>
@@ -181,12 +174,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
 
       {/* Low-Stock Alerts Section */}
       <View style={styles.sectionCard}>
-        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-          <LottieIcon name="alert" size={20} />
-          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            {t('admin.lowStockAlerts')}
-          </Text>
-        </View>
+        <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+          ⚠️ {t('admin.lowStockAlerts')}
+        </Text>
         {stats.lowStockArticles.length === 0 ? (
           <Text style={styles.emptyText}>جميع الكتب متوفرة بمخزون جيد</Text>
         ) : (
@@ -213,12 +203,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
 
       {/* Recent Orders Section */}
       <View style={styles.sectionCard}>
-        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-          <LottieIcon name="cart" size={20} />
-          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            {t('admin.recentOrders')}
-          </Text>
-        </View>
+        <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+          🛒 {t('admin.recentOrders')}
+        </Text>
         <View style={styles.table}>
           {stats.recentOrders.map((ord) => (
             <View
