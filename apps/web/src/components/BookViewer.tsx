@@ -308,7 +308,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   <TouchableOpacity
                     style={[styles.navArrow, styles.navArrowLeft]}
                     onPress={onLeftArrow}
-                    disabled={isRTL ? currentPage === rawSamplePages.length - 1 : currentPage === 0}
+                    disabled={isRTL ? currentPage === totalPages - 1 : currentPage === 0}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel={isRTL ? t('app.nextPage') : t('app.prevPage')}
@@ -357,7 +357,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   <TouchableOpacity
                     style={[styles.navArrow, styles.navArrowRight]}
                     onPress={onRightArrow}
-                    disabled={isRTL ? currentPage === 0 : currentPage === rawSamplePages.length - 1}
+                    disabled={isRTL ? currentPage === 0 : currentPage === totalPages - 1}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel={isRTL ? t('app.prevPage') : t('app.nextPage')}
