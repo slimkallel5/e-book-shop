@@ -29,22 +29,23 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
 }) => {
   const { language, isRTL, t } = useLanguage();
 
-  const renderCategoryIcon = (id: NavCategory) => {
+  const renderCategoryIcon = (id: NavCategory, isSelected: boolean) => {
+    const iconColor = isSelected ? colors.primaryDark : colors.accent;
     switch (id) {
       case 'all':
-        return <Library size={18} color={colors.accent} />;
+        return <Library size={18} color={iconColor} />;
       case 'primary':
-        return <GraduationCap size={18} color={colors.accent} />;
+        return <GraduationCap size={18} color={iconColor} />;
       case 'middle':
-        return <Compass size={18} color={colors.accent} />;
+        return <Compass size={18} color={iconColor} />;
       case 'secondary':
-        return <GraduationCap size={18} color={colors.accent} />;
+        return <GraduationCap size={18} color={iconColor} />;
       case 'packs':
-        return <Gift size={18} color={colors.accent} />;
+        return <Gift size={18} color={iconColor} />;
       case 'articles':
-        return <Newspaper size={18} color={colors.accent} />;
+        return <Newspaper size={18} color={iconColor} />;
       default:
-        return <BookOpen size={18} color={colors.accent} />;
+        return <BookOpen size={18} color={iconColor} />;
     }
   };
 
@@ -77,15 +78,17 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
 
   return (
     <View style={[styles.shelfContainer, isCompact && styles.shelfContainerCompact]}>
-      {/* Wooden Header Bar */}
+      {/* Menu Header Bar */}
       <View style={[styles.headerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <BookOpen size={20} color={colors.accent} />
+        <View style={styles.headerIconContainer}>
+          <BookOpen size={18} color={colors.accent} />
+        </View>
         <Text style={[styles.shelfTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
           {t('app.shelfOverview')}
         </Text>
       </View>
 
-      {/* 3D Book Spines Collection */}
+      {/* Navigation Menu List */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.spinesListContent}
@@ -96,41 +99,68 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
           const displaySub = item.subtitleKey && item.subtitleKey.startsWith('app.') ? t(item.subtitleKey) : item.subtitleKey;
 
           return (
-            <Tooltip key={item.id} content={displayTitle} position="right">
+            <Tooltip key={item.id} content={displayTitle} position={isRTL ? 'left' : 'right'}>
               <TouchableOpacity
                 style={[
-                  styles.spine3DCard,
-                  { backgroundColor: item.color },
-                  isSelected && styles.spine3DCardSelected,
+                  styles.menuItemCard,
+                  isSelected && styles.menuItemCardSelected,
                   { flexDirection: isRTL ? 'row-reverse' : 'row' },
                 ]}
                 onPress={() => onSelectCategory(item.id)}
-                activeOpacity={0.88}
+                activeOpacity={0.8}
                 accessibilityRole="button"
                 accessibilityLabel={displayTitle}
                 accessibilityState={{ selected: isSelected }}
               >
-                {/* Spine 3D Left Edge Shadow & Ribbing */}
-                <View style={styles.spineRibEdge} />
-                <View style={styles.spineGoldFoil} />
+                {/* Accent border strip for category differentiation */}
+                <View
+                  style={[
+                    styles.accentStrip,
+                    isRTL ? styles.accentStripRtl : styles.accentStripLtr,
+                    { backgroundColor: item.color },
+                  ]}
+                />
 
-                {/* Book Spine Icon & Content */}
-                <View style={styles.spineItemIcon}>{renderCategoryIcon(item.id)}</View>
-                <View style={[styles.spineTextCol, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
-                  <Text style={[styles.spineTitleText, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
+                {/* Category Icon */}
+                <View
+                  style={[
+                    styles.menuItemIcon,
+                    isSelected && styles.menuItemIconSelected,
+                  ]}
+                >
+                  {renderCategoryIcon(item.id, isSelected)}
+                </View>
+
+                {/* Text Labels */}
+                <View style={[styles.menuItemTextCol, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
+                  <Text
+                    style={[
+                      styles.menuItemTitle,
+                      isSelected && styles.menuItemTitleSelected,
+                      { textAlign: isRTL ? 'right' : 'left' },
+                    ]}
+                    numberOfLines={1}
+                  >
                     {displayTitle}
                   </Text>
                   {displaySub && (
-                    <Text style={[styles.spineSubText, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
+                    <Text
+                      style={[
+                        styles.menuItemSub,
+                        isSelected && styles.menuItemSubSelected,
+                        { textAlign: isRTL ? 'right' : 'left' },
+                      ]}
+                      numberOfLines={1}
+                    >
                       {displaySub}
                     </Text>
                   )}
                 </View>
 
-                {/* Active Golden Bookmark Ribbon Indicator */}
+                {/* Active Indicator Icon */}
                 {isSelected && (
-                  <View style={styles.activeRibbonBookmark}>
-                    <Star size={11} color={colors.primaryDark} fill={colors.primaryDark} />
+                  <View style={styles.selectedBadge}>
+                    <Star size={12} color={colors.primaryDark} fill={colors.primaryDark} />
                   </View>
                 )}
               </TouchableOpacity>
@@ -138,12 +168,6 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
           );
         })}
       </ScrollView>
-
-      {/* Real Handcrafted Wooden Shelf Platform */}
-      <View style={styles.woodenPlatform}>
-        <View style={styles.platformLedge} />
-        <View style={styles.woodTextureLine} />
-      </View>
     </View>
   );
 };
@@ -151,123 +175,108 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
 const styles = StyleSheet.create({
   shelfContainer: {
     width: 280,
-    backgroundColor: '#321C14', // Rich mahogany / dark walnut wood
+    backgroundColor: 'rgba(18, 59, 43, 0.95)',
     borderRadius: layout.borderRadius.xl,
     padding: 16,
     ...shadows.lg,
-    borderWidth: 2,
-    borderColor: '#523223',
-    position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
   },
   shelfContainerCompact: {
     width: '100%',
   },
   headerRow: {
     alignItems: 'center',
-    gap: 8,
-    borderBottomWidth: 1.5,
-    borderBottomColor: '#523223',
-    paddingBottom: 12,
-    marginBottom: 16,
+    gap: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.12)',
+    paddingBottom: 14,
+    marginBottom: 14,
+  },
+  headerIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: layout.borderRadius.md,
+    backgroundColor: 'rgba(229, 193, 88, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   shelfTitle: {
-    color: '#E8D8C8',
+    color: colors.textLight,
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
     flex: 1,
   },
   spinesListContent: {
-    gap: 12,
-    paddingBottom: 8,
+    gap: 8,
+    paddingBottom: 4,
   },
-  spine3DCard: {
-    borderRadius: layout.borderRadius.md,
+  menuItemCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: layout.borderRadius.lg,
     paddingVertical: 12,
     paddingHorizontal: 14,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: 10,
+    gap: 12,
     position: 'relative',
     overflow: 'hidden',
-    borderLeftWidth: 5,
-    borderLeftColor: 'rgba(255, 255, 255, 0.45)',
-    ...shadows.md,
-    transform: Platform.OS === 'web' ? ([{ perspective: 400 }, { rotateY: '-4deg' }] as any) : [],
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  spine3DCardSelected: {
+  menuItemCardSelected: {
+    backgroundColor: 'rgba(229, 193, 88, 0.22)',
     borderColor: colors.accent,
-    borderWidth: 2,
-    borderLeftWidth: 7,
-    borderLeftColor: colors.accentLight,
-    transform: Platform.OS === 'web' ? ([{ perspective: 400 }, { rotateY: '0deg' }, { scale: 1.03 }] as any) : [{ scale: 1.03 }],
-    shadowColor: colors.accent,
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+    ...shadows.sm,
   },
-  spineRibEdge: {
+  accentStrip: {
     position: 'absolute',
     top: 0,
     bottom: 0,
+    width: 4,
+  },
+  accentStripLtr: {
     left: 0,
-    width: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
   },
-  spineGoldFoil: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 12,
-    width: 2,
-    backgroundColor: 'rgba(255, 215, 0, 0.25)',
+  accentStripRtl: {
+    right: 0,
   },
-  spineItemIcon: {
-    width: 24,
+  menuItemIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: layout.borderRadius.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  spineTextCol: {
+  menuItemIconSelected: {
+    backgroundColor: colors.accent,
+  },
+  menuItemTextCol: {
     flex: 1,
   },
-  spineTitleText: {
+  menuItemTitle: {
     color: colors.textLight,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
   },
-  spineSubText: {
-    color: 'rgba(255, 255, 255, 0.75)',
+  menuItemTitleSelected: {
+    color: colors.accentLight,
+  },
+  menuItemSub: {
+    color: 'rgba(255, 255, 255, 0.65)',
     fontSize: typography.fontSize.xs,
     marginTop: 2,
   },
-  activeRibbonBookmark: {
-    position: 'absolute',
-    top: -2,
-    right: 8,
-    backgroundColor: colors.accent,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderBottomLeftRadius: 4,
-    borderBottomRightRadius: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
+  menuItemSubSelected: {
+    color: 'rgba(255, 255, 255, 0.9)',
   },
-  woodenPlatform: {
-    marginTop: 12,
-    height: 14,
-    backgroundColor: '#1E100B',
-    borderRadius: layout.borderRadius.sm,
+  selectedBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: layout.borderRadius.full,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 8,
-  },
-  platformLedge: {
-    height: 3,
-    backgroundColor: colors.accent,
-    opacity: 0.6,
-    borderRadius: 2,
-  },
-  woodTextureLine: {
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginTop: 3,
   },
 });

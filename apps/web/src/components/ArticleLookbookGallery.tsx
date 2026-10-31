@@ -13,8 +13,6 @@ import { MOCK_ARTICLES, Article } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import {
   Newspaper,
-  ChevronLeft,
-  ChevronRight,
   User,
   Clock,
   Calendar,
@@ -92,39 +90,6 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
 
       {/* Horizontally Arranged Curved 3D Lookbook Stage */}
       <View style={styles.perspectiveStage}>
-        {/* Navigation Arrows */}
-        <Tooltip content={isRTL ? t('app.nextPage') : t('app.prevPage')}>
-          <TouchableOpacity
-            style={[styles.navArrow, styles.arrowLeft]}
-            onPress={isRTL ? handleNext : handlePrev}
-            accessibilityLabel={isRTL ? t('app.nextPage') : t('app.prevPage')}
-            accessibilityRole="button"
-            activeOpacity={0.8}
-          >
-            {isRTL ? (
-              <ChevronRight size={22} color={colors.textLight} />
-            ) : (
-              <ChevronLeft size={22} color={colors.textLight} />
-            )}
-          </TouchableOpacity>
-        </Tooltip>
-
-        <Tooltip content={isRTL ? t('app.prevPage') : t('app.nextPage')}>
-          <TouchableOpacity
-            style={[styles.navArrow, styles.arrowRight]}
-            onPress={isRTL ? handlePrev : handleNext}
-            accessibilityLabel={isRTL ? t('app.prevPage') : t('app.nextPage')}
-            accessibilityRole="button"
-            activeOpacity={0.8}
-          >
-            {isRTL ? (
-              <ChevronLeft size={22} color={colors.textLight} />
-            ) : (
-              <ChevronRight size={22} color={colors.textLight} />
-            )}
-          </TouchableOpacity>
-        </Tooltip>
-
         {/* Curved Row of Image Cards */}
         <View style={styles.cardsRowWrapper}>
           {articles.map((article, idx) => {
@@ -314,29 +279,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 8,
     overflow: 'hidden',
-  },
-  navArrow: {
-    position: 'absolute',
-    top: '42%',
-    backgroundColor: colors.primary,
-    width: 42,
-    height: 42,
-    borderRadius: layout.borderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 50,
-    ...shadows.md,
-  },
-  arrowLeft: {
-    left: 12,
-  },
-  arrowRight: {
-    right: 12,
-  },
-  arrowIcon: {
-    color: colors.textLight,
-    fontSize: 16,
-    fontWeight: typography.fontWeight.bold,
   },
   cardsRowWrapper: {
     width: '100%',
