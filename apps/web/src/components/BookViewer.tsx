@@ -29,11 +29,9 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-  if (!book) return null;
-
-  const samplePages = book.samplePages || [];
+  const samplePages = book?.samplePages || [];
   const hasPages = samplePages.length > 0;
-  const title = book.title[language] || book.title.ar;
+  const title = book ? (book.title[language] || book.title.ar) : '';
 
   const handleNextPage = () => {
     if (currentPage < samplePages.length - 1) {
@@ -51,8 +49,14 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
   const onRightArrow = isRTL ? handlePrevPage : handleNextPage;
   const onLeftArrow = isRTL ? handleNextPage : handlePrevPage;
 
+  // Reset page when book changes
   useEffect(() => {
-    if (!visible || Platform.OS !== 'web' || typeof window === 'undefined') return;
+    setCurrentPage(0);
+    setIsZoomed(false);
+  }, [book?.id]);
+
+  useEffect(() => {
+    if (!visible || !book || Platform.OS !== 'web' || typeof window === 'undefined') return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -68,7 +72,9 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [visible, currentPage, isRTL, samplePages.length]);
+  }, [visible, book, currentPage, isRTL, samplePages.length]);
+
+  if (!book) return null;
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
