@@ -23,6 +23,8 @@ import {
   Plus,
   Minus,
   Trash2,
+  Sparkles,
+  Layers,
 } from 'lucide-react-native';
 import { Header, Footer } from './src/components/Header';
 import { Bookshelf, NavCategory } from './src/components/Bookshelf';
@@ -46,6 +48,7 @@ import { OrderLookupModal } from './src/components/OrderLookupModal';
 import { ContactModal } from './src/components/ContactModal';
 import { Modal } from './src/components/ui/Modal';
 import { Button } from './src/components/ui/Button';
+import { GlassCard } from './src/components/ui/GlassCard';
 import { Book, MOCK_BOOKS } from './src/mock/data';
 import { fetchCatalogBooks } from './src/services/api';
 import { colors, layout, shadows, typography } from './src/theme/tokens';
@@ -124,7 +127,7 @@ function StorefrontContent() {
   return (
     <ThreeDScene showFloatingBooks={!isAdminView && !show3DPreview} interactiveCamera={!isAdminView}>
       <View style={styles.appContainer}>
-        {/* Persistent Shell Header */}
+        {/* Rebuilt 3D Shell Navigation Header */}
         <Header
           cartCount={cartTotalItems}
           favouritesCount={favourites.length}
@@ -148,9 +151,13 @@ function StorefrontContent() {
                 style={[styles.mobileMenuTrigger, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
                 onPress={() => setMobileMenuOpen(!mobileMenuOpen)}
                 activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={t('app.menuToggle')}
               >
-                <BookOpen size={20} color={colors.textLight} />
-                <Text style={styles.triggerText}>{t('app.menuToggle')}</Text>
+                <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 10 }]}>
+                  <BookOpen size={20} color={colors.accentLight} />
+                  <Text style={styles.triggerText}>{t('app.menuToggle')}</Text>
+                </View>
                 {mobileMenuOpen ? (
                   <ChevronUp size={20} color={colors.accent} />
                 ) : (
@@ -265,8 +272,12 @@ function StorefrontContent() {
                     <ArticleLookbookGallery />
                   ) : (
                     <>
+                      {/* 3D Catalog Header & Filter Control Bar */}
                       <View style={[styles.catalogHeaderRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                        <Text style={styles.catalogTitle}>{t('app.catalogTitle')}</Text>
+                        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+                          <Sparkles size={20} color={colors.accentLight} />
+                          <Text style={styles.catalogTitle}>{t('app.catalogTitle')}</Text>
+                        </View>
 
                         {/* Quarter Filter Pills */}
                         <View style={[styles.filterBar, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
@@ -279,6 +290,8 @@ function StorefrontContent() {
                               ]}
                               onPress={() => setSelectedQuarter(q)}
                               activeOpacity={0.8}
+                              accessibilityRole="button"
+                              accessibilityLabel={q === 'all' ? t('app.allQuarters') : t(`app.${q}`)}
                             >
                               <Text
                                 style={[
@@ -301,7 +314,7 @@ function StorefrontContent() {
                         />
                       )}
 
-                      {/* Responsive Books Grid */}
+                      {/* Responsive 3D Books Grid */}
                       <View style={[styles.booksGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                         {filteredBooks.length > 0 ? (
                           filteredBooks.map((book) => (
@@ -382,6 +395,7 @@ function StorefrontContent() {
                       <TouchableOpacity
                         style={styles.qtyBtn}
                         onPress={() => updateQuantity(item.book.id, item.quantity - 1)}
+                        accessibilityRole="button"
                         accessibilityLabel="Decrease quantity"
                       >
                         <Minus size={14} color={colors.accentLight} />
@@ -392,6 +406,7 @@ function StorefrontContent() {
                       <TouchableOpacity
                         style={styles.qtyBtn}
                         onPress={() => updateQuantity(item.book.id, item.quantity + 1)}
+                        accessibilityRole="button"
                         accessibilityLabel="Increase quantity"
                       >
                         <Plus size={14} color={colors.accentLight} />
@@ -401,6 +416,7 @@ function StorefrontContent() {
                       <TouchableOpacity
                         style={styles.removeBtn}
                         onPress={() => removeFromCart(item.book.id)}
+                        accessibilityRole="button"
                         accessibilityLabel={t('admin.delete')}
                       >
                         <Trash2 size={16} color={colors.error} />
@@ -482,38 +498,35 @@ const styles = StyleSheet.create({
   },
   mainScrollContent: {
     paddingVertical: 24,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
   },
   storeLayoutWrapper: {
     width: '100%',
     alignSelf: 'stretch',
+    maxWidth: 1440,
+    marginHorizontal: 'auto',
   },
   mobileMenuTrigger: {
-    backgroundColor: colors.primary,
+    backgroundColor: 'rgba(12, 38, 28, 0.95)',
     padding: 14,
-    borderRadius: layout.borderRadius.md,
+    borderRadius: layout.borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.35)',
     ...shadows.md,
   },
-  triggerIcon: {
-    fontSize: 20,
-  },
   triggerText: {
-    color: colors.textLight,
+    color: '#ffffff',
     fontWeight: typography.fontWeight.bold,
     fontSize: typography.fontSize.md,
-  },
-  triggerArrow: {
-    color: colors.accent,
-    fontSize: 14,
   },
   mobileShelfDrawer: {
     marginBottom: 20,
   },
   storeLayout: {
-    gap: 24,
+    gap: 28,
     alignItems: 'flex-start',
   },
   shelfCol: {
@@ -527,21 +540,22 @@ const styles = StyleSheet.create({
   catalogHeaderRow: {
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 18,
     flexWrap: 'wrap',
-    gap: 12,
-    backgroundColor: 'rgba(18, 59, 43, 0.85)',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: layout.borderRadius.lg,
+    gap: 14,
+    backgroundColor: 'rgba(10, 32, 23, 0.88)',
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderRadius: layout.borderRadius.xl,
     borderWidth: 1,
-    borderColor: 'rgba(229, 193, 88, 0.3)',
-    ...shadows.md,
+    borderColor: 'rgba(229, 193, 88, 0.35)',
+    ...shadows.lg,
   },
   catalogTitle: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textLight,
+    color: '#ffffff',
+    letterSpacing: 0.3,
   },
   filterBar: {
     alignItems: 'center',
@@ -550,19 +564,20 @@ const styles = StyleSheet.create({
   },
   pillBtn: {
     paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingVertical: 7,
     borderRadius: layout.borderRadius.full,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
+    borderColor: 'rgba(255, 255, 255, 0.25)',
   },
   pillBtnActive: {
     backgroundColor: colors.accent,
-    borderColor: colors.accentLight,
+    borderColor: '#fff1a8',
+    ...shadows.goldGlow,
   },
   pillText: {
     fontSize: typography.fontSize.xs,
-    color: colors.textLight,
+    color: 'rgba(255, 255, 255, 0.85)',
   },
   pillTextActive: {
     color: colors.primaryDark,
@@ -570,8 +585,8 @@ const styles = StyleSheet.create({
   },
   booksGrid: {
     flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 16,
+    gap: 14,
+    marginTop: 18,
   },
   emptyGrid: {
     padding: 32,
@@ -597,9 +612,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   cartItemRow: {
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: 'rgba(229, 193, 88, 0.2)',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
@@ -662,10 +677,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  qtyBtnText: {
-    fontSize: 14,
-    fontWeight: typography.fontWeight.bold,
-  },
   qtyValue: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
@@ -674,9 +685,6 @@ const styles = StyleSheet.create({
   removeBtn: {
     padding: 4,
     marginLeft: 6,
-  },
-  removeBtnText: {
-    fontSize: 16,
   },
   cartSummary: {
     marginTop: 16,

@@ -40,36 +40,62 @@ export const ThreeDScene: React.FC<ThreeDSceneProps> = ({
 
     const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
+    // Rich atmospheric 3D Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0d2118);
-    scene.fog = new THREE.FogExp2(0x0a2319, 0.08);
+    scene.background = new THREE.Color(0x0a1c14); // Deep nocturnal emerald
+    scene.fog = new THREE.FogExp2(0x081811, 0.075);
 
-    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0, 7);
+    const camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 7.5);
 
+    // Multi-source Lighting
     createLibraryLighting(scene);
+
+    // Glowing accent point light responding to depth
+    const ambientGlow = new THREE.PointLight(0xe5c158, 0.8, 15);
+    ambientGlow.position.set(0, 2, 3);
+    scene.add(ambientGlow);
 
     const cameraController = new LibraryCameraController(camera, prefersReducedMotion);
 
+    // 3D Floating Book models in environment
     let floatingBooks: FloatingBookItem[] = [];
     if (showFloatingBooks) {
-      floatingBooks = createFloatingBooks(scene, isMobile ? 3 : 6);
+      floatingBooks = createFloatingBooks(scene, isMobile ? 3 : 7);
     }
 
-    const particleCount = isMobile ? 40 : 100;
+    // Dynamic dual-tone volumetric particle dust
+    const particleCount = isMobile ? 50 : 130;
     const particleGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
+    const particleColors = new Float32Array(particleCount * 3);
+
     for (let i = 0; i < particleCount * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 14;
-      positions[i + 1] = (Math.random() - 0.5) * 10;
-      positions[i + 2] = (Math.random() - 0.5) * 8;
+      positions[i] = (Math.random() - 0.5) * 16;
+      positions[i + 1] = (Math.random() - 0.5) * 12;
+      positions[i + 2] = (Math.random() - 0.5) * 10;
+
+      // Subtle gold and emerald dust
+      const isGold = Math.random() > 0.4;
+      if (isGold) {
+        particleColors[i] = 0.9;
+        particleColors[i + 1] = 0.76;
+        particleColors[i + 2] = 0.35;
+      } else {
+        particleColors[i] = 0.18;
+        particleColors[i + 1] = 0.75;
+        particleColors[i + 2] = 0.55;
+      }
     }
+
     particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeometry.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+
     const particleMaterial = new THREE.PointsMaterial({
-      color: 0xe5c158,
-      size: 0.04,
+      size: 0.05,
+      vertexColors: true,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.65,
       blending: THREE.AdditiveBlending,
     });
     const particles = new THREE.Points(particleGeometry, particleMaterial);
@@ -106,6 +132,9 @@ export const ThreeDScene: React.FC<ThreeDSceneProps> = ({
       const normX = (e.clientX / window.innerWidth) * 2 - 1;
       const normY = -(e.clientY / window.innerHeight) * 2 + 1;
       cameraController.handlePointerMove(normX, normY);
+      // Move ambient glow slightly with mouse cursor for dynamic illumination
+      ambientGlow.position.x = normX * 3;
+      ambientGlow.position.y = normY * 2 + 2;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -131,7 +160,8 @@ export const ThreeDScene: React.FC<ThreeDSceneProps> = ({
       }
 
       if (!prefersReducedMotion) {
-        particles.rotation.y = elapsedTime * 0.02;
+        particles.rotation.y = elapsedTime * 0.015;
+        particles.rotation.x = Math.sin(elapsedTime * 0.08) * 0.03;
       }
 
       renderer.render(scene, camera);
@@ -177,7 +207,7 @@ export const ThreeDScene: React.FC<ThreeDSceneProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#0a1c14',
     minHeight: '100%',
     position: 'relative',
   },
@@ -191,7 +221,7 @@ const styles = StyleSheet.create({
   },
   fallbackOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(10, 35, 25, 0.7)',
+    backgroundColor: 'rgba(10, 28, 20, 0.75)',
   },
   foregroundLayer: {
     flex: 1,

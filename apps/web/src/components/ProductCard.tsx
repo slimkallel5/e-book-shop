@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native';
-import { ShoppingCart, Heart, Star, GraduationCap } from 'lucide-react-native';
+import { ShoppingCart, Heart, Star, GraduationCap, Eye } from 'lucide-react-native';
 import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { useStore } from '../context/StoreContext';
@@ -58,6 +58,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
             {/* Simulated 3D Book Spine Left Shadow Edge */}
             <View style={styles.spine3DEdge} />
 
+            {/* Foil edge shimmer overlay */}
+            <View style={styles.topFoilEdge} />
+
             {/* Floating Badges */}
             <View style={[styles.badgeContainer, isRTL ? { right: 8 } : { left: 8 }]}>
               {book.isPack && <Badge label={t('app.packBadge')} variant="pack" />}
@@ -70,6 +73,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
               )}
             </View>
 
+            {/* Quick preview hover hint icon */}
+            <View style={[styles.quickViewBadge, isRTL ? { left: 44 } : { right: 44 }]}>
+              <Eye size={14} color="rgba(255, 255, 255, 0.85)" />
+            </View>
+
             {/* Favourite Button with Tooltip */}
             <Tooltip content={favorited ? t('app.favourites') : t('app.favourites')}>
               <TouchableOpacity
@@ -79,6 +87,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
                   toggleFavourite(book.id);
                 }}
                 activeOpacity={0.8}
+                accessibilityRole="button"
                 accessibilityLabel={t('app.favourites')}
               >
                 <Heart
@@ -157,17 +166,17 @@ const styles = StyleSheet.create({
     transform: Platform.OS === 'web' ? ([{ perspective: 1000 }] as any) : [],
   },
   cardContainer: {
-    borderRadius: layout.borderRadius.lg,
+    borderRadius: layout.borderRadius.xl,
     overflow: 'hidden',
-    width: 220,
+    width: 224,
     borderWidth: 1,
-    borderColor: 'rgba(229, 193, 88, 0.3)',
+    borderColor: 'rgba(229, 193, 88, 0.32)',
     ...shadows.lg,
   },
   coverWrapper: {
     width: '100%',
     aspectRatio: 1 / layout.a4AspectRatio,
-    backgroundColor: colors.background,
+    backgroundColor: '#0a1c14',
     position: 'relative',
   },
   coverImage: {
@@ -179,20 +188,28 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     left: 0,
-    width: 6,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    width: 7,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
     borderRightWidth: 1,
     borderRightColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  topFoilEdge: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: 'rgba(229, 193, 88, 0.5)',
   },
   badgeContainer: {
     position: 'absolute',
     top: 8,
     zIndex: 10,
   },
-  favBtn: {
+  quickViewBadge: {
     position: 'absolute',
     top: 8,
-    backgroundColor: 'rgba(13, 33, 24, 0.85)',
+    backgroundColor: 'rgba(10, 28, 20, 0.75)',
     borderRadius: layout.borderRadius.full,
     width: 32,
     height: 32,
@@ -200,13 +217,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 10,
     borderWidth: 1,
-    borderColor: 'rgba(229, 193, 88, 0.4)',
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  favBtn: {
+    position: 'absolute',
+    top: 8,
+    backgroundColor: 'rgba(10, 28, 20, 0.85)',
+    borderRadius: layout.borderRadius.full,
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.45)',
     ...shadows.sm,
   },
   contentContainer: {
-    padding: 12,
+    padding: 14,
     justifyContent: 'space-between',
     flex: 1,
+    backgroundColor: 'rgba(10, 32, 23, 0.94)',
   },
   levelRow: {
     alignItems: 'center',
@@ -226,7 +257,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textLight,
+    color: '#ffffff',
     minHeight: 38,
     marginBottom: 6,
   },
@@ -241,7 +272,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold,
   },
   reviewsCount: {
-    color: colors.textMuted,
+    color: 'rgba(255, 255, 255, 0.65)',
     fontSize: typography.fontSize.xs,
   },
   priceRow: {
@@ -260,13 +291,13 @@ const styles = StyleSheet.create({
   },
   originalPrice: {
     fontSize: typography.fontSize.xs,
-    color: colors.textMuted,
+    color: 'rgba(255, 255, 255, 0.55)',
     textDecorationLine: 'line-through',
   },
   normalPrice: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textLight,
+    color: '#ffffff',
   },
   cartBtn: {
     marginTop: 'auto',

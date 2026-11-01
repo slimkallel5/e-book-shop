@@ -13,6 +13,7 @@ import {
   ChevronRight,
   GraduationCap,
   Star,
+  Sparkles,
 } from 'lucide-react-native';
 import { Book } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
@@ -40,7 +41,6 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
     return null;
   }
 
-  // Ensure index is within current books bounds
   const activeIndex = selectedIndex >= books.length ? 0 : selectedIndex;
   const activeBook = books[activeIndex];
 
@@ -64,12 +64,13 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
                 style={[styles.stageArrow, styles.arrowLeft]}
                 onPress={isRTL ? handleNext : handlePrev}
                 activeOpacity={0.8}
+                accessibilityRole="button"
                 accessibilityLabel={isRTL ? t('app.nextPage') : t('app.prevPage')}
               >
                 {isRTL ? (
-                  <ChevronRight size={22} color={colors.textLight} />
+                  <ChevronRight size={22} color={colors.accentLight} />
                 ) : (
-                  <ChevronLeft size={22} color={colors.textLight} />
+                  <ChevronLeft size={22} color={colors.accentLight} />
                 )}
               </TouchableOpacity>
             </Tooltip>
@@ -79,12 +80,13 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
                 style={[styles.stageArrow, styles.arrowRight]}
                 onPress={isRTL ? handlePrev : handleNext}
                 activeOpacity={0.8}
+                accessibilityRole="button"
                 accessibilityLabel={isRTL ? t('app.prevPage') : t('app.nextPage')}
               >
                 {isRTL ? (
-                  <ChevronLeft size={22} color={colors.textLight} />
+                  <ChevronLeft size={22} color={colors.accentLight} />
                 ) : (
-                  <ChevronRight size={22} color={colors.textLight} />
+                  <ChevronRight size={22} color={colors.accentLight} />
                 )}
               </TouchableOpacity>
             </Tooltip>
@@ -98,17 +100,15 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
             const title = book.title[language] || book.title.ar;
             const level = book.levelName[language] || book.levelName.ar;
 
-            // Calculate offset relative to active book
             const offset = idx - activeIndex;
             const absOffset = Math.abs(offset);
 
-            if (absOffset > 2) return null; // Show focal item and 2 neighbors
+            if (absOffset > 2) return null;
 
-            // Perspective layout transformations
-            const rotateY = offset * -20;
-            const translateX = offset * 150;
-            const scale = 1 - absOffset * 0.18;
-            const opacity = 1 - absOffset * 0.3;
+            const rotateY = offset * -22;
+            const translateX = offset * 160;
+            const scale = 1 - absOffset * 0.16;
+            const opacity = 1 - absOffset * 0.28;
             const zIndex = 10 - absOffset;
 
             const discountPercent =
@@ -120,14 +120,14 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
               <TouchableOpacity
                 key={book.id}
                 style={[
-                  styles.lookbookCard,
-                  isFocal && styles.lookbookCardFocal,
+                  styles.lookbookCard3D,
+                  isFocal && styles.lookbookCard3DFocal,
                   {
                     zIndex,
                     opacity,
                     transform: Platform.OS === 'web'
                       ? ([
-                          { perspective: 900 },
+                          { perspective: 1000 },
                           { translateX },
                           { scale },
                           { rotateY: `${rotateY}deg` },
@@ -192,6 +192,7 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
                 )}
                 <Star size={13} color={colors.accent} fill={colors.accent} />
                 <Text style={styles.detailStars}>{activeBook.rating.toFixed(1)}</Text>
+                <Sparkles size={13} color={colors.accentLight} />
               </View>
 
               <Text style={[styles.detailTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   perspectiveStage: {
-    height: 320,
+    height: 330,
     width: '100%',
     position: 'relative',
     justifyContent: 'center',
@@ -250,15 +251,15 @@ const styles = StyleSheet.create({
   stageArrow: {
     position: 'absolute',
     top: '42%',
-    backgroundColor: 'rgba(18, 59, 43, 0.95)',
-    width: 42,
-    height: 42,
+    backgroundColor: 'rgba(10, 32, 23, 0.95)',
+    width: 44,
+    height: 44,
     borderRadius: layout.borderRadius.full,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 50,
     borderWidth: 1,
-    borderColor: 'rgba(229, 193, 88, 0.4)',
+    borderColor: 'rgba(229, 193, 88, 0.45)',
     ...shadows.md,
   },
   arrowLeft: {
@@ -274,18 +275,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-  lookbookCard: {
+  lookbookCard3D: {
     position: 'absolute',
-    width: 210,
-    height: 285,
-    borderRadius: layout.borderRadius.lg,
+    width: 220,
+    height: 295,
+    borderRadius: layout.borderRadius.xl,
     overflow: 'hidden',
-    backgroundColor: colors.cardBg,
+    backgroundColor: 'rgba(12, 38, 28, 0.95)',
     ...shadows.lg,
     borderWidth: 1,
     borderColor: 'rgba(229, 193, 88, 0.3)',
   },
-  lookbookCardFocal: {
+  lookbookCard3DFocal: {
     borderColor: colors.accent,
     borderWidth: 2,
     ...shadows.goldGlow,
@@ -299,8 +300,10 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     left: 0,
-    width: 6,
-    backgroundColor: 'rgba(0,0,0,0.25)',
+    width: 7,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    borderRightWidth: 1,
+    borderRightColor: 'rgba(255, 255, 255, 0.3)',
   },
   badgeContainer: {
     position: 'absolute',
@@ -313,7 +316,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 12,
-    backgroundColor: 'rgba(10, 35, 25, 0.92)',
+    backgroundColor: 'rgba(7, 24, 17, 0.94)',
   },
   levelRow: {
     alignItems: 'center',
@@ -326,7 +329,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold,
   },
   cardTitle: {
-    color: colors.textLight,
+    color: '#ffffff',
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
     lineHeight: 16,
@@ -342,15 +345,15 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 4,
+    height: 5,
     backgroundColor: colors.accent,
   },
   revealDetailCard: {
-    padding: 16,
+    padding: 18,
     borderWidth: 1,
     borderColor: 'rgba(229, 193, 88, 0.35)',
-    ...shadows.md,
-    marginTop: 12,
+    ...shadows.lg,
+    marginTop: 14,
   },
   detailHeader: {
     justifyContent: 'space-between',
@@ -364,7 +367,7 @@ const styles = StyleSheet.create({
   },
   metaBadgesRow: {
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
     marginBottom: 4,
   },
   detailLevel: {
@@ -383,12 +386,12 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold,
   },
   detailTitle: {
-    color: colors.textLight,
+    color: '#ffffff',
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
   },
   detailDesc: {
-    color: 'rgba(255, 255, 255, 0.75)',
+    color: 'rgba(255, 255, 255, 0.8)',
     fontSize: typography.fontSize.xs,
     marginTop: 4,
     lineHeight: 18,
