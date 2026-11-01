@@ -357,6 +357,7 @@ function StorefrontContent() {
         >
           {cart.length === 0 ? (
             <View style={styles.emptyCartContainer}>
+              <ShoppingCart size={48} color={colors.textMuted} style={{ marginBottom: 12 }} />
               <Text style={styles.emptyCartText}>{t('app.emptyCart')}</Text>
             </View>
           ) : (
@@ -383,7 +384,7 @@ function StorefrontContent() {
                         onPress={() => updateQuantity(item.book.id, item.quantity - 1)}
                         accessibilityLabel="Decrease quantity"
                       >
-                        <Minus size={14} color={colors.textPrimary} />
+                        <Minus size={14} color={colors.accentLight} />
                       </TouchableOpacity>
                     </Tooltip>
                     <Text style={styles.qtyValue}>{item.quantity}</Text>
@@ -393,7 +394,7 @@ function StorefrontContent() {
                         onPress={() => updateQuantity(item.book.id, item.quantity + 1)}
                         accessibilityLabel="Increase quantity"
                       >
-                        <Plus size={14} color={colors.textPrimary} />
+                        <Plus size={14} color={colors.accentLight} />
                       </TouchableOpacity>
                     </Tooltip>
                     <Tooltip content={t('admin.delete')}>

@@ -22,6 +22,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
+import { GlassCard } from './ui/GlassCard';
 
 interface BookViewerProps {
   book: Book | null;
@@ -255,7 +256,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
-        <View style={styles.viewerContainer}>
+        <GlassCard variant="dark" elevation="lg" style={styles.viewerContainer}>
           {/* Header Controls */}
           <View style={[styles.headerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             <View style={styles.titleCol}>
@@ -308,7 +309,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   <TouchableOpacity
                     style={[styles.navArrow, styles.navArrowLeft]}
                     onPress={onLeftArrow}
-                    disabled={isRTL ? currentPage === rawSamplePages.length - 1 : currentPage === 0}
+                    disabled={isRTL ? currentPage === totalPages - 1 : currentPage === 0}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel={isRTL ? t('app.nextPage') : t('app.prevPage')}
@@ -328,7 +329,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
 
                   {isLoadingPdf && !activeImageUri ? (
                     <View style={styles.loadingContainer}>
-                      <ActivityIndicator size="large" color={colors.accent} />
+                      <ActivityIndicator size="large" color={colors.accentLight} />
                       <Text style={styles.loadingText}>
                         {isRTL ? 'جاري تحميل عينة الكتاب...' : 'Loading sample preview...'}
                       </Text>
@@ -347,7 +348,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                     />
                   ) : (
                     <View style={styles.loadingContainer}>
-                      <ActivityIndicator size="small" color={colors.accent} />
+                      <ActivityIndicator size="small" color={colors.accentLight} />
                     </View>
                   )}
                 </View>
@@ -357,7 +358,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
                   <TouchableOpacity
                     style={[styles.navArrow, styles.navArrowRight]}
                     onPress={onRightArrow}
-                    disabled={isRTL ? currentPage === 0 : currentPage === rawSamplePages.length - 1}
+                    disabled={isRTL ? currentPage === 0 : currentPage === totalPages - 1}
                     activeOpacity={0.7}
                     accessibilityRole="button"
                     accessibilityLabel={isRTL ? t('app.prevPage') : t('app.nextPage')}
@@ -383,7 +384,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
             <View style={[styles.footerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Button
                 title={t('app.prevPage')}
-                icon={isRTL ? <ChevronRight size={16} color={colors.primary} /> : <ChevronLeft size={16} color={colors.primary} />}
+                icon={isRTL ? <ChevronRight size={16} color={colors.textLight} /> : <ChevronLeft size={16} color={colors.textLight} />}
                 tooltip={t('app.prevPage')}
                 onPress={handlePrevPage}
                 disabled={currentPage === 0}
@@ -395,16 +396,16 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
               </Text>
               <Button
                 title={t('app.nextPage')}
-                icon={isRTL ? <ChevronLeft size={16} color={colors.textLight} /> : <ChevronRight size={16} color={colors.textLight} />}
+                icon={isRTL ? <ChevronLeft size={16} color={colors.primaryDark} /> : <ChevronRight size={16} color={colors.primaryDark} />}
                 tooltip={t('app.nextPage')}
                 onPress={handleNextPage}
                 disabled={currentPage === totalPages - 1}
-                variant="primary"
+                variant="accent"
                 size="sm"
               />
             </View>
           )}
-        </View>
+        </GlassCard>
       </View>
     </Modal>
   );
@@ -413,7 +414,7 @@ export const BookViewer: React.FC<BookViewerProps> = ({ book, visible, onClose }
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(10, 35, 25, 0.85)',
+    backgroundColor: 'rgba(10, 35, 25, 0.88)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
@@ -422,16 +423,19 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 900,
     height: '88%',
-    backgroundColor: colors.background,
     borderRadius: layout.borderRadius.xl,
     overflow: 'hidden',
     ...shadows.lg,
     flexDirection: 'column',
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.35)',
   },
   headerRow: {
     paddingHorizontal: 20,
     paddingVertical: 14,
-    backgroundColor: colors.primary,
+    backgroundColor: 'rgba(18, 59, 43, 0.95)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(229, 193, 88, 0.25)',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -446,7 +450,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold,
   },
   pageCounter: {
-    color: colors.accent,
+    color: colors.accentLight,
     fontSize: typography.fontSize.xs,
     marginTop: 2,
   },
@@ -470,7 +474,7 @@ const styles = StyleSheet.create({
   },
   stage: {
     flex: 1,
-    backgroundColor: '#1E2923',
+    backgroundColor: 'rgba(10, 35, 25, 0.65)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
@@ -484,13 +488,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   navArrow: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(229, 193, 88, 0.2)',
     width: 44,
     height: 44,
     borderRadius: layout.borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.35)',
   },
   navArrowLeft: {
     marginRight: 8,
@@ -509,7 +515,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: colors.borderDark,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
   },
   zoomedContainer: {
     transform: [{ scale: 1.2 }],
@@ -525,7 +531,7 @@ const styles = StyleSheet.create({
     left: '50%',
     width: 16,
     marginLeft: -8,
-    backgroundColor: 'rgba(0, 0, 0, 0.12)',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     zIndex: 10,
   },
   pageImage: {
@@ -556,15 +562,15 @@ const styles = StyleSheet.create({
   footerRow: {
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: colors.cardBg,
+    backgroundColor: 'rgba(18, 59, 43, 0.95)',
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: 'rgba(229, 193, 88, 0.25)',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   footerPageInfo: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
 });

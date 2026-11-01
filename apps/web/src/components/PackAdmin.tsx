@@ -22,6 +22,7 @@ import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { Tooltip } from './ui/Tooltip';
+import { GlassCard } from './ui/GlassCard';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 
 export interface AdminPackItem {
@@ -216,44 +217,46 @@ export const PackAdmin: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Top Header & Actions */}
-      <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <View style={styles.titleGroup}>
-          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-            <Gift size={22} color={colors.primary} />
-            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('admin.packsManagementTitle')}
+      {/* Top Header & Actions Card */}
+      <GlassCard variant="dark" elevation="sm" style={styles.topRowCard}>
+        <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <View style={styles.titleGroup}>
+            <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+              <Gift size={22} color={colors.accentLight} />
+              <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+                {t('admin.packsManagementTitle')}
+              </Text>
+            </View>
+            <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('admin.packsManagementSub')}
             </Text>
           </View>
-          <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
-            {t('admin.packsManagementSub')}
-          </Text>
+          <Button
+            title={t('admin.addNewPack')}
+            icon={<Plus size={18} color={colors.primaryDark} />}
+            tooltip={t('admin.addNewPack')}
+            onPress={() => openModal()}
+            variant="accent"
+            size="md"
+          />
         </View>
-        <Button
-          title={t('admin.addNewPack')}
-          icon={<Plus size={18} color={colors.primaryDark} />}
-          tooltip={t('admin.addNewPack')}
-          onPress={() => openModal()}
-          variant="accent"
-          size="md"
-        />
-      </View>
 
-      {/* Search Input */}
-      <View style={styles.searchBox}>
-        <TextInput
-          style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
-          placeholder={t('admin.searchPackPlaceholder')}
-          placeholderTextColor={colors.textMuted}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
+        {/* Search Input */}
+        <View style={styles.searchBox}>
+          <TextInput
+            style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
+            placeholder={t('admin.searchPackPlaceholder')}
+            placeholderTextColor={colors.textMuted}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+      </GlassCard>
 
       {/* Table / List View */}
       <ScrollView style={styles.listScrollView}>
         {filteredPacks.map((pack) => (
-          <View key={pack.id} style={styles.packCard}>
+          <GlassCard key={pack.id} variant="dark" elevation="sm" style={styles.packCard}>
             <View style={[styles.cardHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <View style={styles.packInfo}>
                 <View style={[styles.skuRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
@@ -290,7 +293,7 @@ export const PackAdmin: React.FC = () => {
                   onPress={() => openModal(pack)}
                   accessibilityLabel={t('admin.editPack')}
                 >
-                  <Pencil size={14} color={colors.primary} />
+                  <Pencil size={14} color={colors.accentLight} />
                   <Text style={styles.editBtnText}>{t('admin.editPack')}</Text>
                 </TouchableOpacity>
               </Tooltip>
@@ -305,7 +308,7 @@ export const PackAdmin: React.FC = () => {
                 </TouchableOpacity>
               </Tooltip>
             </View>
-          </View>
+          </GlassCard>
         ))}
       </ScrollView>
 
@@ -329,6 +332,7 @@ export const PackAdmin: React.FC = () => {
             value={sku}
             onChangeText={setSku}
             placeholder="TUN-PACK-01"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Text style={styles.fieldLabel}>{t('admin.packTitleAr')} *:</Text>
@@ -337,6 +341,7 @@ export const PackAdmin: React.FC = () => {
             value={nameAr}
             onChangeText={setNameAr}
             placeholder="Pack Title in Arabic"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Text style={styles.fieldLabel}>{t('admin.packPriceLabel')} *:</Text>
@@ -346,6 +351,7 @@ export const PackAdmin: React.FC = () => {
             onChangeText={setPriceStr}
             keyboardType="numeric"
             placeholder="45.00"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Text style={styles.fieldLabel}>{t('admin.discountPriceOpt')}:</Text>
@@ -355,6 +361,7 @@ export const PackAdmin: React.FC = () => {
             onChangeText={setDiscountStr}
             keyboardType="numeric"
             placeholder="38.00"
+            placeholderTextColor={colors.textMuted}
           />
 
           {/* Included Items Section */}
@@ -401,7 +408,7 @@ export const PackAdmin: React.FC = () => {
             style={[styles.addItemBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }]}
             onPress={addItemRow}
           >
-            <Plus size={16} color={colors.primary} />
+            <Plus size={16} color={colors.accentLight} />
             <Text style={styles.addItemBtnText}>{t('admin.addAnotherBook')}</Text>
           </TouchableOpacity>
 
@@ -411,6 +418,7 @@ export const PackAdmin: React.FC = () => {
             value={posterUrl}
             onChangeText={setPosterUrl}
             placeholder="/uploads/pack-poster.jpg"
+            placeholderTextColor={colors.textMuted}
           />
 
           <TouchableOpacity
@@ -442,10 +450,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  topRowCard: {
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
+    gap: 12,
+  },
   topRow: {
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
     flexWrap: 'wrap',
     gap: 12,
   },
@@ -455,15 +469,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.textLight,
   },
   sectionSub: {
     fontSize: typography.fontSize.sm,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.7)',
     marginTop: 2,
   },
   searchBox: {
-    marginBottom: 16,
+    marginTop: 4,
   },
   searchInput: {
     backgroundColor: colors.cardBg,
@@ -471,20 +485,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderDark,
     fontSize: typography.fontSize.sm,
+    color: colors.textPrimary,
   },
   listScrollView: {
     flex: 1,
   },
   packCard: {
-    backgroundColor: colors.cardBg,
-    borderRadius: layout.borderRadius.md,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
+    borderColor: 'rgba(229, 193, 88, 0.25)',
   },
   cardHeader: {
     justifyContent: 'space-between',
@@ -502,11 +514,11 @@ const styles = StyleSheet.create({
   packTitle: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   itemsSummary: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.75)',
     marginTop: 4,
   },
   priceContainer: {
@@ -515,7 +527,7 @@ const styles = StyleSheet.create({
   priceCurrent: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
   priceOriginal: {
     fontSize: typography.fontSize.xs,
@@ -526,22 +538,22 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: 'rgba(229, 193, 88, 0.2)',
     justifyContent: 'flex-end',
     gap: 12,
   },
   editBtn: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: layout.borderRadius.sm,
     borderWidth: 1,
-    borderColor: colors.borderDark,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
   },
   editBtnText: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   deleteBtn: {
     paddingHorizontal: 12,
@@ -575,21 +587,22 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   formInput: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.cardBg,
     borderWidth: 1,
     borderColor: colors.borderDark,
     borderRadius: layout.borderRadius.sm,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: typography.fontSize.sm,
+    color: colors.textPrimary,
   },
   itemSelectRow: {
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     padding: 8,
     borderRadius: layout.borderRadius.sm,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(229, 193, 88, 0.2)',
   },
   pickerScroll: {
     marginBottom: 6,
@@ -601,18 +614,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cardBg,
     marginRight: 6,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderDark,
   },
   artSelectChipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.accent,
+    borderColor: colors.accentLight,
   },
   artSelectChipText: {
     fontSize: typography.fontSize.xs,
     color: colors.textSecondary,
   },
   artSelectChipTextActive: {
-    color: colors.textLight,
+    color: colors.primaryDark,
     fontWeight: typography.fontWeight.bold,
   },
   qtyRow: {
@@ -626,17 +639,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fee2e2',
     borderRadius: layout.borderRadius.sm,
   },
-  removeRowText: {
-    color: colors.error,
-    fontWeight: typography.fontWeight.bold,
-  },
   addItemBtn: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: layout.borderRadius.sm,
     borderWidth: 1,
-    borderColor: colors.borderDark,
+    borderColor: 'rgba(229, 193, 88, 0.35)',
     borderStyle: 'dashed',
     alignItems: 'center',
     marginVertical: 6,
@@ -644,7 +653,7 @@ const styles = StyleSheet.create({
   addItemBtnText: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
   toggleBtn: {
     marginTop: 14,

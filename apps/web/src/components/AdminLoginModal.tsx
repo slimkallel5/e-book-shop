@@ -4,13 +4,13 @@ import {
   Text,
   TextInput,
   View,
-  TouchableOpacity,
 } from 'react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
-import { LogIn } from 'lucide-react-native';
+import { LogIn, ShieldCheck } from 'lucide-react-native';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
+import { GlassCard } from './ui/GlassCard';
 import { colors, layout, typography } from '../theme/tokens';
 
 interface AdminLoginModalProps {
@@ -80,6 +80,13 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   return (
     <Modal visible={visible} onClose={onClose} title={t('admin.loginTitle')}>
       <View style={styles.container}>
+        <GlassCard variant="dark" elevation="sm" style={styles.badgeBanner}>
+          <ShieldCheck size={20} color={colors.accentLight} />
+          <Text style={styles.badgeBannerText}>
+            {isRTL ? 'منطقة إدارة آمنة ومحمية' : 'Secure Admin Authentication Area'}
+          </Text>
+        </GlassCard>
+
         {errorMsg ? (
           <View style={styles.errorBanner}>
             <Text style={styles.errorText}>{errorMsg}</Text>
@@ -113,10 +120,10 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
         <Button
           title={loading ? '...' : t('admin.loginBtn')}
-          icon={<LogIn size={18} color={colors.textLight} />}
+          icon={<LogIn size={18} color={colors.primaryDark} />}
           tooltip={t('admin.loginBtn')}
           onPress={handleLogin}
-          variant="primary"
+          variant="accent"
           size="lg"
           style={{ marginTop: 12 }}
         />
@@ -129,6 +136,19 @@ const styles = StyleSheet.create({
   container: {
     gap: 16,
     paddingVertical: 8,
+  },
+  badgeBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
+  },
+  badgeBannerText: {
+    color: colors.accentLight,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
   },
   errorBanner: {
     backgroundColor: 'rgba(239, 68, 68, 0.15)',
@@ -155,8 +175,9 @@ const styles = StyleSheet.create({
     borderColor: colors.borderDark,
     borderRadius: layout.borderRadius.sm,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 10,
     fontSize: typography.fontSize.sm,
     backgroundColor: colors.cardBg,
+    color: colors.textPrimary,
   },
 });

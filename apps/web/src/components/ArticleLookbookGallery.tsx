@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
-  AccessibilityInfo,
 } from 'react-native';
 import { MOCK_ARTICLES, Article } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
@@ -22,6 +21,7 @@ import {
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
+import { GlassCard } from './ui/GlassCard';
 
 interface ArticleLookbookGalleryProps {
   articles?: Article[];
@@ -76,9 +76,9 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
   return (
     <View style={styles.sectionContainer}>
       {/* Section Header */}
-      <View style={[styles.sectionHeader, { alignItems: isRTL ? 'flex-start' : 'flex-end' }]}>
-        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-          <Newspaper size={24} color={colors.accent} />
+      <GlassCard variant="dark" elevation="sm" style={styles.sectionHeader}>
+        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 10 }]}>
+          <Newspaper size={24} color={colors.accentLight} />
           <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('app.articlesGalleryTitle')}
           </Text>
@@ -86,7 +86,7 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
         <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
           {t('app.articlesGallerySub')}
         </Text>
-      </View>
+      </GlassCard>
 
       {/* Horizontally Arranged Curved 3D Lookbook Stage */}
       <View style={styles.perspectiveStage}>
@@ -170,7 +170,7 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
 
       {/* Expanded Story Panel Revealing Active Article Details */}
       {activeArticle && (
-        <View style={styles.expandedStoryPanel}>
+        <GlassCard variant="dark" elevation="md" style={styles.expandedStoryPanel}>
           <View style={[styles.storyHeaderRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             <View style={styles.storyContentCol}>
               <Text style={styles.storyCategory}>
@@ -187,21 +187,21 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
             <View style={styles.storyActionCol}>
               <Button
                 title={t('app.readArticle')}
-                icon={<BookOpen size={18} color={colors.textLight} />}
+                icon={<BookOpen size={18} color={colors.primaryDark} />}
                 tooltip={t('app.readArticle')}
                 onPress={() => setExpandedArticle(activeArticle)}
-                variant="primary"
+                variant="accent"
                 size="md"
               />
             </View>
           </View>
-        </View>
+        </GlassCard>
       )}
 
       {/* Full Article Modal Reader Overlay */}
       {expandedArticle && (
         <View style={styles.readerModalOverlay} accessibilityViewIsModal aria-modal={true}>
-          <View style={styles.readerContainer}>
+          <GlassCard variant="dark" elevation="lg" style={styles.readerContainer}>
             <View style={[styles.readerHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Text style={styles.readerCategory}>
                 {expandedArticle.category[language] || expandedArticle.category.ar}
@@ -227,15 +227,15 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
 
               <View style={[styles.readerMetaRow, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 12 }]}>
                 <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}>
-                  <User size={14} color={colors.primary} />
+                  <User size={14} color={colors.accentLight} />
                   <Text style={styles.readerMetaText}>{expandedArticle.author}</Text>
                 </View>
                 <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}>
-                  <Calendar size={14} color={colors.primary} />
+                  <Calendar size={14} color={colors.accentLight} />
                   <Text style={styles.readerMetaText}>{expandedArticle.date}</Text>
                 </View>
                 <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4 }]}>
-                  <Clock size={14} color={colors.primary} />
+                  <Clock size={14} color={colors.accentLight} />
                   <Text style={styles.readerMetaText}>{expandedArticle.readTime}</Text>
                 </View>
               </View>
@@ -246,7 +246,7 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
                 {expandedArticle.content[language] || expandedArticle.content.ar}
               </Text>
             </ScrollView>
-          </View>
+          </GlassCard>
         </View>
       )}
     </View>
@@ -255,19 +255,20 @@ export const ArticleLookbookGallery: React.FC<ArticleLookbookGalleryProps> = ({
 
 const styles = StyleSheet.create({
   sectionContainer: {
-    marginVertical: 20,
+    marginVertical: 16,
     width: '100%',
   },
   sectionHeader: {
+    padding: 16,
     marginBottom: 16,
   },
   sectionTitle: {
-    color: colors.primaryDark,
+    color: colors.textLight,
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
   },
   sectionSub: {
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.7)',
     fontSize: typography.fontSize.sm,
     marginTop: 4,
   },
@@ -296,14 +297,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cardBg,
     ...shadows.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
   },
   lookbookCardFocal: {
     borderColor: colors.accent,
     borderWidth: 2,
-    shadowColor: colors.primary,
-    shadowOpacity: 0.28,
-    shadowRadius: 16,
+    ...shadows.goldGlow,
   },
   cardImage: {
     width: '100%',
@@ -315,10 +314,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 12,
-    backgroundColor: 'rgba(10, 35, 25, 0.88)',
+    backgroundColor: 'rgba(10, 35, 25, 0.92)',
   },
   categoryBadge: {
-    color: colors.accent,
+    color: colors.accentLight,
     fontSize: 10,
     fontWeight: typography.fontWeight.bold,
     textTransform: 'uppercase',
@@ -335,7 +334,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   metaText: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'rgba(255, 255, 255, 0.85)',
     fontSize: 10,
   },
   focalGoldHighlight: {
@@ -347,12 +346,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
   },
   expandedStoryPanel: {
-    backgroundColor: colors.cardBg,
-    borderRadius: layout.borderRadius.lg,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.md,
+    padding: 18,
     marginTop: 12,
   },
   storyHeaderRow: {
@@ -366,18 +360,18 @@ const styles = StyleSheet.create({
     minWidth: 240,
   },
   storyCategory: {
-    color: colors.primary,
+    color: colors.accentLight,
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
     marginBottom: 4,
   },
   storyTitle: {
-    color: colors.textPrimary,
+    color: colors.textLight,
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
   },
   storyExcerpt: {
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.75)',
     fontSize: typography.fontSize.xs,
     marginTop: 4,
     lineHeight: 18,
@@ -401,20 +395,20 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 800,
     maxHeight: '90%',
-    backgroundColor: colors.cardBg,
     borderRadius: layout.borderRadius.xl,
     overflow: 'hidden',
-    ...shadows.lg,
   },
   readerHeader: {
     paddingHorizontal: 20,
     paddingVertical: 14,
-    backgroundColor: colors.primary,
+    backgroundColor: 'rgba(18, 59, 43, 0.9)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(229, 193, 88, 0.3)',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   readerCategory: {
-    color: colors.accent,
+    color: colors.accentLight,
     fontWeight: typography.fontWeight.bold,
     fontSize: typography.fontSize.sm,
   },
@@ -433,7 +427,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   readerTitle: {
-    color: colors.textPrimary,
+    color: colors.textLight,
     fontSize: typography.fontSize.xxl,
     fontWeight: typography.fontWeight.bold,
     lineHeight: 32,
@@ -442,11 +436,11 @@ const styles = StyleSheet.create({
     marginVertical: 14,
     gap: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: 'rgba(229, 193, 88, 0.25)',
     paddingBottom: 10,
   },
   readerMetaText: {
-    color: colors.textSecondary,
+    color: colors.accentLight,
     fontSize: typography.fontSize.xs,
   },
   readerImage: {
@@ -456,7 +450,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   readerBodyText: {
-    color: colors.textPrimary,
+    color: colors.textLight,
     fontSize: typography.fontSize.md,
     lineHeight: 28,
   },

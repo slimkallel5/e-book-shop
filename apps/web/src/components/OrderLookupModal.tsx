@@ -4,18 +4,23 @@ import {
   Text,
   View,
   ScrollView,
+  TextInput,
   TouchableOpacity,
-  ActivityIndicator,
 } from 'react-native';
 import {
+  Package,
   Search,
-  AlertCircle,
+  Clock,
+  CheckCircle2,
   XCircle,
+  Truck,
   MapPin,
+  Calendar,
 } from 'lucide-react-native';
 import { Modal } from './ui/Modal';
-import { Input } from './ui/Input';
 import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import { GlassCard } from './ui/GlassCard';
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
@@ -25,22 +30,17 @@ export interface OrderLookupModalProps {
   onClose: () => void;
 }
 
-export interface LookupOrderDetails {
+export interface LookedUpOrder {
   id: string;
   reference: string;
   customer: {
     fullName: string;
-    email: string;
     phone: string;
     city: string;
     address: string;
-    instructions?: string;
   };
   items: Array<{
-    type: string;
     name: { ar: string; fr?: string; en?: string };
-    unitPrice: number;
-    discountPrice?: number;
     quantity: number;
     subtotal: number;
   }>;
@@ -52,37 +52,43 @@ export interface LookupOrderDetails {
   createdAt: string;
 }
 
-export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ visible, onClose }) => {
-  const { language, isRTL, t } = useLanguage();
-
-  const [referenceInput, setReferenceInput] = useState('');
+export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({
+  visible,
+  onClose,
+}) => {
+  const { isRTL, language, t } = useLanguage();
+  const [reference, setReference] = useState('');
+  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [orderData, setOrderData] = useState<LookupOrderDetails | null>(null);
+  const [order, setOrder] = useState<LookedUpOrder | null>(null);
 
-  const handleSearch = async () => {
+  const handleLookup = async () => {
     setErrorMsg(null);
-    setOrderData(null);
+    setOrder(null);
 
-    const ref = referenceInput.trim();
-    if (!ref) {
-      setErrorMsg(t('app.enterOrderRef'));
+    if (!reference.trim() || !phone.trim()) {
+      setErrorMsg(t('app.lookupRequiredFields'));
       return;
     }
 
     setLoading(true);
-
     try {
-      const res = await fetch(getApiUrl(`/orders/lookup/${encodeURIComponent(ref)}`));
-      if (res.status === 404) {
-        throw new Error(t('app.orderNotFound'));
-      }
+      const res = await fetch(
+        getApiUrl(
+          `/orders/lookup?reference=${encodeURIComponent(
+            reference.trim(),
+          )}&phone=${encodeURIComponent(phone.trim())}`,
+        ),
+      );
+
       if (!res.ok) {
-        throw new Error('Failed to retrieve order status');
+        const errorData = await res.json();
+        throw new Error(errorData.message || t('app.orderNotFound'));
       }
 
-      const data: LookupOrderDetails = await res.json();
-      setOrderData(data);
+      const data = await res.json();
+      setOrder(data);
     } catch (err: any) {
       setErrorMsg(err.message || t('app.orderNotFound'));
     } finally {
@@ -90,144 +96,122 @@ export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ visible, onC
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const renderStatusBadge = (status: LookedUpOrder['status']) => {
     switch (status) {
       case 'pending':
-        return { label: t('admin.pending'), color: '#E65100', bg: '#FFF3E0' };
+        return <Badge label={t('admin.pending')} variant="discount" />;
       case 'in_progress':
-        return { label: t('admin.inProgress'), color: '#0288D1', bg: '#E1F5FE' };
+        return <Badge label={t('admin.inProgress')} variant="secondary" />;
       case 'delivered':
-        return { label: t('admin.delivered'), color: '#2E7D32', bg: '#E8F5E9' };
+        return <Badge label={t('admin.delivered')} variant="primary" />;
       case 'rejected':
-        return { label: t('admin.rejected'), color: '#C62828', bg: '#FFEBEE' };
-      default:
-        return { label: status, color: colors.textSecondary, bg: colors.background };
+        return <Badge label={t('admin.rejected')} variant="discount" />;
     }
   };
 
-  const handleClose = () => {
-    setReferenceInput('');
-    setErrorMsg(null);
-    setOrderData(null);
-    onClose();
-  };
-
   return (
-    <Modal visible={visible} onClose={handleClose} title={t('app.lookupOrderTitle')}>
+    <Modal visible={visible} onClose={onClose} title={t('app.lookupOrderTitle')}>
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.searchBox}>
-          <Input
-            label={t('app.enterOrderRef')}
-            value={referenceInput}
-            onChangeText={setReferenceInput}
-            placeholder="TN-123456-789"
+        <View style={styles.searchSection}>
+          <Text style={[styles.infoText, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {t('app.lookupOrderDesc')}
+          </Text>
+
+          {errorMsg && (
+            <View style={styles.errorBox}>
+              <Text style={styles.errorText}>{errorMsg}</Text>
+            </View>
+          )}
+
+          <TextInput
+            style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+            placeholder={t('app.orderRefPlaceholder')}
+            placeholderTextColor={colors.textMuted}
+            value={reference}
+            onChangeText={setReference}
             autoCapitalize="characters"
           />
+
+          <TextInput
+            style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+            placeholder={t('app.phonePlaceholder')}
+            placeholderTextColor={colors.textMuted}
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+          />
+
           <Button
-            title={loading ? 'جاري البحث...' : t('app.searchOrder')}
-            icon={<Search size={18} color={colors.primaryDark} />}
-            tooltip={t('app.searchOrder')}
-            onPress={handleSearch}
+            title={loading ? '...' : t('app.lookupBtn')}
+            icon={<Search size={16} color={colors.primaryDark} />}
+            tooltip={t('app.lookupBtn')}
+            onPress={handleLookup}
             variant="accent"
             size="md"
             disabled={loading}
           />
         </View>
 
-        {errorMsg && (
-          <View style={[styles.errorCard, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-            <AlertCircle size={16} color="#D32F2F" />
-            <Text style={styles.errorText}>{errorMsg}</Text>
-          </View>
-        )}
-
-        {loading && (
-          <View style={styles.loadingBox}>
-            <ActivityIndicator size="large" color={colors.accent} />
-          </View>
-        )}
-
-        {orderData && (
-          <View style={styles.orderCard}>
-            {/* Order Header */}
-            <View style={[styles.orderHeaderRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+        {order && (
+          <GlassCard variant="dark" elevation="md" style={styles.resultCard}>
+            <View style={[styles.headerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <View>
-                <Text style={styles.refLabel}>{t('app.orderRefLabel')}</Text>
-                <Text style={styles.refCode}>{orderData.reference}</Text>
+                <Text style={styles.refText}>{order.reference}</Text>
+                <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4, marginTop: 4 }]}>
+                  <Calendar size={13} color={colors.textMuted} />
+                  <Text style={styles.dateText}>
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </Text>
+                </View>
               </View>
-
-              {(() => {
-                const badge = getStatusBadge(orderData.status);
-                return (
-                  <View style={[styles.statusBadge, { backgroundColor: badge.bg }]}>
-                    <Text style={[styles.statusBadgeText, { color: badge.color }]}>
-                      {badge.label}
-                    </Text>
-                  </View>
-                );
-              })()}
+              {renderStatusBadge(order.status)}
             </View>
 
-            {orderData.status === 'rejected' && orderData.rejectionReason && (
-              <View style={[styles.rejectionBox, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
-                <XCircle size={16} color="#DC2626" />
-                <Text style={styles.rejectionText}>
-                  {t('admin.rejectionReasonLabel')}: {orderData.rejectionReason}
+            {order.status === 'rejected' && order.rejectionReason && (
+              <View style={styles.rejectNotice}>
+                <Text style={styles.rejectNoticeText}>
+                  {t('admin.rejectionReasonLabel')}: {order.rejectionReason}
                 </Text>
               </View>
             )}
 
-            {/* Delivery Details */}
-            <View style={styles.detailsBox}>
-              <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 4 }]}>
-                <MapPin size={16} color={colors.primary} />
-                <Text style={[styles.detailsHeading, { textAlign: isRTL ? 'right' : 'left', marginBottom: 0 }]}>
-                  {t('app.customerDetails')}
+            <View style={styles.sectionDivider} />
+
+            <View style={[styles.customerRow, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
+              <Text style={styles.customerName}>{order.customer.fullName}</Text>
+              <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 4, marginTop: 2 }]}>
+                <MapPin size={13} color={colors.accentLight} />
+                <Text style={styles.customerAddress}>
+                  {order.customer.address}, {order.customer.city}
                 </Text>
               </View>
-              <Text style={[styles.detailText, { textAlign: isRTL ? 'right' : 'left' }]}>
-                {orderData.customer.fullName} ({orderData.customer.phone})
-              </Text>
-              <Text style={[styles.detailText, { textAlign: isRTL ? 'right' : 'left' }]}>
-                {orderData.customer.address}, {orderData.customer.city}
-              </Text>
             </View>
 
-            {/* Items Summary */}
-            <View style={styles.itemsBox}>
-              {orderData.items.map((item, idx) => (
-                <View
-                  key={idx}
-                  style={[styles.itemRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
-                >
-                  <Text style={[styles.itemName, { textAlign: isRTL ? 'right' : 'left' }]}>
-                    {item.name[language] || item.name.ar} × {item.quantity}
+            <View style={styles.itemsList}>
+              <Text style={[styles.itemsHeading, { textAlign: isRTL ? 'right' : 'left' }]}>
+                {t('admin.orderItems')}:
+              </Text>
+              {order.items.map((it, idx) => (
+                <View key={idx} style={[styles.itemLine, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <Text style={styles.itemName}>
+                    {it.name[language] || it.name.ar} × {it.quantity}
                   </Text>
                   <Text style={styles.itemPrice}>
-                    {item.subtotal.toFixed(2)} {t('app.currency')}
+                    {it.subtotal.toFixed(2)} {t('app.currency')}
                   </Text>
                 </View>
               ))}
             </View>
 
-            {/* Order Breakdown */}
-            <View style={styles.breakdownBox}>
-              <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Text style={styles.summaryLabel}>{t('app.subtotal')}:</Text>
-                <Text style={styles.summaryVal}>{orderData.subtotal.toFixed(2)} {t('app.currency')}</Text>
-              </View>
+            <View style={styles.sectionDivider} />
 
-              <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Text style={styles.summaryLabel}>{t('app.delivery')}:</Text>
-                <Text style={styles.summaryVal}>{orderData.deliveryFee.toFixed(2)} {t('app.currency')}</Text>
-              </View>
-
-              <View style={[styles.summaryRow, styles.totalRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Text style={styles.totalLabel}>{t('app.total')}:</Text>
-                <Text style={styles.totalVal}>{orderData.total.toFixed(2)} {t('app.currency')}</Text>
-              </View>
+            <View style={[styles.totalRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              <Text style={styles.totalLabel}>{t('app.total')}:</Text>
+              <Text style={styles.totalValue}>
+                {order.total.toFixed(2)} {t('app.currency')}
+              </Text>
             </View>
-          </View>
+          </GlassCard>
         )}
       </ScrollView>
     </Modal>
@@ -236,134 +220,117 @@ export const OrderLookupModal: React.FC<OrderLookupModalProps> = ({ visible, onC
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 8,
+    paddingVertical: 12,
+    gap: 16,
   },
-  searchBox: {
+  searchSection: {
     gap: 12,
-    marginBottom: 16,
   },
-  loadingBox: {
-    padding: 20,
-    alignItems: 'center',
+  infoText: {
+    fontSize: typography.fontSize.xs,
+    color: colors.textSecondary,
+    lineHeight: 18,
   },
-  errorCard: {
+  errorBox: {
     backgroundColor: '#FFEBEE',
-    borderColor: '#FFCDD2',
-    borderWidth: 1,
-    borderRadius: layout.borderRadius.md,
-    padding: 12,
-    marginBottom: 12,
+    padding: 10,
+    borderRadius: layout.borderRadius.sm,
   },
   errorText: {
     color: '#D32F2F',
-    fontSize: typography.fontSize.sm,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
   },
-  orderCard: {
+  input: {
     backgroundColor: colors.cardBg,
     borderColor: colors.borderDark,
     borderWidth: 1,
-    borderRadius: layout.borderRadius.lg,
-    padding: 16,
-    gap: 12,
-    ...shadows.sm,
+    borderRadius: layout.borderRadius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: typography.fontSize.sm,
+    color: colors.textPrimary,
   },
-  orderHeaderRow: {
+  resultCard: {
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.35)',
+    gap: 10,
+  },
+  headerRow: {
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  refLabel: {
-    fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
-  },
-  refCode: {
+  refText: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: layout.borderRadius.full,
-  },
-  statusBadgeText: {
+  dateText: {
     fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.bold,
+    color: colors.textMuted,
   },
-  rejectionBox: {
+  rejectNotice: {
     backgroundColor: '#FFEBEE',
-    padding: 10,
-    borderRadius: layout.borderRadius.md,
+    padding: 8,
+    borderRadius: layout.borderRadius.sm,
   },
-  rejectionText: {
+  rejectNoticeText: {
     color: '#C62828',
     fontSize: typography.fontSize.xs,
   },
-  detailsBox: {
-    backgroundColor: colors.background,
-    padding: 10,
-    borderRadius: layout.borderRadius.md,
-    gap: 4,
+  sectionDivider: {
+    height: 1,
+    backgroundColor: 'rgba(229, 193, 88, 0.25)',
+    marginVertical: 4,
   },
-  detailsHeading: {
+  customerRow: {
+    gap: 2,
+  },
+  customerName: {
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textLight,
+  },
+  customerAddress: {
+    fontSize: typography.fontSize.xs,
+    color: colors.textMuted,
+  },
+  itemsList: {
+    gap: 6,
+    marginTop: 4,
+  },
+  itemsHeading: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
-  detailText: {
-    fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
-  },
-  itemsBox: {
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: 8,
-    gap: 6,
-  },
-  itemRow: {
+  itemLine: {
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   itemName: {
     fontSize: typography.fontSize.xs,
-    color: colors.textPrimary,
-    flex: 1,
+    color: colors.textLight,
   },
   itemPrice: {
     fontSize: typography.fontSize.xs,
+    color: colors.accentLight,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
-  },
-  breakdownBox: {
-    gap: 6,
-  },
-  summaryRow: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  summaryLabel: {
-    fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
-  },
-  summaryVal: {
-    fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
   },
   totalRow: {
-    borderTopWidth: 1,
-    borderTopColor: colors.borderDark,
-    paddingTop: 6,
-    marginTop: 2,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 4,
   },
   totalLabel: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
-  totalVal: {
+  totalValue: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
 });

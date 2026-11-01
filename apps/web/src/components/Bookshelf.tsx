@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import {
   BookOpen,
   Library,
@@ -13,6 +13,7 @@ import { EDUCATION_LEVELS } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Tooltip } from './ui/Tooltip';
+import { GlassCard } from './ui/GlassCard';
 
 export type NavCategory = 'all' | 'primary' | 'middle' | 'secondary' | 'packs' | 'articles';
 
@@ -30,7 +31,7 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
   const { language, isRTL, t } = useLanguage();
 
   const renderCategoryIcon = (id: NavCategory, isSelected: boolean) => {
-    const iconColor = isSelected ? colors.primaryDark : colors.accent;
+    const iconColor = isSelected ? colors.primaryDark : colors.accentLight;
     switch (id) {
       case 'all':
         return <Library size={18} color={iconColor} />;
@@ -77,11 +78,15 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
   ];
 
   return (
-    <View style={[styles.shelfContainer, isCompact && styles.shelfContainerCompact]}>
+    <GlassCard
+      variant="dark"
+      elevation="lg"
+      style={[styles.shelfContainer, isCompact && styles.shelfContainerCompact]}
+    >
       {/* Menu Header Bar */}
       <View style={[styles.headerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View style={styles.headerIconContainer}>
-          <BookOpen size={18} color={colors.accent} />
+          <BookOpen size={18} color={colors.accentLight} />
         </View>
         <Text style={[styles.shelfTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
           {t('app.shelfOverview')}
@@ -168,19 +173,18 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
           );
         })}
       </ScrollView>
-    </View>
+    </GlassCard>
   );
 };
 
 const styles = StyleSheet.create({
   shelfContainer: {
     width: 280,
-    backgroundColor: 'rgba(18, 59, 43, 0.95)',
     borderRadius: layout.borderRadius.xl,
     padding: 16,
-    ...shadows.lg,
     borderWidth: 1,
-    borderColor: 'rgba(229, 193, 88, 0.3)',
+    borderColor: 'rgba(229, 193, 88, 0.35)',
+    ...shadows.lg,
   },
   shelfContainerCompact: {
     width: '100%',
@@ -189,7 +193,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.12)',
+    borderBottomColor: 'rgba(229, 193, 88, 0.25)',
     paddingBottom: 14,
     marginBottom: 14,
   },
@@ -197,7 +201,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: layout.borderRadius.md,
-    backgroundColor: 'rgba(229, 193, 88, 0.15)',
+    backgroundColor: 'rgba(229, 193, 88, 0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -212,7 +216,7 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   menuItemCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: layout.borderRadius.lg,
     paddingVertical: 12,
     paddingHorizontal: 14,
@@ -222,12 +226,12 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   menuItemCardSelected: {
-    backgroundColor: 'rgba(229, 193, 88, 0.22)',
+    backgroundColor: 'rgba(229, 193, 88, 0.24)',
     borderColor: colors.accent,
-    ...shadows.sm,
+    ...shadows.goldGlow,
   },
   accentStrip: {
     position: 'absolute',

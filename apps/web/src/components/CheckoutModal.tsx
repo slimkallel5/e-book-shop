@@ -14,11 +14,14 @@ import {
   Banknote,
   Copy,
   Check,
+  ChevronRight,
+  ChevronLeft,
 } from 'lucide-react-native';
 import { Modal } from './ui/Modal';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
+import { GlassCard } from './ui/GlassCard';
 import { useLanguage } from '../context/LanguageContext';
 import { CartItem } from '../context/StoreContext';
 import { getApiUrl } from '../services/api';
@@ -49,6 +52,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   onSuccess,
 }) => {
   const { isRTL, t } = useLanguage();
+
+  // 3-step checkout: 1: Customer details, 2: Delivery & payment review, 3: Order completed
+  const [step, setStep] = useState<1 | 2>(1);
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -102,19 +108,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     return /^(216)?\d{8}$/.test(clean);
   };
 
-  const handleSubmit = async () => {
+  const handleProceedToReview = () => {
     setErrorMsg(null);
-
     if (!fullName.trim() || !email.trim() || !phone.trim() || !city.trim() || !address.trim()) {
       setErrorMsg(t('app.requiredError'));
       return;
     }
-
     if (!validateTunisianPhone(phone)) {
       setErrorMsg(t('app.phoneError'));
       return;
     }
+    setStep(2);
+  };
 
+  const handleSubmit = async () => {
+    setErrorMsg(null);
     setLoading(true);
 
     try {
@@ -160,6 +168,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setConfirmedOrder(null);
     setErrorMsg(null);
     setCopied(false);
+    setStep(1);
     onClose();
   };
 
@@ -179,7 +188,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             <Text style={styles.successTitle}>{t('app.orderSuccessTitle')}</Text>
             <Text style={styles.successSub}>{t('app.orderSuccessSub')}</Text>
 
-            <View style={styles.referenceBox}>
+            <GlassCard variant="goldGlow" elevation="md" style={styles.referenceBox}>
               <Text style={styles.referenceLabel}>{t('app.orderRefLabel')}:</Text>
               <Text style={styles.referenceCode}>{confirmedOrder.reference}</Text>
               <Tooltip content={copied ? t('app.copied') : t('app.copyRef')}>
@@ -197,9 +206,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   </Text>
                 </TouchableOpacity>
               </Tooltip>
-            </View>
+            </GlassCard>
 
-            <View style={styles.orderSummaryBox}>
+            <GlassCard variant="dark" elevation="sm" style={styles.orderSummaryBox}>
               <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                 <Text style={styles.summaryLabel}>{t('app.subtotal')}:</Text>
                 <Text style={styles.summaryVal}>{confirmedOrder.subtotal.toFixed(2)} {t('app.currency')}</Text>
@@ -212,7 +221,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <Text style={styles.totalLabel}>{t('app.total')}:</Text>
                 <Text style={styles.totalVal}>{confirmedOrder.total.toFixed(2)} {t('app.currency')}</Text>
               </View>
-            </View>
+            </GlassCard>
 
             <Button
               title={t('app.closeConfirmation')}
@@ -224,8 +233,25 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             />
           </View>
         ) : (
-          /* Customer Checkout Form */
+          /* Multi-step Customer Checkout Form */
           <View style={styles.formContent}>
+            {/* Step Indicators */}
+            <View style={[styles.stepBar, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              <View style={[styles.stepItem, step === 1 && styles.stepItemActive]}>
+                <Text style={[styles.stepNum, step === 1 && styles.stepNumActive]}>1</Text>
+                <Text style={[styles.stepLabel, step === 1 && styles.stepLabelActive]}>
+                  {t('app.customerDetails')}
+                </Text>
+              </View>
+              <View style={styles.stepDivider} />
+              <View style={[styles.stepItem, step === 2 && styles.stepItemActive]}>
+                <Text style={[styles.stepNum, step === 2 && styles.stepNumActive]}>2</Text>
+                <Text style={[styles.stepLabel, step === 2 && styles.stepLabelActive]}>
+                  {t('app.paymentMethodLabel')}
+                </Text>
+              </View>
+            </View>
+
             {errorMsg && (
               <View style={[styles.errorBox, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
                 <AlertCircle size={16} color="#D32F2F" />
@@ -233,115 +259,139 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </View>
             )}
 
-            {/* Customer Details */}
-            <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 12 }]}>
-              <User size={18} color={colors.primary} />
-              <Text style={[styles.sectionHeading, { textAlign: isRTL ? 'right' : 'left', marginBottom: 0 }]}>
-                {t('app.customerDetails')}
-              </Text>
-            </View>
+            {step === 1 ? (
+              /* Step 1: Customer Details */
+              <View style={styles.stepForm}>
+                <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 8 }]}>
+                  <User size={18} color={colors.accentLight} />
+                  <Text style={[styles.sectionHeading, { textAlign: isRTL ? 'right' : 'left' }]}>
+                    {t('app.customerDetails')}
+                  </Text>
+                </View>
 
-            <Input
-              label={t('app.fullName')}
-              value={fullName}
-              onChangeText={setFullName}
-              placeholder="Sami Ben Ali"
-            />
-
-            <View style={styles.twoColRow}>
-              <View style={{ flex: 1 }}>
                 <Input
-                  label={t('app.email')}
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="name@domain.tn"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
+                  label={t('app.fullName')}
+                  value={fullName}
+                  onChangeText={setFullName}
+                  placeholder="Sami Ben Ali"
+                />
+
+                <View style={styles.twoColRow}>
+                  <View style={{ flex: 1 }}>
+                    <Input
+                      label={t('app.email')}
+                      value={email}
+                      onChangeText={setEmail}
+                      placeholder="name@domain.tn"
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                    />
+                  </View>
+
+                  <View style={{ flex: 1 }}>
+                    <Input
+                      label={t('app.phone')}
+                      value={phone}
+                      onChangeText={setPhone}
+                      placeholder="20 123 456"
+                      keyboardType="phone-pad"
+                      inputStyle={{ textAlign: 'left' }}
+                      style={{ textAlign: 'left' }}
+                    />
+                  </View>
+                </View>
+
+                <Input
+                  label={t('app.city')}
+                  value={city}
+                  onChangeText={setCity}
+                  placeholder="Tunis / Ariana / Sousse / Sfax"
+                />
+
+                <Input
+                  label={t('app.address')}
+                  value={address}
+                  onChangeText={setAddress}
+                  placeholder="Av. Habib Bourguiba, App. 4"
+                />
+
+                <Input
+                  label={t('app.instructions')}
+                  value={instructions}
+                  onChangeText={setInstructions}
+                  placeholder="..."
+                />
+
+                <Button
+                  title={isRTL ? 'المتابعة لتأكيد الطلب' : 'Continue to Review'}
+                  icon={isRTL ? <ChevronLeft size={18} color={colors.primaryDark} /> : <ChevronRight size={18} color={colors.primaryDark} />}
+                  onPress={handleProceedToReview}
+                  variant="accent"
+                  size="lg"
+                  style={{ marginTop: 14 }}
                 />
               </View>
+            ) : (
+              /* Step 2: Payment & Financial Review */
+              <View style={styles.stepForm}>
+                <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 8 }]}>
+                  <Truck size={18} color={colors.accentLight} />
+                  <Text style={[styles.sectionHeading, { textAlign: isRTL ? 'right' : 'left' }]}>
+                    {t('app.paymentMethodLabel')}
+                  </Text>
+                </View>
 
-              <View style={{ flex: 1 }}>
-                <Input
-                  label={t('app.phone')}
-                  value={phone}
-                  onChangeText={setPhone}
-                  placeholder="20 123 456"
-                  keyboardType="phone-pad"
-                  inputStyle={{ textAlign: 'left' }}
-                  style={{ textAlign: 'left' }}
-                />
+                <GlassCard variant="goldGlow" elevation="sm" style={styles.paymentMethodBox}>
+                  <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
+                    <Banknote size={18} color={colors.accentLight} />
+                    <Text style={styles.paymentMethodTitle}>{t('app.cashOnDelivery')}</Text>
+                  </View>
+                  <Text style={styles.paymentMethodSub}>
+                    {t('app.cashOnDeliverySub')}
+                  </Text>
+                </GlassCard>
+
+                {/* Financial Breakdown */}
+                <GlassCard variant="dark" elevation="sm" style={styles.breakdownCard}>
+                  <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                    <Text style={styles.summaryLabel}>{t('app.subtotal')}:</Text>
+                    <Text style={styles.summaryVal}>{subtotal.toFixed(2)} {t('app.currency')}</Text>
+                  </View>
+
+                  <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                    <Text style={styles.summaryLabel}>{t('app.delivery')}:</Text>
+                    <Text style={[styles.summaryVal, isFreeDelivery && styles.freeBadge]}>
+                      {isFreeDelivery ? t('app.freeDeliveryBadge') : `${deliveryFee.toFixed(2)} ${t('app.currency')}`}
+                    </Text>
+                  </View>
+
+                  <View style={[styles.summaryRow, styles.totalRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                    <Text style={styles.totalLabel}>{t('app.total')}:</Text>
+                    <Text style={styles.totalVal}>{totalAmount.toFixed(2)} {t('app.currency')}</Text>
+                  </View>
+                </GlassCard>
+
+                <View style={[styles.actionBtnRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <Button
+                    title={isRTL ? 'رجوع' : 'Back'}
+                    onPress={() => setStep(1)}
+                    variant="outline"
+                    size="md"
+                    style={{ flex: 1 }}
+                  />
+                  <Button
+                    title={loading ? t('app.submittingOrder') : t('app.submitOrder')}
+                    icon={<Truck size={18} color={colors.primaryDark} />}
+                    tooltip={t('app.submitOrder')}
+                    onPress={handleSubmit}
+                    variant="accent"
+                    size="md"
+                    disabled={loading}
+                    style={{ flex: 2 }}
+                  />
+                </View>
               </View>
-            </View>
-
-            <Input
-              label={t('app.city')}
-              value={city}
-              onChangeText={setCity}
-              placeholder="Tunis / Ariana / Sousse / Sfax"
-            />
-
-            <Input
-              label={t('app.address')}
-              value={address}
-              onChangeText={setAddress}
-              placeholder="Av. Habib Bourguiba, App. 4"
-            />
-
-            <Input
-              label={t('app.instructions')}
-              value={instructions}
-              onChangeText={setInstructions}
-              placeholder="..."
-            />
-
-            {/* Payment & Delivery Summary */}
-            <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginTop: 16, marginBottom: 8 }]}>
-              <Truck size={18} color={colors.primary} />
-              <Text style={[styles.sectionHeading, { textAlign: isRTL ? 'right' : 'left', marginBottom: 0 }]}>
-                {t('app.paymentMethodLabel')}
-              </Text>
-            </View>
-
-            <View style={styles.paymentMethodBox}>
-              <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
-                <Banknote size={18} color={colors.primaryDark} />
-                <Text style={styles.paymentMethodTitle}>{t('app.cashOnDelivery')}</Text>
-              </View>
-              <Text style={styles.paymentMethodSub}>
-                {t('app.cashOnDeliverySub')}
-              </Text>
-            </View>
-
-            {/* Financial Breakdown */}
-            <View style={styles.breakdownCard}>
-              <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Text style={styles.summaryLabel}>{t('app.subtotal')}:</Text>
-                <Text style={styles.summaryVal}>{subtotal.toFixed(2)} {t('app.currency')}</Text>
-              </View>
-
-              <View style={[styles.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Text style={styles.summaryLabel}>{t('app.delivery')}:</Text>
-                <Text style={[styles.summaryVal, isFreeDelivery && styles.freeBadge]}>
-                  {isFreeDelivery ? t('app.freeDeliveryBadge') : `${deliveryFee.toFixed(2)} ${t('app.currency')}`}
-                </Text>
-              </View>
-
-              <View style={[styles.summaryRow, styles.totalRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Text style={styles.totalLabel}>{t('app.total')}:</Text>
-                <Text style={styles.totalVal}>{totalAmount.toFixed(2)} {t('app.currency')}</Text>
-              </View>
-            </View>
-
-            <Button
-              title={loading ? t('app.submittingOrder') : t('app.submitOrder')}
-              icon={<Truck size={18} color={colors.primaryDark} />}
-              tooltip={t('app.submitOrder')}
-              onPress={handleSubmit}
-              variant="accent"
-              size="lg"
-              disabled={loading}
-              style={{ marginTop: 20 }}
-            />
+            )}
           </View>
         )}
       </ScrollView>
@@ -356,11 +406,59 @@ const styles = StyleSheet.create({
   formContent: {
     gap: 12,
   },
+  stepBar: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(229, 193, 88, 0.25)',
+    marginBottom: 12,
+  },
+  stepItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    opacity: 0.6,
+  },
+  stepItemActive: {
+    opacity: 1,
+  },
+  stepNum: {
+    width: 22,
+    height: 22,
+    borderRadius: layout.borderRadius.full,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    color: colors.textLight,
+    textAlign: 'center',
+    lineHeight: 22,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+  },
+  stepNumActive: {
+    backgroundColor: colors.accent,
+    color: colors.primaryDark,
+  },
+  stepLabel: {
+    fontSize: typography.fontSize.xs,
+    color: colors.textMuted,
+  },
+  stepLabelActive: {
+    color: colors.accentLight,
+    fontWeight: typography.fontWeight.bold,
+  },
+  stepDivider: {
+    width: 32,
+    height: 1,
+    backgroundColor: 'rgba(229, 193, 88, 0.3)',
+    marginHorizontal: 12,
+  },
+  stepForm: {
+    gap: 12,
+  },
   sectionHeading: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
-    marginBottom: 4,
+    color: colors.accentLight,
   },
   twoColRow: {
     flexDirection: 'row',
@@ -379,31 +477,25 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.medium,
   },
   paymentMethodBox: {
-    backgroundColor: colors.cardBg,
-    borderColor: colors.accent,
-    borderWidth: 1.5,
-    borderRadius: layout.borderRadius.md,
     padding: 14,
-    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.4)',
   },
   paymentMethodTitle: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primaryDark,
+    color: colors.accentLight,
   },
   paymentMethodSub: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.75)',
     marginTop: 4,
   },
   breakdownCard: {
-    backgroundColor: colors.background,
-    borderColor: colors.borderDark,
-    borderWidth: 1,
-    borderRadius: layout.borderRadius.md,
     padding: 14,
-    marginTop: 12,
     gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.25)',
   },
   summaryRow: {
     justifyContent: 'space-between',
@@ -411,45 +503,45 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: typography.fontSize.sm,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.75)',
   },
   summaryVal: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   freeBadge: {
-    color: colors.secondary,
+    color: colors.accentLight,
     fontWeight: typography.fontWeight.bold,
   },
   totalRow: {
     borderTopWidth: 1,
-    borderTopColor: colors.borderDark,
+    borderTopColor: 'rgba(229, 193, 88, 0.25)',
     paddingTop: 8,
     marginTop: 4,
   },
   totalLabel: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   totalVal: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
+  },
+  actionBtnRow: {
+    gap: 10,
+    marginTop: 12,
   },
   successContainer: {
     alignItems: 'center',
     paddingVertical: 16,
   },
-  successBadge: {
-    fontSize: 48,
-    marginBottom: 12,
-  },
   successTitle: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.textPrimary,
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -460,13 +552,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   referenceBox: {
-    backgroundColor: colors.primaryDark,
     padding: 16,
     borderRadius: layout.borderRadius.lg,
     alignItems: 'center',
     width: '100%',
     marginBottom: 16,
-    ...shadows.md,
   },
   referenceLabel: {
     fontSize: typography.fontSize.xs,
@@ -493,11 +583,9 @@ const styles = StyleSheet.create({
   },
   orderSummaryBox: {
     width: '100%',
-    backgroundColor: colors.cardBg,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: layout.borderRadius.md,
     padding: 14,
     gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.25)',
   },
 });

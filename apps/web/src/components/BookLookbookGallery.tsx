@@ -21,6 +21,7 @@ import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { Tooltip } from './ui/Tooltip';
+import { GlassCard } from './ui/GlassCard';
 
 interface BookLookbookGalleryProps {
   books: Book[];
@@ -157,8 +158,8 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
 
                 {/* Bottom Overlay Info */}
                 <View style={styles.cardGradient}>
-                  <View style={styles.levelRow}>
-                    <GraduationCap size={12} color={colors.accent} />
+                  <View style={[styles.levelRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                    <GraduationCap size={12} color={colors.accentLight} />
                     <Text style={styles.levelBadge}>{level}</Text>
                   </View>
                   <Text style={[styles.cardTitle, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={2}>
@@ -176,13 +177,13 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
         </View>
       </View>
 
-      {/* Selected Book Reveal Details Panel */}
+      {/* Selected Book Reveal Details Panel with GlassCard */}
       {activeBook && (
-        <View style={styles.revealDetailCard}>
+        <GlassCard variant="dark" elevation="md" style={styles.revealDetailCard}>
           <View style={[styles.detailHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             <View style={styles.detailInfoCol}>
               <View style={[styles.metaBadgesRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <GraduationCap size={14} color={colors.primary} />
+                <GraduationCap size={14} color={colors.accentLight} />
                 <Text style={styles.detailLevel}>
                   {activeBook.levelName[language] || activeBook.levelName.ar}
                 </Text>
@@ -217,16 +218,16 @@ export const BookLookbookGallery: React.FC<BookLookbookGalleryProps> = ({
               <View style={[styles.btnRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                 <Button
                   title={t('app.addToCart')}
-                  icon={<ShoppingCart size={16} color={colors.textLight} />}
+                  icon={<ShoppingCart size={16} color={colors.primaryDark} />}
                   tooltip={t('app.addToCart')}
                   onPress={() => addToCart(activeBook)}
-                  variant="primary"
+                  variant="accent"
                   size="md"
                 />
               </View>
             </View>
           </View>
-        </View>
+        </GlassCard>
       )}
     </View>
   );
@@ -249,13 +250,15 @@ const styles = StyleSheet.create({
   stageArrow: {
     position: 'absolute',
     top: '42%',
-    backgroundColor: colors.primary,
+    backgroundColor: 'rgba(18, 59, 43, 0.95)',
     width: 42,
     height: 42,
     borderRadius: layout.borderRadius.full,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 50,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.4)',
     ...shadows.md,
   },
   arrowLeft: {
@@ -280,14 +283,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cardBg,
     ...shadows.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
   },
   lookbookCardFocal: {
     borderColor: colors.accent,
     borderWidth: 2,
-    shadowColor: colors.primary,
-    shadowOpacity: 0.3,
-    shadowRadius: 18,
+    ...shadows.goldGlow,
   },
   coverImage: {
     width: '100%',
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     width: 6,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: 'rgba(0,0,0,0.25)',
   },
   badgeContainer: {
     position: 'absolute',
@@ -312,16 +313,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 12,
-    backgroundColor: 'rgba(10, 35, 25, 0.88)',
+    backgroundColor: 'rgba(10, 35, 25, 0.92)',
   },
   levelRow: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     marginBottom: 2,
   },
   levelBadge: {
-    color: colors.accent,
+    color: colors.accentLight,
     fontSize: 10,
     fontWeight: typography.fontWeight.bold,
   },
@@ -346,11 +346,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
   },
   revealDetailCard: {
-    backgroundColor: colors.cardBg,
-    borderRadius: layout.borderRadius.lg,
     padding: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(229, 193, 88, 0.35)',
     ...shadows.md,
     marginTop: 12,
   },
@@ -370,7 +368,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   detailLevel: {
-    color: colors.primary,
+    color: colors.accentLight,
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
   },
@@ -385,12 +383,12 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold,
   },
   detailTitle: {
-    color: colors.textPrimary,
+    color: colors.textLight,
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
   },
   detailDesc: {
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.75)',
     fontSize: typography.fontSize.xs,
     marginTop: 4,
     lineHeight: 18,
@@ -404,7 +402,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   currentPrice: {
-    color: colors.primary,
+    color: colors.accentLight,
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
   },

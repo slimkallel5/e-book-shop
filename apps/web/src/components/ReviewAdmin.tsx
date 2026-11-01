@@ -20,6 +20,7 @@ import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 import { Tooltip } from './ui/Tooltip';
+import { GlassCard } from './ui/GlassCard';
 
 export interface AdminReview {
   id: string;
@@ -113,60 +114,62 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
 
   return (
     <View style={styles.container}>
-      {/* Top Header */}
-      <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <View>
-          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-            <Star size={22} color={colors.accent} fill={colors.accent} />
-            <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('admin.reviewsManagementTitle')}
+      {/* Top Header Card */}
+      <GlassCard variant="dark" elevation="sm" style={styles.topRowCard}>
+        <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <View>
+            <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+              <Star size={22} color={colors.accentLight} fill={colors.accentLight} />
+              <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+                {t('admin.reviewsManagementTitle')}
+              </Text>
+            </View>
+            <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('admin.reviewsManagementSub')}
             </Text>
           </View>
-          <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            {t('admin.reviewsManagementSub')}
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={[styles.refreshBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
-          onPress={fetchReviews}
-        >
-          <RefreshCw size={14} color={colors.primary} />
-          <Text style={styles.refreshBtnText}>{t('admin.refresh')}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Filter Tabs */}
-      <View style={[styles.tabsRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        {[
-          { key: 'all', label: t('admin.all') },
-          { key: 'pending', label: t('admin.underReview') },
-          { key: 'published', label: t('admin.published') },
-        ].map((tab) => (
           <TouchableOpacity
-            key={tab.key}
-            style={[styles.tabPill, filter === tab.key && styles.tabPillActive]}
-            onPress={() => setFilter(tab.key as any)}
+            style={[styles.refreshBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+            onPress={fetchReviews}
           >
-            <Text style={[styles.tabPillText, filter === tab.key && styles.tabPillTextActive]}>
-              {tab.label}
-            </Text>
+            <RefreshCw size={14} color={colors.accentLight} />
+            <Text style={styles.refreshBtnText}>{t('admin.refresh')}</Text>
           </TouchableOpacity>
-        ))}
-      </View>
+        </View>
+
+        {/* Filter Tabs */}
+        <View style={[styles.tabsRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          {[
+            { key: 'all', label: t('admin.all') },
+            { key: 'pending', label: t('admin.underReview') },
+            { key: 'published', label: t('admin.published') },
+          ].map((tab) => (
+            <TouchableOpacity
+              key={tab.key}
+              style={[styles.tabPill, filter === tab.key && styles.tabPillActive]}
+              onPress={() => setFilter(tab.key as any)}
+            >
+              <Text style={[styles.tabPillText, filter === tab.key && styles.tabPillTextActive]}>
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </GlassCard>
 
       {loading ? (
-        <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }} />
+        <ActivityIndicator size="large" color={colors.accentLight} style={{ marginTop: 20 }} />
       ) : (
         <ScrollView style={styles.list}>
           {filteredReviews.length === 0 ? (
             <Text style={styles.emptyText}>{t('admin.noReviews')}</Text>
           ) : (
             filteredReviews.map((rev) => (
-              <View key={rev.id} style={styles.card}>
+              <GlassCard key={rev.id} variant="dark" elevation="sm" style={styles.card}>
                 <View style={[styles.cardHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <View>
                     <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
-                      <User size={15} color={colors.primary} />
+                      <User size={15} color={colors.accentLight} />
                       <Text style={styles.authorName}>{rev.authorName}</Text>
                     </View>
                     <Text style={styles.starsText}>{renderStars(rev.rating)} ({rev.rating}/5)</Text>
@@ -202,7 +205,7 @@ export const ReviewAdmin: React.FC<ReviewAdminProps> = ({ token }) => {
                     </TouchableOpacity>
                   </Tooltip>
                 </View>
-              </View>
+              </GlassCard>
             ))
           )}
         </ScrollView>
@@ -216,26 +219,32 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  topRowCard: {
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
+    gap: 12,
+  },
   topRow: {
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
     flexWrap: 'wrap',
     gap: 8,
   },
   title: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.textLight,
   },
   subtitle: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.7)',
     marginTop: 2,
   },
   refreshBtn: {
-    backgroundColor: colors.cardBg,
-    borderColor: colors.borderDark,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(229, 193, 88, 0.3)',
     borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -244,30 +253,30 @@ const styles = StyleSheet.create({
   refreshBtnText: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   tabsRow: {
     gap: 8,
-    marginBottom: 12,
+    flexWrap: 'wrap',
   },
   tabPill: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: layout.borderRadius.full,
-    backgroundColor: colors.cardBg,
-    borderColor: colors.border,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(229, 193, 88, 0.25)',
     borderWidth: 1,
   },
   tabPillActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.accent,
+    borderColor: colors.accentLight,
   },
   tabPillText: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: colors.textLight,
   },
   tabPillTextActive: {
-    color: colors.textLight,
+    color: colors.primaryDark,
     fontWeight: typography.fontWeight.bold,
   },
   list: {
@@ -280,14 +289,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   card: {
-    backgroundColor: colors.cardBg,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: layout.borderRadius.md,
     padding: 14,
     marginBottom: 12,
     gap: 8,
-    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.25)',
   },
   cardHeader: {
     justifyContent: 'space-between',
@@ -296,16 +302,16 @@ const styles = StyleSheet.create({
   authorName: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   starsText: {
     fontSize: typography.fontSize.xs,
-    color: colors.secondary,
+    color: colors.accentLight,
     marginTop: 2,
   },
   commentText: {
     fontSize: typography.fontSize.sm,
-    color: colors.textPrimary,
+    color: 'rgba(255, 255, 255, 0.85)',
     fontStyle: 'italic',
     lineHeight: 20,
   },
@@ -313,7 +319,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: 'rgba(229, 193, 88, 0.2)',
     paddingTop: 8,
     marginTop: 4,
   },
