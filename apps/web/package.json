@@ -21,9 +21,11 @@
     "react-dom": "18.2.0",
     "react-native": "0.73.2",
     "react-native-svg": "^15.16.0",
-    "react-native-web": "~0.19.10"
+    "react-native-web": "~0.19.10",
+    "three": "^0.160.0"
   },
   "devDependencies": {
+    "@types/three": "^0.160.0",
     "@babel/core": "^7.20.0",
     "@types/react": "~18.2.45",
     "typescript": "^5.3.3"

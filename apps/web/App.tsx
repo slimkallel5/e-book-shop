@@ -39,7 +39,8 @@ import { AdminDashboard } from './src/components/AdminDashboard';
 import { AdminLoginModal } from './src/components/AdminLoginModal';
 import { BookLookbookGallery } from './src/components/BookLookbookGallery';
 import { ArticleLookbookGallery } from './src/components/ArticleLookbookGallery';
-import { ImmersiveBackground } from './src/components/ImmersiveBackground';
+import { ThreeDScene } from './src/components/3d/ThreeDScene';
+import { ThreeDPreviewDemonstrator } from './src/components/3d/ThreeDPreviewDemonstrator';
 import { CheckoutModal } from './src/components/CheckoutModal';
 import { OrderLookupModal } from './src/components/OrderLookupModal';
 import { ContactModal } from './src/components/ContactModal';
@@ -72,6 +73,7 @@ function StorefrontContent() {
   const [orderLookupOpen, setOrderLookupOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [show3DPreview, setShow3DPreview] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -120,7 +122,7 @@ function StorefrontContent() {
   const cartTotalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <ImmersiveBackground>
+    <ThreeDScene showFloatingBooks={!isAdminView && !show3DPreview} interactiveCamera={!isAdminView}>
       <View style={styles.appContainer}>
         {/* Persistent Shell Header */}
         <Header
@@ -133,6 +135,8 @@ function StorefrontContent() {
           onSearchChange={setSearchQuery}
           isAdminMode={isAdminView}
           onToggleAdminMode={handleToggleAdminMode}
+          onToggle3DPreview={() => setShow3DPreview(!show3DPreview)}
+          is3DPreviewActive={show3DPreview}
         />
 
         {/* Main Content Area */}
@@ -169,8 +173,13 @@ function StorefrontContent() {
               </View>
             )}
 
-            {/* Main Content: Admin View or Storefront View */}
-            {isAdminView ? (
+            {/* 3D Demonstrator Preview Mode */}
+            {show3DPreview ? (
+              <ThreeDPreviewDemonstrator
+                sampleBooks={filteredBooks.length > 0 ? filteredBooks : books}
+                onClose={() => setShow3DPreview(false)}
+              />
+            ) : isAdminView ? (
               <View style={styles.adminContainer}>
                 {/* Admin Sub-navigation Tabs */}
                 <View style={[styles.adminTabRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
@@ -450,7 +459,7 @@ function StorefrontContent() {
         {/* Persistent Shell Footer */}
         <Footer />
       </View>
-    </ImmersiveBackground>
+    </ThreeDScene>
   );
 }
 
