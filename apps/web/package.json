@@ -9,6 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build": "tsc --noEmit",
+    "export": "expo export --platform web",
     "test": "node -e \"console.log('Web tests passed')\"",
     "lint": "tsc --noEmit"
   },

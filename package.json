@@ -7,7 +7,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present && npm --workspace=apps/web run export && rm -rf public/* && cp -r apps/web/dist/* public/",
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "web": "npm --workspace=apps/web run start",
