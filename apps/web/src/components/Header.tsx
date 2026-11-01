@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from 'react-native';
 import {
   BookOpen,
@@ -16,6 +17,8 @@ import {
   Heart,
   ShoppingCart,
   ChevronDown,
+  Sparkles,
+  Layers,
 } from 'lucide-react-native';
 import { useLanguage, Language } from '../context/LanguageContext';
 import { colors, layout, shadows, typography } from '../theme/tokens';
@@ -52,6 +55,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { language, setLanguage, isRTL, t } = useLanguage();
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const languages: { code: Language; label: string; flag: string }[] = [
     { code: 'ar', label: 'العربية (RTL)', flag: '🇹🇳' },
@@ -62,92 +66,122 @@ export const Header: React.FC<HeaderProps> = ({
   const activeLang = languages.find((l) => l.code === language) || languages[0];
 
   return (
-    <View style={styles.headerContainer}>
+    <View style={styles.headerWrapper}>
+      {/* 3D Glassmorphic Navigation Bar */}
       <View style={[styles.innerHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        {/* Brand Logo & Name */}
+        {/* Brand Logo & Name with 3D Holographic Crest */}
         <View style={[styles.brandContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-          <View style={styles.logoBadge}>
-            <BookOpen size={24} color={colors.primaryDark} />
+          <View style={styles.logoBadge3D}>
+            <View style={styles.logoBadgeInner}>
+              <BookOpen size={22} color={colors.primaryDark} strokeWidth={2.4} />
+            </View>
+            <View style={styles.logoShine} />
           </View>
-          <View style={styles.brandTextCol}>
-            <Text style={[styles.brandTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('app.name')}
-            </Text>
+          <View style={[styles.brandTextCol, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
+            <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
+              <Text style={[styles.brandTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+                {t('app.name')}
+              </Text>
+              <Sparkles size={14} color={colors.accent} />
+            </View>
             <Text style={[styles.brandSub, { textAlign: isRTL ? 'right' : 'left' }]}>
               {t('app.tagline')}
             </Text>
           </View>
         </View>
 
-        {/* Search Bar */}
+        {/* 3D Search Field with Glowing Focus Halo */}
         <View style={styles.searchWrapper}>
-          <View style={[styles.searchBox, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <Search size={18} color="rgba(255, 255, 255, 0.7)" style={styles.searchIcon} />
+          <View
+            style={[
+              styles.searchBox,
+              isSearchFocused && styles.searchBoxFocused,
+              { flexDirection: isRTL ? 'row-reverse' : 'row' },
+            ]}
+          >
+            <Search
+              size={18}
+              color={isSearchFocused ? colors.accentLight : 'rgba(255, 255, 255, 0.65)'}
+              style={styles.searchIcon}
+            />
             <TextInput
               style={[
                 styles.searchInput,
                 { textAlign: isRTL ? 'right' : 'left', direction: isRTL ? 'rtl' : 'ltr' },
               ]}
               placeholder={t('app.searchPlaceholder')}
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor="rgba(255, 255, 255, 0.5)"
               value={searchQuery}
               onChangeText={onSearchChange}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
             />
           </View>
         </View>
 
-        {/* Action Controls & Language Selector */}
+        {/* Action Controls & Navigation Modules */}
         <View style={[styles.actionsRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-          {/* 3D Preview Toggle */}
+          {/* 3D Demonstrator Toggle */}
           {onToggle3DPreview && (
             <Tooltip content={is3DPreviewActive ? t('app.storefront') : '3D'}>
               <TouchableOpacity
                 style={[
                   styles.actionBtn,
-                  is3DPreviewActive ? styles.adminActiveBtn : styles.adminBtn,
+                  is3DPreviewActive ? styles.demonstratorActiveBtn : styles.demonstratorBtn,
+                  { flexDirection: isRTL ? 'row-reverse' : 'row' },
                 ]}
                 onPress={onToggle3DPreview}
                 activeOpacity={0.8}
+                accessibilityRole="button"
                 accessibilityLabel="3D Preview"
               >
-                <Text style={[styles.cartLabel, is3DPreviewActive ? { color: colors.accentLight } : { color: colors.textLight }]}>
+                <Layers size={16} color={is3DPreviewActive ? colors.primaryDark : colors.accentLight} />
+                <Text
+                  style={[
+                    styles.navBtnLabel,
+                    is3DPreviewActive ? { color: colors.primaryDark } : { color: colors.accentLight },
+                  ]}
+                >
                   {is3DPreviewActive ? (language === 'ar' ? 'المتجر' : 'Store') : '3D'}
                 </Text>
               </TouchableOpacity>
             </Tooltip>
           )}
 
-          {/* Admin Toggle Button */}
+          {/* Admin Toggle */}
           {onToggleAdminMode && (
             <Tooltip content={isAdminMode ? t('app.storefront') : t('app.administrator')}>
               <TouchableOpacity
                 style={[
                   styles.actionBtn,
                   isAdminMode ? styles.adminActiveBtn : styles.adminBtn,
+                  { flexDirection: isRTL ? 'row-reverse' : 'row' },
                 ]}
                 onPress={onToggleAdminMode}
                 activeOpacity={0.8}
+                accessibilityRole="button"
                 accessibilityLabel={isAdminMode ? t('app.storefront') : t('app.administrator')}
               >
                 {isAdminMode ? (
-                  <Store size={18} color={colors.textLight} />
+                  <Store size={16} color={colors.textLight} />
                 ) : (
-                  <Settings size={18} color={colors.textLight} />
+                  <Settings size={16} color={colors.textLight} />
                 )}
-                <Text style={[styles.cartLabel, isAdminMode && { color: colors.textLight }]}>
+                <Text style={[styles.navBtnLabel, { color: colors.textLight }]}>
                   {isAdminMode ? t('app.storefront') : t('app.administrator')}
                 </Text>
               </TouchableOpacity>
             </Tooltip>
           )}
 
-          {/* Order Tracking Lookup Button */}
+          {/* Order Tracking */}
           {onOpenOrderLookup && (
             <Tooltip content={t('app.lookupOrderTitle')}>
               <TouchableOpacity
                 style={styles.actionBtn}
                 onPress={onOpenOrderLookup}
                 activeOpacity={0.7}
+                accessibilityRole="button"
                 accessibilityLabel={t('app.lookupOrderTitle')}
               >
                 <Package size={18} color={colors.textLight} />
@@ -155,13 +189,14 @@ export const Header: React.FC<HeaderProps> = ({
             </Tooltip>
           )}
 
-          {/* Contact Us Button */}
+          {/* Contact Trigger */}
           {onOpenContact && (
             <Tooltip content={t('app.contactUs')}>
               <TouchableOpacity
                 style={styles.actionBtn}
                 onPress={onOpenContact}
                 activeOpacity={0.7}
+                accessibilityRole="button"
                 accessibilityLabel={t('app.contactUs')}
               >
                 <Mail size={18} color={colors.textLight} />
@@ -169,12 +204,13 @@ export const Header: React.FC<HeaderProps> = ({
             </Tooltip>
           )}
 
-          {/* Favourites Button */}
+          {/* Favourites */}
           <Tooltip content={t('app.favourites')}>
             <TouchableOpacity
               style={styles.actionBtn}
               onPress={onOpenFavourites}
               activeOpacity={0.7}
+              accessibilityRole="button"
               accessibilityLabel={t('app.favourites')}
             >
               <Heart
@@ -190,31 +226,37 @@ export const Header: React.FC<HeaderProps> = ({
             </TouchableOpacity>
           </Tooltip>
 
-          {/* Cart Button */}
+          {/* Glowing 3D Cart Pill */}
           <Tooltip content={t('app.cart')}>
             <TouchableOpacity
-              style={[styles.actionBtn, styles.cartBtn]}
+              style={[
+                styles.actionBtn,
+                styles.cartBtn3D,
+                { flexDirection: isRTL ? 'row-reverse' : 'row' },
+              ]}
               onPress={onOpenCart}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
+              accessibilityRole="button"
               accessibilityLabel={t('app.cart')}
             >
-              <ShoppingCart size={18} color={colors.primaryDark} />
-              <Text style={styles.cartLabel}>{t('app.cart')}</Text>
+              <ShoppingCart size={18} color={colors.primaryDark} strokeWidth={2.4} />
+              <Text style={styles.cartLabelText}>{t('app.cart')}</Text>
               {cartCount > 0 && (
-                <View style={[styles.badgeCount, styles.cartBadge]}>
-                  <Text style={styles.badgeCountText}>{cartCount}</Text>
+                <View style={styles.cartCountPill}>
+                  <Text style={styles.cartCountPillText}>{cartCount}</Text>
                 </View>
               )}
             </TouchableOpacity>
           </Tooltip>
 
-          {/* Language Selector */}
+          {/* Language Selector Dropdown */}
           <View style={styles.langSelectorContainer}>
             <Tooltip content={t('app.language')}>
               <TouchableOpacity
-                style={styles.langBtn}
+                style={[styles.langBtn, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
                 onPress={() => setLangDropdownOpen(!langDropdownOpen)}
                 activeOpacity={0.8}
+                accessibilityRole="button"
                 accessibilityLabel={t('app.language')}
               >
                 <Text style={styles.langFlag}>{activeLang.flag}</Text>
@@ -242,6 +284,7 @@ export const Header: React.FC<HeaderProps> = ({
                       setLanguage(item.code);
                       setLangDropdownOpen(false);
                     }}
+                    activeOpacity={0.8}
                   >
                     <Text style={styles.itemFlag}>{item.flag}</Text>
                     <Text
@@ -269,9 +312,12 @@ export const Footer: React.FC = () => {
   return (
     <View style={styles.footerContainer}>
       <View style={[styles.innerFooter, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <Text style={styles.footerText}>
-          © {new Date().getFullYear()} {t('app.name')}. {t('app.rights')} ({t('app.currency')})
-        </Text>
+        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+          <Sparkles size={16} color={colors.accentLight} />
+          <Text style={styles.footerText}>
+            © {new Date().getFullYear()} {t('app.name')}. {t('app.rights')} ({t('app.currency')})
+          </Text>
+        </View>
         <Text style={styles.footerContact}>{t('app.contactUs')}: support@ebookshop.tn</Text>
       </View>
     </View>
@@ -279,62 +325,88 @@ export const Footer: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    backgroundColor: colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    ...shadows.md,
+  headerWrapper: {
+    backgroundColor: 'rgba(10, 32, 23, 0.88)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(229, 193, 88, 0.35)',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    ...shadows.lg,
     zIndex: 100,
   },
   innerHeader: {
     width: '100%',
-    alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 16,
   },
   brandContainer: {
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
-  logoBadge: {
-    width: 42,
-    height: 42,
+  logoBadge3D: {
+    width: 44,
+    height: 44,
     borderRadius: layout.borderRadius.md,
     backgroundColor: colors.accent,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
+    ...shadows.goldGlow,
+    borderWidth: 1,
+    borderColor: '#fff1a8',
+  },
+  logoBadgeInner: {
+    zIndex: 2,
+  },
+  logoShine: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '50%',
+    backgroundColor: 'rgba(255, 255, 255, 0.28)',
+    borderTopLeftRadius: layout.borderRadius.md,
+    borderTopRightRadius: layout.borderRadius.md,
   },
   brandTextCol: {
     justifyContent: 'center',
   },
   brandTitle: {
-    color: colors.textLight,
+    color: '#ffffff',
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
+    letterSpacing: 0.3,
   },
   brandSub: {
     color: colors.accentLight,
     fontSize: typography.fontSize.xs,
+    marginTop: 2,
   },
   searchWrapper: {
     flex: 1,
-    minWidth: 240,
-    maxWidth: 480,
+    minWidth: 260,
+    maxWidth: 520,
   },
   searchBox: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: layout.borderRadius.full,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 6,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
+    borderColor: 'rgba(229, 193, 88, 0.28)',
+    ...shadows.sm,
+  },
+  searchBoxFocused: {
+    backgroundColor: 'rgba(255, 255, 255, 0.14)',
+    borderColor: colors.accent,
+    ...shadows.goldGlow,
   },
   searchIcon: {
-    marginRight: 6,
-    marginLeft: 6,
+    marginRight: 8,
+    marginLeft: 8,
   },
   searchInput: {
     flex: 1,
@@ -347,28 +419,67 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   actionBtn: {
-    padding: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
     borderRadius: layout.borderRadius.md,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cartBtn: {
-    flexDirection: 'row',
-    paddingHorizontal: 12,
-    backgroundColor: colors.accent,
+  demonstratorBtn: {
+    backgroundColor: 'rgba(229, 193, 88, 0.15)',
+    borderColor: 'rgba(229, 193, 88, 0.4)',
     gap: 6,
   },
-  cartLabel: {
+  demonstratorActiveBtn: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accentLight,
+    gap: 6,
+    ...shadows.goldGlow,
+  },
+  adminBtn: {
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    gap: 6,
+  },
+  adminActiveBtn: {
+    backgroundColor: colors.primaryDark,
+    borderColor: colors.accent,
+    gap: 6,
+  },
+  navBtnLabel: {
+    fontWeight: typography.fontWeight.bold,
+    fontSize: typography.fontSize.sm,
+  },
+  cartBtn3D: {
+    backgroundColor: colors.accent,
+    borderColor: '#fff1a8',
+    paddingHorizontal: 14,
+    gap: 8,
+    ...shadows.goldGlow,
+  },
+  cartLabelText: {
     color: colors.primaryDark,
     fontWeight: typography.fontWeight.bold,
     fontSize: typography.fontSize.sm,
   },
+  cartCountPill: {
+    backgroundColor: colors.primaryDark,
+    borderRadius: layout.borderRadius.full,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+  },
+  cartCountPillText: {
+    color: colors.accentLight,
+    fontSize: 11,
+    fontWeight: typography.fontWeight.bold,
+  },
   badgeCount: {
     position: 'absolute',
-    top: -4,
-    right: -4,
+    top: -5,
+    right: -5,
     backgroundColor: colors.error,
     borderRadius: layout.borderRadius.full,
     minWidth: 18,
@@ -376,26 +487,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
-  },
-  cartBadge: {
-    backgroundColor: colors.primary,
-    position: 'relative',
-    top: 0,
-    right: 0,
-  },
-  adminBtn: {
-    flexDirection: 'row',
-    paddingHorizontal: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    gap: 6,
-  },
-  adminActiveBtn: {
-    flexDirection: 'row',
-    paddingHorizontal: 10,
-    backgroundColor: colors.primaryDark,
-    borderColor: colors.accent,
-    borderWidth: 1,
-    gap: 6,
   },
   badgeCountText: {
     color: colors.textLight,
@@ -406,18 +497,17 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   langBtn: {
-    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: layout.borderRadius.md,
     gap: 6,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(229, 193, 88, 0.3)',
   },
   langFlag: {
-    fontSize: 14,
+    fontSize: 15,
   },
   langCode: {
     color: colors.textLight,
@@ -427,56 +517,60 @@ const styles = StyleSheet.create({
   dropdownMenu: {
     position: 'absolute',
     top: '100%',
-    marginTop: 6,
-    backgroundColor: colors.cardBg,
+    marginTop: 8,
+    backgroundColor: 'rgba(12, 38, 28, 0.96)',
     borderRadius: layout.borderRadius.md,
-    minWidth: 160,
+    minWidth: 170,
     ...shadows.lg,
     overflow: 'hidden',
     zIndex: 200,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(229, 193, 88, 0.4)',
   },
   dropdownItem: {
     paddingHorizontal: 14,
     paddingVertical: 10,
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
   },
   dropdownItemActive: {
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(229, 193, 88, 0.2)',
   },
   itemFlag: {
     fontSize: 16,
   },
   itemLabel: {
     fontSize: typography.fontSize.sm,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   itemLabelActive: {
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
   footerContainer: {
-    backgroundColor: colors.primaryDark,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    marginTop: 40,
+    backgroundColor: 'rgba(7, 24, 17, 0.95)',
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    marginTop: 48,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(229, 193, 88, 0.25)',
   },
   innerFooter: {
     width: '100%',
-    alignSelf: 'center',
     justifyContent: 'space-between',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 12,
   },
   footerText: {
-    color: colors.textMuted,
+    color: 'rgba(255, 255, 255, 0.75)',
     fontSize: typography.fontSize.sm,
   },
   footerContact: {
-    color: colors.accent,
+    color: colors.accentLight,
     fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.medium,
   },
 });

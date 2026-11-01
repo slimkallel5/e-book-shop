@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import {
   BookOpen,
   Library,
@@ -7,7 +7,9 @@ import {
   Compass,
   Gift,
   Newspaper,
-  Star,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react-native';
 import { EDUCATION_LEVELS } from '../mock/data';
 import { useLanguage } from '../context/LanguageContext';
@@ -83,7 +85,7 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
       elevation="lg"
       style={[styles.shelfContainer, isCompact && styles.shelfContainerCompact]}
     >
-      {/* Menu Header Bar */}
+      {/* 3D Shelf Header */}
       <View style={[styles.headerRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <View style={styles.headerIconContainer}>
           <BookOpen size={18} color={colors.accentLight} />
@@ -91,14 +93,15 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
         <Text style={[styles.shelfTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
           {t('app.shelfOverview')}
         </Text>
+        <Sparkles size={16} color={colors.accent} />
       </View>
 
-      {/* Navigation Menu List */}
+      {/* 3D Isometric Book Spines Menu */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.spinesListContent}
       >
-        {navItems.map((item) => {
+        {navItems.map((item, index) => {
           const isSelected = selectedCategory === item.id;
           const displayTitle = item.titleKey.startsWith('app.') ? t(item.titleKey) : item.titleKey;
           const displaySub = item.subtitleKey && item.subtitleKey.startsWith('app.') ? t(item.subtitleKey) : item.subtitleKey;
@@ -107,41 +110,41 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
             <Tooltip key={item.id} content={displayTitle} position={isRTL ? 'left' : 'right'}>
               <TouchableOpacity
                 style={[
-                  styles.menuItemCard,
-                  isSelected && styles.menuItemCardSelected,
+                  styles.spineCard3D,
+                  isSelected && styles.spineCard3DSelected,
                   { flexDirection: isRTL ? 'row-reverse' : 'row' },
                 ]}
                 onPress={() => onSelectCategory(item.id)}
-                activeOpacity={0.8}
+                activeOpacity={0.85}
                 accessibilityRole="button"
                 accessibilityLabel={displayTitle}
                 accessibilityState={{ selected: isSelected }}
               >
-                {/* Accent border strip for category differentiation */}
+                {/* 3D Spine Colored Rim & Binding Ridge */}
                 <View
                   style={[
-                    styles.accentStrip,
-                    isRTL ? styles.accentStripRtl : styles.accentStripLtr,
+                    styles.spineRidge,
+                    isRTL ? styles.spineRidgeRtl : styles.spineRidgeLtr,
                     { backgroundColor: item.color },
                   ]}
                 />
 
-                {/* Category Icon */}
+                {/* Level / Category Icon Badge */}
                 <View
                   style={[
-                    styles.menuItemIcon,
-                    isSelected && styles.menuItemIconSelected,
+                    styles.categoryIconBadge,
+                    isSelected && styles.categoryIconBadgeSelected,
                   ]}
                 >
                   {renderCategoryIcon(item.id, isSelected)}
                 </View>
 
-                {/* Text Labels */}
-                <View style={[styles.menuItemTextCol, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
+                {/* Spine Title & Subtitle Labels */}
+                <View style={[styles.spineTextContainer, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
                   <Text
                     style={[
-                      styles.menuItemTitle,
-                      isSelected && styles.menuItemTitleSelected,
+                      styles.spineTitle,
+                      isSelected && styles.spineTitleSelected,
                       { textAlign: isRTL ? 'right' : 'left' },
                     ]}
                     numberOfLines={1}
@@ -151,8 +154,8 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
                   {displaySub && (
                     <Text
                       style={[
-                        styles.menuItemSub,
-                        isSelected && styles.menuItemSubSelected,
+                        styles.spineSubtitle,
+                        isSelected && styles.spineSubtitleSelected,
                         { textAlign: isRTL ? 'right' : 'left' },
                       ]}
                       numberOfLines={1}
@@ -162,10 +165,18 @@ export const Bookshelf: React.FC<BookshelfProps> = ({
                   )}
                 </View>
 
-                {/* Active Indicator Icon */}
-                {isSelected && (
-                  <View style={styles.selectedBadge}>
-                    <Star size={12} color={colors.primaryDark} fill={colors.primaryDark} />
+                {/* Selection Pointer indicator */}
+                {isSelected ? (
+                  <View style={styles.activeGlowIndicator}>
+                    <Sparkles size={14} color={colors.primaryDark} />
+                  </View>
+                ) : (
+                  <View style={styles.idleArrow}>
+                    {isRTL ? (
+                      <ChevronLeft size={16} color="rgba(255, 255, 255, 0.3)" />
+                    ) : (
+                      <ChevronRight size={16} color="rgba(255, 255, 255, 0.3)" />
+                    )}
                   </View>
                 )}
               </TouchableOpacity>
@@ -198,25 +209,27 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   headerIconContainer: {
-    width: 32,
-    height: 32,
+    width: 34,
+    height: 34,
     borderRadius: layout.borderRadius.md,
     backgroundColor: 'rgba(229, 193, 88, 0.18)',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
   },
   shelfTitle: {
-    color: colors.textLight,
+    color: '#ffffff',
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
     flex: 1,
   },
   spinesListContent: {
-    gap: 8,
+    gap: 10,
     paddingBottom: 4,
   },
-  menuItemCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+  spineCard3D: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: layout.borderRadius.lg,
     paddingVertical: 12,
     paddingHorizontal: 14,
@@ -228,58 +241,65 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
   },
-  menuItemCardSelected: {
-    backgroundColor: 'rgba(229, 193, 88, 0.24)',
+  spineCard3DSelected: {
+    backgroundColor: 'rgba(229, 193, 88, 0.22)',
     borderColor: colors.accent,
     ...shadows.goldGlow,
   },
-  accentStrip: {
+  spineRidge: {
     position: 'absolute',
     top: 0,
     bottom: 0,
-    width: 4,
+    width: 5,
   },
-  accentStripLtr: {
+  spineRidgeLtr: {
     left: 0,
   },
-  accentStripRtl: {
+  spineRidgeRtl: {
     right: 0,
   },
-  menuItemIcon: {
-    width: 32,
-    height: 32,
+  categoryIconBadge: {
+    width: 34,
+    height: 34,
     borderRadius: layout.borderRadius.md,
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  menuItemIconSelected: {
+  categoryIconBadgeSelected: {
     backgroundColor: colors.accent,
+    ...shadows.sm,
   },
-  menuItemTextCol: {
+  spineTextContainer: {
     flex: 1,
   },
-  menuItemTitle: {
-    color: colors.textLight,
+  spineTitle: {
+    color: '#ffffff',
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
   },
-  menuItemTitleSelected: {
+  spineTitleSelected: {
     color: colors.accentLight,
   },
-  menuItemSub: {
+  spineSubtitle: {
     color: 'rgba(255, 255, 255, 0.65)',
     fontSize: typography.fontSize.xs,
     marginTop: 2,
   },
-  menuItemSubSelected: {
-    color: 'rgba(255, 255, 255, 0.9)',
+  spineSubtitleSelected: {
+    color: 'rgba(255, 255, 255, 0.95)',
   },
-  selectedBadge: {
-    width: 22,
-    height: 22,
+  activeGlowIndicator: {
+    width: 24,
+    height: 24,
     borderRadius: layout.borderRadius.full,
     backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.sm,
+  },
+  idleArrow: {
+    width: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
