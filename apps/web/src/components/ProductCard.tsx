@@ -38,7 +38,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
       <TouchableOpacity
         onPress={() => onPreview(book)}
         activeOpacity={0.92}
-        accessibilityRole="button"
         accessibilityLabel={title}
       >
         <GlassCard
