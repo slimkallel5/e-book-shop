@@ -1,31 +1,29 @@
 import React, { useState } from 'react';
 import {
-  ScrollView,
   StyleSheet,
   Text,
   View,
+  ScrollView,
+  TextInput,
 } from 'react-native';
+import { Mail, Send, CheckCircle2, AlertCircle } from 'lucide-react-native';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
+import { GlassCard } from './ui/GlassCard';
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, typography } from '../theme/tokens';
-import {
-  Mail,
-  Send,
-  CheckCircle2,
-  AlertCircle,
-} from 'lucide-react-native';
-import { Button } from './ui/Button';
-import { Input } from './ui/Input';
-import { Modal } from './ui/Modal';
 
 export interface ContactModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) => {
+export const ContactModal: React.FC<ContactModalProps> = ({
+  visible,
+  onClose,
+}) => {
   const { isRTL, t } = useLanguage();
-
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -33,19 +31,17 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
   const [message, setMessage] = useState('');
 
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     setErrorMsg(null);
-
     if (!name.trim() || !email.trim() || !subject.trim() || !message.trim()) {
       setErrorMsg(t('app.requiredError'));
       return;
     }
 
     setLoading(true);
-
     try {
       const res = await fetch(getApiUrl('/contact'), {
         method: 'POST',
@@ -60,110 +56,117 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
       });
 
       if (!res.ok) {
-        throw new Error(t('app.sendError'));
+        throw new Error('Error sending contact message');
       }
 
       setSuccess(true);
+      setName('');
+      setEmail('');
+      setPhone('');
+      setSubject('');
+      setMessage('');
     } catch (err: any) {
-      setErrorMsg(err.message || t('app.sendError'));
+      setErrorMsg(err.message || 'Error sending contact message');
     } finally {
       setLoading(false);
     }
   };
 
   const handleClose = () => {
-    setName('');
-    setEmail('');
-    setPhone('');
-    setSubject('');
-    setMessage('');
-    setErrorMsg(null);
     setSuccess(false);
+    setErrorMsg(null);
     onClose();
   };
 
   return (
-    <Modal visible={visible} onClose={handleClose} title={t('app.contactModalTitle')}>
+    <Modal visible={visible} onClose={handleClose} title={t('app.contactUs')}>
       <ScrollView contentContainerStyle={styles.container}>
         {success ? (
-          <View style={styles.successBox}>
-            <CheckCircle2 size={50} color="#059669" style={{ alignSelf: 'center', marginBottom: 12 }} />
-
-            <Text style={styles.successTitle}>{t('app.messageSuccessTitle')}</Text>
-            <Text style={styles.successSub}>
-              {t('app.messageSuccessSub')}
-            </Text>
+          <GlassCard variant="dark" elevation="sm" style={styles.successBox}>
+            <CheckCircle2 size={42} color="#059669" style={{ alignSelf: 'center', marginBottom: 12 }} />
+            <Text style={styles.successTitle}>{t('app.contactSuccessTitle')}</Text>
+            <Text style={styles.successSub}>{t('app.contactSuccessSub')}</Text>
             <Button
               title={t('app.closeConfirmation')}
-              tooltip={t('app.closeConfirmation')}
               onPress={handleClose}
               variant="accent"
               size="md"
               style={{ marginTop: 16 }}
             />
-          </View>
+          </GlassCard>
         ) : (
-          <View style={styles.form}>
+          <View style={styles.formContent}>
             {errorMsg && (
-              <View style={[styles.errorBox, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+              <View style={[styles.errorBox, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
                 <AlertCircle size={16} color="#D32F2F" />
                 <Text style={styles.errorText}>{errorMsg}</Text>
               </View>
             )}
 
-            <Input
-              label={`${t('app.fullName')} *`}
+            <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('app.fullName')} *:
+            </Text>
+            <TextInput
+              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+              placeholder="Sami Ben Ali"
+              placeholderTextColor={colors.textMuted}
               value={name}
               onChangeText={setName}
-              placeholder="Ali Ben Salem"
             />
 
-            <View style={styles.twoColRow}>
-              <View style={{ flex: 1 }}>
-                <Input
-                  label={`${t('app.email')} *`}
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="name@domain.tn"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
+            <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('app.email')} *:
+            </Text>
+            <TextInput
+              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+              placeholder="sami@example.tn"
+              placeholderTextColor={colors.textMuted}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
 
-              <View style={{ flex: 1 }}>
-                <Input
-                  label={t('app.optionalPhone')}
-                  value={phone}
-                  onChangeText={setPhone}
-                  placeholder="98 123 456"
-                  keyboardType="phone-pad"
-                  inputStyle={{ textAlign: 'left' }}
-                  style={{ textAlign: 'left' }}
-                />
-              </View>
-            </View>
+            <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('app.phone')}:
+            </Text>
+            <TextInput
+              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+              placeholder="20 123 456"
+              placeholderTextColor={colors.textMuted}
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+            />
 
-            <Input
-              label={`${t('app.subject')} *`}
+            <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('app.subject')} *:
+            </Text>
+            <TextInput
+              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+              placeholder="..."
+              placeholderTextColor={colors.textMuted}
               value={subject}
               onChangeText={setSubject}
-              placeholder={t('app.subjectPlaceholder')}
             />
 
-            <Input
-              label={`${t('app.message')} *`}
+            <Text style={[styles.fieldLabel, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('app.message')} *:
+            </Text>
+            <TextInput
+              style={[styles.input, styles.textArea, { textAlign: isRTL ? 'right' : 'left' }]}
+              placeholder="..."
+              placeholderTextColor={colors.textMuted}
               value={message}
               onChangeText={setMessage}
-              placeholder={t('app.messagePlaceholder')}
               multiline
               numberOfLines={4}
-              style={{ height: 100 }}
             />
 
             <Button
-              title={loading ? t('app.sending') : t('app.sendMessage')}
-              icon={<Send size={18} color={colors.primaryDark} />}
-              tooltip={t('app.sendMessage')}
+              title={loading ? '...' : t('app.sendBtn')}
+              icon={<Send size={16} color={colors.primaryDark} />}
+              tooltip={t('app.sendBtn')}
               onPress={handleSubmit}
               variant="accent"
               size="lg"
@@ -179,42 +182,53 @@ export const ContactModal: React.FC<ContactModalProps> = ({ visible, onClose }) 
 
 const styles = StyleSheet.create({
   container: {
+    paddingVertical: 12,
+  },
+  formContent: {
+    gap: 8,
+  },
+  fieldLabel: {
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textPrimary,
+    marginTop: 4,
+  },
+  input: {
+    backgroundColor: colors.cardBg,
+    borderColor: colors.borderDark,
+    borderWidth: 1,
+    borderRadius: layout.borderRadius.sm,
+    paddingHorizontal: 12,
     paddingVertical: 8,
+    fontSize: typography.fontSize.sm,
+    color: colors.textPrimary,
   },
-  form: {
-    gap: 10,
-  },
-  twoColRow: {
-    flexDirection: 'row',
-    gap: 12,
+  textArea: {
+    height: 90,
   },
   errorBox: {
     backgroundColor: '#FFEBEE',
-    borderColor: '#FFCDD2',
-    borderWidth: 1,
-    borderRadius: layout.borderRadius.md,
     padding: 10,
+    borderRadius: layout.borderRadius.sm,
+    marginBottom: 6,
   },
   errorText: {
     color: '#D32F2F',
     fontSize: typography.fontSize.xs,
   },
   successBox: {
+    padding: 24,
     alignItems: 'center',
-    paddingVertical: 16,
     gap: 8,
   },
-  successBadge: {
-    fontSize: 48,
-  },
   successTitle: {
-    fontSize: typography.fontSize.lg,
+    fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.textLight,
   },
   successSub: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: colors.textMuted,
     textAlign: 'center',
   },
 });

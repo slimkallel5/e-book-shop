@@ -8,6 +8,7 @@ import { colors, layout, shadows, typography } from '../theme/tokens';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
+import { GlassCard } from './ui/GlassCard';
 
 interface ProductCardProps {
   book: Book;
@@ -35,110 +36,116 @@ export const ProductCard: React.FC<ProductCardProps> = ({ book, onPreview }) => 
   return (
     <View style={[styles.card3DWrapper, prefersReducedMotion && { transform: [] }]}>
       <TouchableOpacity
-        style={styles.cardContainer}
         onPress={() => onPreview(book)}
         activeOpacity={0.92}
         accessibilityRole="button"
         accessibilityLabel={title}
       >
-        {/* Cover Image Wrapper with A4 Aspect Ratio and 3D Spine Shadow */}
-        <View style={styles.coverWrapper}>
-          <Image
-            source={{ uri: book.coverUrl }}
-            style={styles.coverImage}
-            resizeMode="cover"
-          />
+        <GlassCard
+          variant={book.isPack ? 'goldGlow' : 'dark'}
+          elevation="md"
+          isInteractive={true}
+          style={styles.cardContainer}
+        >
+          {/* Cover Image Wrapper with A4 Aspect Ratio and 3D Spine Shadow */}
+          <View style={styles.coverWrapper}>
+            <Image
+              source={{ uri: book.coverUrl }}
+              style={styles.coverImage}
+              resizeMode="cover"
+            />
 
-          {/* Simulated 3D Book Spine Left Shadow Edge */}
-          <View style={styles.spine3DEdge} />
+            {/* Simulated 3D Book Spine Left Shadow Edge */}
+            <View style={styles.spine3DEdge} />
 
-          {/* Floating Badges */}
-          <View style={[styles.badgeContainer, isRTL ? { right: 8 } : { left: 8 }]}>
-            {book.isPack && <Badge label={t('app.packBadge')} variant="pack" />}
-            {discountPercent && (
-              <Badge
-                label={`-${discountPercent}%`}
-                variant="discount"
-                style={{ marginTop: 4 }}
-              />
-            )}
+            {/* Floating Badges */}
+            <View style={[styles.badgeContainer, isRTL ? { right: 8 } : { left: 8 }]}>
+              {book.isPack && <Badge label={t('app.packBadge')} variant="pack" />}
+              {discountPercent && (
+                <Badge
+                  label={`-${discountPercent}%`}
+                  variant="discount"
+                  style={{ marginTop: 4 }}
+                />
+              )}
+            </View>
+
+            {/* Favourite Button with Tooltip */}
+            <Tooltip content={favorited ? t('app.favourites') : t('app.favourites')}>
+              <TouchableOpacity
+                style={[styles.favBtn, isRTL ? { left: 8 } : { right: 8 }]}
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  toggleFavourite(book.id);
+                }}
+                activeOpacity={0.8}
+                accessibilityLabel={t('app.favourites')}
+              >
+                <Heart
+                  size={16}
+                  color={favorited ? colors.error : colors.textMuted}
+                  fill={favorited ? colors.error : 'transparent'}
+                />
+              </TouchableOpacity>
+            </Tooltip>
           </View>
 
-          {/* Favourite Button with Tooltip */}
-          <Tooltip content={favorited ? t('app.favourites') : t('app.favourites')}>
-            <TouchableOpacity
-              style={[styles.favBtn, isRTL ? { left: 8 } : { right: 8 }]}
-              onPress={(e) => {
-                e.stopPropagation?.();
-                toggleFavourite(book.id);
-              }}
-              activeOpacity={0.8}
-              accessibilityLabel={t('app.favourites')}
+          {/* Book Content Details */}
+          <View style={styles.contentContainer}>
+            {/* Education Level Badge */}
+            <View style={[styles.levelRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              <GraduationCap size={14} color={colors.accentLight} />
+              <Text style={styles.levelText}>{levelName}</Text>
+              {book.quarter && book.quarter !== 'full' && (
+                <Text style={styles.quarterText}>• {t(`app.${book.quarter}`)}</Text>
+              )}
+            </View>
+
+            {/* Localized Title */}
+            <Text
+              style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}
+              numberOfLines={2}
             >
-              <Heart
-                size={16}
-                color={favorited ? colors.error : colors.textMuted}
-                fill={favorited ? colors.error : 'transparent'}
-              />
-            </TouchableOpacity>
-          </Tooltip>
-        </View>
+              {title}
+            </Text>
 
-        {/* Book Content Details */}
-        <View style={styles.contentContainer}>
-          {/* Education Level Badge */}
-          <View style={[styles.levelRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <GraduationCap size={14} color={colors.textSecondary} />
-            <Text style={styles.levelText}>{levelName}</Text>
-            {book.quarter && book.quarter !== 'full' && (
-              <Text style={styles.quarterText}>• {t(`app.${book.quarter}`)}</Text>
-            )}
-          </View>
+            {/* Rating Stars */}
+            <View style={[styles.ratingRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              <Star size={13} color={colors.accent} fill={colors.accent} />
+              <Text style={styles.stars}>{book.rating.toFixed(1)}</Text>
+              <Text style={styles.reviewsCount}>({book.reviewCount} {t('app.reviews')})</Text>
+            </View>
 
-          {/* Localized Title */}
-          <Text
-            style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}
-            numberOfLines={2}
-          >
-            {title}
-          </Text>
-
-          {/* Rating Stars */}
-          <View style={[styles.ratingRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <Star size={13} color={colors.accent} fill={colors.accent} />
-            <Text style={styles.stars}>{book.rating.toFixed(1)}</Text>
-            <Text style={styles.reviewsCount}>({book.reviewCount} {t('app.reviews')})</Text>
-          </View>
-
-          {/* Pricing Row */}
-          <View style={[styles.priceRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            {book.discountPrice ? (
-              <View style={[styles.priceGroup, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Text style={styles.discountPrice}>
-                  {book.discountPrice.toFixed(2)} {t('app.currency')}
-                </Text>
-                <Text style={styles.originalPrice}>
+            {/* Pricing Row */}
+            <View style={[styles.priceRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              {book.discountPrice ? (
+                <View style={[styles.priceGroup, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <Text style={styles.discountPrice}>
+                    {book.discountPrice.toFixed(2)} {t('app.currency')}
+                  </Text>
+                  <Text style={styles.originalPrice}>
+                    {book.price.toFixed(2)} {t('app.currency')}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.normalPrice}>
                   {book.price.toFixed(2)} {t('app.currency')}
                 </Text>
-              </View>
-            ) : (
-              <Text style={styles.normalPrice}>
-                {book.price.toFixed(2)} {t('app.currency')}
-              </Text>
-            )}
-          </View>
+              )}
+            </View>
 
-          {/* Add to Basket Action using Lucide Icon and Tooltip */}
-          <Button
-            title={t('app.addToCart')}
-            icon={<ShoppingCart size={16} color={colors.textLight} />}
-            tooltip={t('app.addToCart')}
-            onPress={() => addToCart(book)}
-            variant="primary"
-            size="sm"
-            style={styles.cartBtn}
-          />
-        </View>
+            {/* Add to Basket Action using Lucide Icon and Tooltip */}
+            <Button
+              title={t('app.addToCart')}
+              icon={<ShoppingCart size={16} color={colors.primaryDark} />}
+              tooltip={t('app.addToCart')}
+              onPress={() => addToCart(book)}
+              variant="accent"
+              size="sm"
+              style={styles.cartBtn}
+            />
+          </View>
+        </GlassCard>
       </TouchableOpacity>
     </View>
   );
@@ -150,12 +157,11 @@ const styles = StyleSheet.create({
     transform: Platform.OS === 'web' ? ([{ perspective: 1000 }] as any) : [],
   },
   cardContainer: {
-    backgroundColor: colors.cardBg,
     borderRadius: layout.borderRadius.lg,
     overflow: 'hidden',
     width: 220,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
     ...shadows.lg,
   },
   coverWrapper: {
@@ -174,7 +180,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     width: 6,
-    backgroundColor: 'rgba(0, 0, 0, 0.18)',
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
     borderRightWidth: 1,
     borderRightColor: 'rgba(255, 255, 255, 0.3)',
   },
@@ -186,36 +192,16 @@ const styles = StyleSheet.create({
   favBtn: {
     position: 'absolute',
     top: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.88)',
+    backgroundColor: 'rgba(13, 33, 24, 0.85)',
     borderRadius: layout.borderRadius.full,
     width: 32,
     height: 32,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.4)',
     ...shadows.sm,
-  },
-  previewOverlayBtn: {
-    position: 'absolute',
-    bottom: 8,
-    left: 8,
-    right: 8,
-    backgroundColor: 'rgba(18, 59, 43, 0.92)',
-    borderRadius: layout.borderRadius.sm,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  previewBtnIcon: {
-    marginRight: 4,
-  },
-  previewBtnText: {
-    color: colors.textLight,
-    fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.bold,
   },
   contentContainer: {
     padding: 12,
@@ -229,7 +215,7 @@ const styles = StyleSheet.create({
   },
   levelText: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: colors.accentLight,
     fontWeight: typography.fontWeight.medium,
   },
   quarterText: {
@@ -240,7 +226,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
     minHeight: 38,
     marginBottom: 6,
   },
@@ -270,7 +256,7 @@ const styles = StyleSheet.create({
   discountPrice: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.error,
+    color: colors.accentLight,
   },
   originalPrice: {
     fontSize: typography.fontSize.xs,
@@ -280,7 +266,7 @@ const styles = StyleSheet.create({
   normalPrice: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.textLight,
   },
   cartBtn: {
     marginTop: 'auto',

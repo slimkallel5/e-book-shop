@@ -4,17 +4,19 @@ import {
   Text,
   View,
   ScrollView,
-  TouchableOpacity,
 } from 'react-native';
 import {
   BarChart3,
   Package,
   AlertTriangle,
   ShoppingCart,
+  TrendingUp,
+  DollarSign,
 } from 'lucide-react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { getApiUrl } from '../services/api';
 import { colors, layout, shadows, typography } from '../theme/tokens';
+import { GlassCard } from './ui/GlassCard';
 
 interface DashboardStats {
   totalArticles: number;
@@ -113,49 +115,56 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, marginBottom: 16 }]}>
-        <BarChart3 size={24} color={colors.primary} />
-        <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left', marginBottom: 0 }]}>
-          {t('admin.dashboardTitle')}
-        </Text>
-      </View>
+      <GlassCard variant="dark" elevation="sm" style={styles.headerBanner}>
+        <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 10 }]}>
+          <BarChart3 size={24} color={colors.accentLight} />
+          <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {t('admin.dashboardTitle')}
+          </Text>
+        </View>
+      </GlassCard>
 
-      {/* KPI Cards Grid */}
+      {/* KPI Cards Grid using GlassCard */}
       <View style={[styles.kpiGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <View style={styles.kpiCard}>
+        <GlassCard variant="dark" elevation="sm" style={styles.kpiCard}>
+          <Package size={20} color={colors.accentLight} style={{ marginBottom: 6 }} />
           <Text style={styles.kpiValue}>{stats.totalArticles}</Text>
           <Text style={styles.kpiLabel}>{t('admin.totalArticles')}</Text>
-        </View>
+        </GlassCard>
 
-        <View style={styles.kpiCard}>
+        <GlassCard variant="dark" elevation="sm" style={styles.kpiCard}>
+          <Package size={20} color={colors.accentLight} style={{ marginBottom: 6 }} />
           <Text style={styles.kpiValue}>{stats.totalPacks}</Text>
           <Text style={styles.kpiLabel}>{t('admin.totalPacks')}</Text>
-        </View>
+        </GlassCard>
 
-        <View style={styles.kpiCard}>
+        <GlassCard variant="dark" elevation="sm" style={styles.kpiCard}>
+          <ShoppingCart size={20} color={colors.accentLight} style={{ marginBottom: 6 }} />
           <Text style={styles.kpiValue}>{stats.totalOrders}</Text>
           <Text style={styles.kpiLabel}>{t('admin.totalOrders')}</Text>
-        </View>
+        </GlassCard>
 
-        <View style={[styles.kpiCard, styles.kpiCardAccent]}>
+        <GlassCard variant="goldGlow" elevation="md" style={styles.kpiCard}>
+          <TrendingUp size={20} color={colors.accentLight} style={{ marginBottom: 6 }} />
           <Text style={styles.kpiValueAccent}>
             {stats.orderValue.toFixed(2)} {t('app.currency')}
           </Text>
           <Text style={styles.kpiLabel}>{t('admin.orderValue')}</Text>
-        </View>
+        </GlassCard>
 
-        <View style={[styles.kpiCard, styles.kpiCardSuccess]}>
+        <GlassCard variant="dark" elevation="sm" style={[styles.kpiCard, styles.kpiCardSuccess]}>
+          <DollarSign size={20} color={colors.success} style={{ marginBottom: 6 }} />
           <Text style={styles.kpiValueSuccess}>
             {stats.collectedRevenue.toFixed(2)} {t('app.currency')}
           </Text>
           <Text style={styles.kpiLabel}>{t('admin.collectedRevenue')}</Text>
-        </View>
+        </GlassCard>
       </View>
 
       {/* Order Status Breakdown Section */}
-      <View style={styles.sectionCard}>
+      <GlassCard variant="dark" elevation="sm" style={styles.sectionCard}>
         <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, marginBottom: 12 }]}>
-          <Package size={20} color={colors.primary} />
+          <Package size={20} color={colors.accentLight} />
           <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.statusBreakdown')}
           </Text>
@@ -182,10 +191,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
             </Text>
           </View>
         </View>
-      </View>
+      </GlassCard>
 
       {/* Low-Stock Alerts Section */}
-      <View style={styles.sectionCard}>
+      <GlassCard variant="dark" elevation="sm" style={styles.sectionCard}>
         <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, marginBottom: 12 }]}>
           <AlertTriangle size={20} color="#D97706" />
           <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
@@ -214,12 +223,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
             ))}
           </View>
         )}
-      </View>
+      </GlassCard>
 
       {/* Recent Orders Section */}
-      <View style={styles.sectionCard}>
+      <GlassCard variant="dark" elevation="sm" style={styles.sectionCard}>
         <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, marginBottom: 12 }]}>
-          <ShoppingCart size={20} color={colors.primary} />
+          <ShoppingCart size={20} color={colors.accentLight} />
           <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
             {t('admin.recentOrders')}
           </Text>
@@ -240,7 +249,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ token }) => {
             </View>
           ))}
         </View>
-      </View>
+      </GlassCard>
     </ScrollView>
   );
 };
@@ -250,11 +259,15 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 16,
   },
+  headerBanner: {
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
+  },
   title: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
-    marginBottom: 8,
+    color: colors.textLight,
   },
   kpiGrid: {
     flexWrap: 'wrap',
@@ -263,31 +276,25 @@ const styles = StyleSheet.create({
   kpiCard: {
     flex: 1,
     minWidth: 160,
-    backgroundColor: colors.cardBg,
     padding: 16,
     borderRadius: layout.borderRadius.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(229, 193, 88, 0.25)',
     alignItems: 'center',
     ...shadows.sm,
   },
-  kpiCardAccent: {
-    borderColor: colors.accent,
-    backgroundColor: 'rgba(229, 193, 88, 0.1)',
-  },
   kpiCardSuccess: {
     borderColor: colors.success,
-    backgroundColor: 'rgba(46, 125, 50, 0.1)',
   },
   kpiValue: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.textLight,
   },
   kpiValueAccent: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
-    color: colors.secondary,
+    color: colors.accentLight,
   },
   kpiValueSuccess: {
     fontSize: typography.fontSize.xl,
@@ -296,23 +303,22 @@ const styles = StyleSheet.create({
   },
   kpiLabel: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.75)',
     marginTop: 4,
     textAlign: 'center',
   },
   sectionCard: {
-    backgroundColor: colors.cardBg,
     padding: 16,
     borderRadius: layout.borderRadius.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(229, 193, 88, 0.25)',
     gap: 12,
     ...shadows.sm,
   },
   sectionTitle: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   statusRow: {
     flexWrap: 'wrap',
@@ -335,46 +341,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: 'rgba(229, 193, 88, 0.2)',
     gap: 8,
   },
   skuText: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textSecondary,
+    color: colors.accentLight,
     width: 80,
   },
   artName: {
     flex: 1,
     fontSize: typography.fontSize.sm,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   stockChip: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    backgroundColor: 'rgba(239, 68, 68, 0.2)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: layout.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: '#EF4444',
   },
   stockChipText: {
     fontSize: typography.fontSize.xs,
-    color: '#DC2626',
+    color: '#EF4444',
     fontWeight: typography.fontWeight.bold,
   },
   refText: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
     width: 100,
   },
   customerText: {
     flex: 1,
     fontSize: typography.fontSize.xs,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   orderTotal: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primaryDark,
+    color: colors.accentLight,
   },
   emptyText: {
     fontSize: typography.fontSize.xs,

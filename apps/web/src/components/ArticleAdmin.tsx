@@ -22,6 +22,7 @@ import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { Select } from './ui/Select';
 import { Tooltip } from './ui/Tooltip';
+import { GlassCard } from './ui/GlassCard';
 import { colors, layout, shadows, typography } from '../theme/tokens';
 
 export interface AdminArticle {
@@ -139,192 +140,6 @@ const INITIAL_ARTICLES: AdminArticle[] = [
     quarter: 'ALL_YEAR',
     posterUrl: '/assets/covers/arabic1.jpg',
     samplePdfUrl: '/assets/samples/arabic1.pdf',
-    author: 'المركز الوطني للبيداغوجيا',
-    publisher: 'CNP',
-    active: true,
-  },
-  {
-    id: 'art-3',
-    sku: 'MATH-P2',
-    name: {
-      ar: 'كتاب الرياضيات - السنة الثانية ابتدائي',
-      fr: 'Livre de Mathématiques 2ème Année',
-      en: 'Math Book 2nd Grade',
-    },
-    description: { ar: 'كتاب التلميذ في الحساب والهندسة وتنمية التفكير المنطقي' },
-    price: 17.5,
-    discountPrice: 14.5,
-    stock: 65,
-    educationLevelId: 'primary',
-    educationSubLevel: '2',
-    quarter: 'ALL_YEAR',
-    posterUrl: '/assets/covers/math2.jpg',
-    samplePdfUrl: '/assets/samples/math2.pdf',
-    author: 'المركز الوطني للبيداغوجيا',
-    publisher: 'CNP',
-    active: true,
-  },
-  {
-    id: 'art-4',
-    sku: 'SCI-P2',
-    name: {
-      ar: 'كتاب الإيقاظ العلمي - السنة الثانية ابتدائي',
-      fr: 'Livre d\'Éveil Scientifique 2ème Année',
-      en: 'Scientific Awakening 2nd Grade',
-    },
-    description: { ar: 'أنشطة استكشاف البيئة وجسم الإنسان والتجارب العلمية المبسطة' },
-    price: 14.0,
-    stock: 50,
-    educationLevelId: 'primary',
-    educationSubLevel: '2',
-    quarter: 'ALL_YEAR',
-    posterUrl: '/assets/covers/science2.jpg',
-    samplePdfUrl: '/assets/samples/science2.pdf',
-    author: 'المركز الوطني للبيداغوجيا',
-    publisher: 'CNP',
-    active: true,
-  },
-  {
-    id: 'art-5',
-    sku: 'MATH-P3',
-    name: {
-      ar: 'كتاب الرياضيات - السنة الثالثة ابتدائي',
-      fr: 'Livre de Mathématiques 3ème Année',
-      en: 'Math Book 3rd Grade',
-    },
-    description: { ar: 'العمليات الحسابية الأساسية والأشكال الهندسية وحل المسائل' },
-    price: 19.0,
-    discountPrice: 16.0,
-    stock: 70,
-    educationLevelId: 'primary',
-    educationSubLevel: '3',
-    quarter: 'ALL_YEAR',
-    posterUrl: '/assets/covers/math3.jpg',
-    samplePdfUrl: '/assets/samples/math3.pdf',
-    author: 'المركز الوطني للبيداغوجيا',
-    publisher: 'CNP',
-    active: true,
-  },
-  {
-    id: 'art-6',
-    sku: 'FRAN-P3',
-    name: {
-      ar: 'كتاب الفرنسية للناشئة - السنة الثالثة ابتدائي',
-      fr: 'Manuel de Français 3ème Année',
-      en: 'French Language 3rd Grade',
-    },
-    description: { ar: 'انطلاق تعلم اللغة الفرنسية: قراءة وحوارات وأنشطة كتابية أولى' },
-    price: 18.0,
-    stock: 60,
-    educationLevelId: 'primary',
-    educationSubLevel: '3',
-    quarter: 'ALL_YEAR',
-    posterUrl: '/assets/covers/french3.jpg',
-    samplePdfUrl: '/assets/samples/french3.pdf',
-    author: 'المركز الوطني للبيداغوجيا',
-    publisher: 'CNP',
-    active: true,
-  },
-  {
-    id: 'art-7',
-    sku: 'MATH-P4',
-    name: {
-      ar: 'كتاب الرياضيات - السنة الرابعة ابتدائي',
-      fr: 'Livre de Mathématiques 4ème Année',
-      en: 'Math Book 4th Grade',
-    },
-    description: { ar: 'الأعداد الكبيرة والضرب والقسمة والهندسة التطبيقية والمقادير' },
-    price: 19.5,
-    discountPrice: 16.5,
-    stock: 75,
-    educationLevelId: 'primary',
-    educationSubLevel: '4',
-    quarter: 'ALL_YEAR',
-    posterUrl: '/assets/covers/math4.jpg',
-    samplePdfUrl: '/assets/samples/math4.pdf',
-    author: 'المركز الوطني للبيداغوجيا',
-    publisher: 'CNP',
-    active: true,
-  },
-  {
-    id: 'art-8',
-    sku: 'MATH-P5',
-    name: {
-      ar: 'كتاب الرياضيات - السنة الخامسة ابتدائي',
-      fr: 'Livre de Mathématiques 5ème Année',
-      en: 'Math Book 5th Grade',
-    },
-    description: { ar: 'الأعداد الكسرية والعشرية والنسب المئوية وحساب المساحات المعقدة' },
-    price: 20.0,
-    discountPrice: 17.0,
-    stock: 80,
-    educationLevelId: 'primary',
-    educationSubLevel: '5',
-    quarter: 'ALL_YEAR',
-    posterUrl: '/assets/covers/math5.jpg',
-    samplePdfUrl: '/assets/samples/math5.pdf',
-    author: 'المركز الوطني للبيداغوجيا',
-    publisher: 'CNP',
-    active: true,
-  },
-  {
-    id: 'art-9',
-    sku: 'ENG-P5',
-    name: {
-      ar: 'كتاب الانجليزية - السنة الخامسة ابتدائي',
-      fr: 'Manuel d\'Anglais 5ème Année',
-      en: 'English for Kids 5th Grade',
-    },
-    description: { ar: 'مدخل إلى المحادثة والمفردات وقواعد اللغة الإنجليزية للطور الابتدائي' },
-    price: 17.5,
-    stock: 55,
-    educationLevelId: 'primary',
-    educationSubLevel: '5',
-    quarter: 'ALL_YEAR',
-    posterUrl: '/assets/covers/english5.jpg',
-    samplePdfUrl: '/assets/samples/english5.pdf',
-    author: 'المركز الوطني للبيداغوجيا',
-    publisher: 'CNP',
-    active: true,
-  },
-  {
-    id: 'art-10',
-    sku: 'MATH-P6',
-    name: {
-      ar: 'كتاب الرياضيات - السنة السادسة ابتدائي (مناظرة السيزيام)',
-      fr: 'Manuel de Mathématiques 6ème Année (Concours)',
-      en: 'Mathematics Textbook 6th Grade (National Exam)',
-    },
-    description: { ar: 'التحضير الشامل لمناظرة الدخول للمدارس الإعدادية النموذجية مع مسائل وحلول' },
-    price: 21.0,
-    discountPrice: 18.0,
-    stock: 90,
-    educationLevelId: 'primary',
-    educationSubLevel: '6',
-    quarter: 'ALL_YEAR',
-    posterUrl: '/assets/covers/math6.jpg',
-    samplePdfUrl: '/assets/samples/math6.pdf',
-    author: 'المركز الوطني للبيداغوجيا',
-    publisher: 'CNP',
-    active: true,
-  },
-  {
-    id: 'art-11',
-    sku: 'SCI-P6',
-    name: {
-      ar: 'كتاب الإيقاظ العلمي - السنة السادسة ابتدائي',
-      fr: 'Livre d\'Éveil Scientifique 6ème Année',
-      en: 'Scientific Awakening 6th Grade',
-    },
-    description: { ar: 'المفاهيم الفيزيائية والبيولوجية والتحضير لمناظرة السيزيام' },
-    price: 17.5,
-    discountPrice: 15.0,
-    stock: 70,
-    educationLevelId: 'primary',
-    educationSubLevel: '6',
-    quarter: 'ALL_YEAR',
-    posterUrl: '/assets/covers/science6.jpg',
-    samplePdfUrl: '/assets/samples/science6.pdf',
     author: 'المركز الوطني للبيداغوجيا',
     publisher: 'CNP',
     active: true,
@@ -502,44 +317,46 @@ export const ArticleAdmin: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Top Header & Actions */}
-      <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <View style={styles.titleGroup}>
-          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-            <Package size={22} color={colors.primary} />
-            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('admin.articlesManagementTitle')}
+      {/* Top Header & Actions Card */}
+      <GlassCard variant="dark" elevation="sm" style={styles.topRowCard}>
+        <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <View style={styles.titleGroup}>
+            <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+              <Package size={22} color={colors.accentLight} />
+              <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+                {t('admin.articlesManagementTitle')}
+              </Text>
+            </View>
+            <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('admin.articlesManagementSub')}
             </Text>
           </View>
-          <Text style={[styles.sectionSub, { textAlign: isRTL ? 'right' : 'left' }]}>
-            {t('admin.articlesManagementSub')}
-          </Text>
+          <Button
+            title={t('admin.addNewArticle')}
+            icon={<Plus size={18} color={colors.primaryDark} />}
+            tooltip={t('admin.addNewArticle')}
+            onPress={() => openModal()}
+            variant="accent"
+            size="md"
+          />
         </View>
-        <Button
-          title={t('admin.addNewArticle')}
-          icon={<Plus size={18} color={colors.primaryDark} />}
-          tooltip={t('admin.addNewArticle')}
-          onPress={() => openModal()}
-          variant="accent"
-          size="md"
-        />
-      </View>
 
-      {/* Search Input */}
-      <View style={styles.searchBox}>
-        <TextInput
-          style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
-          placeholder={t('admin.searchArticlePlaceholder')}
-          placeholderTextColor={colors.textMuted}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
+        {/* Search Input */}
+        <View style={styles.searchBox}>
+          <TextInput
+            style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
+            placeholder={t('admin.searchArticlePlaceholder')}
+            placeholderTextColor={colors.textMuted}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+      </GlassCard>
 
-      {/* Table / List View */}
+      {/* Table / List View with GlassCards */}
       <ScrollView style={styles.listScrollView}>
         {filteredArticles.map((art) => (
-          <View key={art.id} style={styles.articleCard}>
+          <GlassCard key={art.id} variant="dark" elevation="sm" style={styles.articleCard}>
             <View style={[styles.cardHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <View style={styles.artInfo}>
                 <View style={[styles.skuRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
@@ -590,7 +407,7 @@ export const ArticleAdmin: React.FC = () => {
                   onPress={() => openModal(art)}
                   accessibilityLabel={t('admin.edit')}
                 >
-                  <Pencil size={14} color={colors.primary} />
+                  <Pencil size={14} color={colors.accentLight} />
                   <Text style={styles.editBtnText}>{t('admin.edit')}</Text>
                 </TouchableOpacity>
               </Tooltip>
@@ -605,7 +422,7 @@ export const ArticleAdmin: React.FC = () => {
                 </TouchableOpacity>
               </Tooltip>
             </View>
-          </View>
+          </GlassCard>
         ))}
       </ScrollView>
 
@@ -629,6 +446,7 @@ export const ArticleAdmin: React.FC = () => {
             value={sku}
             onChangeText={setSku}
             placeholder="مثال: TUN-ART-101"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Text style={styles.fieldLabel}>اسم الكتاب (عربي) *:</Text>
@@ -637,6 +455,7 @@ export const ArticleAdmin: React.FC = () => {
             value={nameAr}
             onChangeText={setNameAr}
             placeholder="عنوان الكتاب بالعربية"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Text style={styles.fieldLabel}>اسم الكتاب (فرنسي):</Text>
@@ -645,6 +464,7 @@ export const ArticleAdmin: React.FC = () => {
             value={nameFr}
             onChangeText={setNameFr}
             placeholder="Nom du livre en français"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Text style={styles.fieldLabel}>السعر الأصلي (د.ت) *:</Text>
@@ -654,6 +474,7 @@ export const ArticleAdmin: React.FC = () => {
             onChangeText={setPriceStr}
             keyboardType="numeric"
             placeholder="15.00"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Text style={styles.fieldLabel}>سعر التخفيض (د.ت) (اختياري):</Text>
@@ -663,6 +484,7 @@ export const ArticleAdmin: React.FC = () => {
             onChangeText={setDiscountStr}
             keyboardType="numeric"
             placeholder="12.00"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Text style={styles.fieldLabel}>المخزون المتوفر:</Text>
@@ -672,6 +494,7 @@ export const ArticleAdmin: React.FC = () => {
             onChangeText={setStockStr}
             keyboardType="numeric"
             placeholder="100"
+            placeholderTextColor={colors.textMuted}
           />
 
           {/* Education Level Dropdown */}
@@ -713,6 +536,7 @@ export const ArticleAdmin: React.FC = () => {
             value={posterUrl}
             onChangeText={setPosterUrl}
             placeholder="/uploads/poster.jpg"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Text style={styles.fieldLabel}>رابط المعاينة PDF (اختياري):</Text>
@@ -721,6 +545,7 @@ export const ArticleAdmin: React.FC = () => {
             value={samplePdfUrl}
             onChangeText={setSamplePdfUrl}
             placeholder="/uploads/sample.pdf"
+            placeholderTextColor={colors.textMuted}
           />
 
           <TouchableOpacity
@@ -752,10 +577,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  topRowCard: {
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
+    gap: 12,
+  },
   topRow: {
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
     flexWrap: 'wrap',
     gap: 12,
   },
@@ -765,15 +596,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.textLight,
   },
   sectionSub: {
     fontSize: typography.fontSize.sm,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.7)',
     marginTop: 2,
   },
   searchBox: {
-    marginBottom: 16,
+    marginTop: 4,
   },
   searchInput: {
     backgroundColor: colors.cardBg,
@@ -781,20 +612,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderDark,
     fontSize: typography.fontSize.sm,
+    color: colors.textPrimary,
   },
   listScrollView: {
     flex: 1,
   },
   articleCard: {
-    backgroundColor: colors.cardBg,
-    borderRadius: layout.borderRadius.md,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
+    borderColor: 'rgba(229, 193, 88, 0.25)',
   },
   cardHeader: {
     justifyContent: 'space-between',
@@ -812,7 +641,7 @@ const styles = StyleSheet.create({
   artTitle: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   priceContainer: {
     alignItems: 'flex-end',
@@ -820,7 +649,7 @@ const styles = StyleSheet.create({
   priceCurrent: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
   priceOriginal: {
     fontSize: typography.fontSize.xs,
@@ -829,29 +658,29 @@ const styles = StyleSheet.create({
   },
   stockLabel: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.75)',
     marginTop: 4,
   },
   cardActions: {
     marginTop: 12,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: 'rgba(229, 193, 88, 0.2)',
     justifyContent: 'flex-end',
     gap: 12,
   },
   editBtn: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: layout.borderRadius.sm,
     borderWidth: 1,
-    borderColor: colors.borderDark,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
   },
   editBtnText: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   deleteBtn: {
     paddingHorizontal: 12,
@@ -885,13 +714,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   formInput: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.cardBg,
     borderWidth: 1,
     borderColor: colors.borderDark,
     borderRadius: layout.borderRadius.sm,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: typography.fontSize.sm,
+    color: colors.textPrimary,
   },
   quarterRow: {
     flexDirection: 'row',
@@ -903,20 +733,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: layout.borderRadius.full,
-    backgroundColor: colors.background,
+    backgroundColor: colors.cardBg,
     borderWidth: 1,
     borderColor: colors.borderDark,
   },
   quarterPillActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.accent,
+    borderColor: colors.accentLight,
   },
   quarterPillText: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: colors.textPrimary,
   },
   quarterPillTextActive: {
-    color: colors.textLight,
+    color: colors.primaryDark,
     fontWeight: typography.fontWeight.bold,
   },
   toggleBtn: {

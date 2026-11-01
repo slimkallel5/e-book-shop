@@ -25,6 +25,8 @@ import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
 import { Tooltip } from './ui/Tooltip';
+import { GlassCard } from './ui/GlassCard';
+import { Book3D } from './3d/Book3D';
 
 interface ProductDetailModalProps {
   book: Book | null;
@@ -121,9 +123,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
       <ScrollView contentContainerStyle={styles.container}>
         {/* Main Product Banner / Details */}
         <View style={[styles.mainSection, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-          {/* Cover Image Container */}
+          {/* Cover Container with Interactive 3D Book */}
           <View style={styles.coverWrapper}>
-            <Image source={{ uri: book.coverUrl }} style={styles.coverImage} resizeMode="contain" />
+            <Book3D
+              coverUrl={book.coverUrl}
+              width={180}
+              height={254}
+              interactive={true}
+            />
             {book.isPack && (
               <View style={styles.packBadgePos}>
                 <Badge label="PACK" variant="accent" />
@@ -221,20 +228,20 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
         {/* Description Section */}
         {description ? (
-          <View style={styles.sectionBlock}>
+          <GlassCard variant="dark" elevation="sm" style={styles.sectionBlock}>
             <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
               {t('app.description')}
             </Text>
             <Text style={[styles.descriptionText, { textAlign: isRTL ? 'right' : 'left' }]}>
               {description}
             </Text>
-          </View>
+          </GlassCard>
         ) : null}
 
         {/* Customer Review Submission Form */}
-        <View style={styles.sectionBlock}>
+        <GlassCard variant="dark" elevation="sm" style={styles.sectionBlock}>
           <View style={[styles.sectionTitleRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <Star size={18} color={colors.accent} fill={colors.accent} />
+            <Star size={18} color={colors.accentLight} fill={colors.accentLight} />
             <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
               {t('app.addReviewTitle')}
             </Text>
@@ -264,8 +271,8 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   <TouchableOpacity key={star} onPress={() => setReviewRating(star)}>
                     <Star
                       size={24}
-                      color={colors.secondary}
-                      fill={star <= reviewRating ? colors.secondary : 'transparent'}
+                      color={colors.accentLight}
+                      fill={star <= reviewRating ? colors.accentLight : 'transparent'}
                     />
                   </TouchableOpacity>
                 ))}
@@ -274,6 +281,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <TextInput
                 style={[styles.reviewInput, { textAlign: isRTL ? 'right' : 'left' }]}
                 placeholder={t('app.reviewAuthorPlaceholder')}
+                placeholderTextColor={colors.textMuted}
                 value={reviewAuthor}
                 onChangeText={setReviewAuthor}
               />
@@ -281,6 +289,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <TextInput
                 style={[styles.reviewInput, styles.textArea, { textAlign: isRTL ? 'right' : 'left' }]}
                 placeholder={t('app.reviewCommentPlaceholder')}
+                placeholderTextColor={colors.textMuted}
                 value={reviewComment}
                 onChangeText={setReviewComment}
                 multiline
@@ -297,11 +306,11 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               />
             </View>
           )}
-        </View>
+        </GlassCard>
 
         {/* Pack Breakdown Section */}
         {book.isPack && includedBooks.length > 0 && (
-          <View style={styles.sectionBlock}>
+          <GlassCard variant="dark" elevation="sm" style={styles.sectionBlock}>
             <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
               {t('app.packContents')}
             </Text>
@@ -321,12 +330,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </View>
               </View>
             ))}
-          </View>
+          </GlassCard>
         )}
 
         {/* Related Books */}
         {relatedBooks.length > 0 && (
-          <View style={styles.sectionBlock}>
+          <GlassCard variant="dark" elevation="sm" style={styles.sectionBlock}>
             <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
               {t('app.relatedProducts')}
             </Text>
@@ -347,7 +356,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
+          </GlassCard>
         )}
       </ScrollView>
     </Modal>
@@ -357,31 +366,25 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 12,
-    gap: 20,
+    gap: 16,
   },
   mainSection: {
     gap: 16,
-    alignItems: 'flex-start',
+    alignItems: 'center',
     flexWrap: 'wrap',
   },
   coverWrapper: {
-    width: 160,
-    height: 226,
+    width: 180,
+    height: 254,
     position: 'relative',
-    backgroundColor: colors.background,
-    borderRadius: layout.borderRadius.md,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  coverImage: {
-    width: '100%',
-    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   packBadgePos: {
     position: 'absolute',
     top: 8,
     right: 8,
+    zIndex: 10,
   },
   detailsContent: {
     flex: 1,
@@ -418,7 +421,7 @@ const styles = StyleSheet.create({
   effectivePrice: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
   originalPrice: {
     fontSize: typography.fontSize.md,
@@ -438,10 +441,8 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   sectionBlock: {
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: 14,
-    gap: 8,
+    padding: 16,
+    gap: 10,
   },
   sectionTitleRow: {
     alignItems: 'center',
@@ -498,6 +499,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: typography.fontSize.xs,
+    color: colors.textPrimary,
   },
   textArea: {
     height: 70,
@@ -524,7 +526,7 @@ const styles = StyleSheet.create({
   },
   packItemPrice: {
     fontSize: typography.fontSize.xs,
-    color: colors.primary,
+    color: colors.accentLight,
     marginTop: 2,
   },
   relatedGrid: {
@@ -534,11 +536,11 @@ const styles = StyleSheet.create({
   },
   relatedCard: {
     width: 100,
-    backgroundColor: colors.cardBg,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: layout.borderRadius.md,
     padding: 8,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(229, 193, 88, 0.25)',
     alignItems: 'center',
   },
   relatedImage: {
@@ -555,7 +557,7 @@ const styles = StyleSheet.create({
   },
   relatedPrice: {
     fontSize: typography.fontSize.xs,
-    color: colors.primary,
+    color: colors.accentLight,
     marginTop: 2,
   },
 });

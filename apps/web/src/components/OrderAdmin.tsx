@@ -29,6 +29,7 @@ import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
 import { Modal } from './ui/Modal';
+import { GlassCard } from './ui/GlassCard';
 
 export interface AdminOrderItem {
   type: 'article' | 'pack';
@@ -206,59 +207,61 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
   return (
     <View style={styles.container}>
       {/* Header & Filter Controls */}
-      <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <View>
-          <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
-            <ShoppingCart size={22} color={colors.primary} />
-            <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
-              {t('admin.orderManagement')}
+      <GlassCard variant="dark" elevation="sm" style={styles.topRowCard}>
+        <View style={[styles.topRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <View>
+            <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }]}>
+              <ShoppingCart size={22} color={colors.accentLight} />
+              <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+                {t('admin.orderManagement')}
+              </Text>
+            </View>
+            <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t('admin.orderManagementSub')}
             </Text>
           </View>
-          <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
-            {t('admin.orderManagementSub')}
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={[styles.refreshBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
-          onPress={fetchOrders}
-        >
-          <RefreshCw size={14} color={colors.primary} />
-          <Text style={styles.refreshBtnText}>{t('admin.refreshData')}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Status Filter Tabs */}
-      <View style={[styles.tabsRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        {[
-          { key: 'all', label: t('admin.all') },
-          { key: 'pending', label: t('admin.pending') },
-          { key: 'in_progress', label: t('admin.inProgress') },
-          { key: 'delivered', label: t('admin.delivered') },
-          { key: 'rejected', label: t('admin.rejected') },
-        ].map((tab) => (
           <TouchableOpacity
-            key={tab.key}
-            style={[styles.tabPill, selectedStatus === tab.key && styles.tabPillActive]}
-            onPress={() => setSelectedStatus(tab.key)}
+            style={[styles.refreshBtn, { flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}
+            onPress={fetchOrders}
           >
-            <Text style={[styles.tabPillText, selectedStatus === tab.key && styles.tabPillTextActive]}>
-              {tab.label}
-            </Text>
+            <RefreshCw size={14} color={colors.accentLight} />
+            <Text style={styles.refreshBtnText}>{t('admin.refreshData')}</Text>
           </TouchableOpacity>
-        ))}
-      </View>
+        </View>
 
-      {/* Search Input */}
-      <TextInput
-        style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
-        placeholder={t('admin.searchOrderPlaceholder')}
-        placeholderTextColor={colors.textMuted}
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
+        {/* Status Filter Tabs */}
+        <View style={[styles.tabsRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          {[
+            { key: 'all', label: t('admin.all') },
+            { key: 'pending', label: t('admin.pending') },
+            { key: 'in_progress', label: t('admin.inProgress') },
+            { key: 'delivered', label: t('admin.delivered') },
+            { key: 'rejected', label: t('admin.rejected') },
+          ].map((tab) => (
+            <TouchableOpacity
+              key={tab.key}
+              style={[styles.tabPill, selectedStatus === tab.key && styles.tabPillActive]}
+              onPress={() => setSelectedStatus(tab.key)}
+            >
+              <Text style={[styles.tabPillText, selectedStatus === tab.key && styles.tabPillTextActive]}>
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Search Input */}
+        <TextInput
+          style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
+          placeholder={t('admin.searchOrderPlaceholder')}
+          placeholderTextColor={colors.textMuted}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </GlassCard>
 
       {loading ? (
-        <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }} />
+        <ActivityIndicator size="large" color={colors.accentLight} style={{ marginTop: 20 }} />
       ) : (
         <ScrollView style={styles.ordersList}>
           {orders.length === 0 ? (
@@ -267,7 +270,7 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
             orders.map((ord) => {
               const badge = getStatusBadge(ord.status);
               return (
-                <View key={ord.id} style={styles.orderCard}>
+                <GlassCard key={ord.id} variant="dark" elevation="sm" style={styles.orderCard}>
                   {/* Header Row */}
                   <View style={[styles.cardHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                     <View>
@@ -286,17 +289,17 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
                   {/* Customer Info */}
                   <View style={[styles.customerInfoBox, { alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
                     <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
-                      <User size={14} color={colors.primary} />
+                      <User size={14} color={colors.accentLight} />
                       <Text style={styles.customerName}>{ord.customer.fullName}</Text>
                     </View>
                     <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
-                      <Phone size={13} color={colors.textSecondary} />
+                      <Phone size={13} color={colors.textMuted} />
                       <Text style={styles.customerDetail}>{ord.customer.phone} | </Text>
-                      <Mail size={13} color={colors.textSecondary} />
+                      <Mail size={13} color={colors.textMuted} />
                       <Text style={styles.customerDetail}>{ord.customer.email}</Text>
                     </View>
                     <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }]}>
-                      <MapPin size={13} color={colors.textSecondary} />
+                      <MapPin size={13} color={colors.textMuted} />
                       <Text style={styles.customerDetail}>{ord.customer.address}, {ord.customer.city}</Text>
                     </View>
                   </View>
@@ -322,7 +325,7 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
                           onPress={() => setSelectedOrder(ord)}
                           accessibilityLabel={t('admin.details')}
                         >
-                          <Eye size={14} color={colors.primary} />
+                          <Eye size={14} color={colors.accentLight} />
                           <Text style={styles.detailsBtnText}>{t('admin.details')}</Text>
                         </TouchableOpacity>
                       </Tooltip>
@@ -354,7 +357,7 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
                       )}
                     </View>
                   </View>
-                </View>
+                </GlassCard>
               );
             })
           )}
@@ -374,6 +377,7 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
           <TextInput
             style={[styles.textArea, { textAlign: isRTL ? 'right' : 'left' }]}
             placeholder="مثال: عدم توفر المخزون، أو عنوان غير مكتمل..."
+            placeholderTextColor={colors.textMuted}
             value={rejectionReasonInput}
             onChangeText={setRejectionReasonInput}
             multiline
@@ -405,19 +409,19 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
           title={`${t('admin.orderDetailsTitle')}: ${selectedOrder.reference}`}
         >
           <ScrollView contentContainerStyle={styles.detailScroll}>
-            <View style={styles.detailBox}>
+            <GlassCard variant="dark" elevation="sm" style={styles.detailBox}>
               <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 8 }]}>
-                <MapPin size={16} color={colors.primary} />
+                <MapPin size={16} color={colors.accentLight} />
                 <Text style={styles.detailTitle}>{t('admin.customerInfo')}</Text>
               </View>
               <Text style={styles.detailLine}>{t('app.fullName')}: {selectedOrder.customer.fullName}</Text>
               <Text style={styles.detailLine}>{t('app.phone')}: {selectedOrder.customer.phone}</Text>
               <Text style={styles.detailLine}>{t('app.address')}: {selectedOrder.customer.address}, {selectedOrder.customer.city}</Text>
-            </View>
+            </GlassCard>
 
-            <View style={styles.detailBox}>
+            <GlassCard variant="dark" elevation="sm" style={styles.detailBox}>
               <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 8 }]}>
-                <BookOpen size={16} color={colors.primary} />
+                <BookOpen size={16} color={colors.accentLight} />
                 <Text style={styles.detailTitle}>{t('admin.orderItems')}</Text>
               </View>
               {selectedOrder.items.map((item, i) => (
@@ -426,19 +430,19 @@ export const OrderAdmin: React.FC<OrderAdminProps> = ({ token }) => {
                   <Text style={styles.itemVal}>{item.subtotal.toFixed(2)} {t('app.currency')}</Text>
                 </View>
               ))}
-            </View>
+            </GlassCard>
 
-            <View style={styles.detailBox}>
+            <GlassCard variant="dark" elevation="sm" style={styles.detailBox}>
               <View style={[{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginBottom: 8 }]}>
-                <DollarSign size={16} color={colors.primary} />
+                <DollarSign size={16} color={colors.accentLight} />
                 <Text style={styles.detailTitle}>{t('admin.financialSummary')}</Text>
               </View>
               <Text style={styles.detailLine}>{t('app.subtotal')}: {selectedOrder.subtotal.toFixed(2)} {t('app.currency')}</Text>
               <Text style={styles.detailLine}>{t('app.delivery')}: {selectedOrder.deliveryFee.toFixed(2)} {t('app.currency')}</Text>
-              <Text style={[styles.detailLine, { fontWeight: typography.fontWeight.bold, color: colors.primary }]}>
+              <Text style={[styles.detailLine, { fontWeight: typography.fontWeight.bold, color: colors.accentLight }]}>
                 {t('app.total')}: {selectedOrder.total.toFixed(2)} {t('app.currency')}
               </Text>
-            </View>
+            </GlassCard>
           </ScrollView>
         </Modal>
       )}
@@ -451,26 +455,32 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  topRowCard: {
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.3)',
+    gap: 12,
+  },
   topRow: {
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
     flexWrap: 'wrap',
     gap: 8,
   },
   title: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.textLight,
   },
   subtitle: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.7)',
     marginTop: 2,
   },
   refreshBtn: {
-    backgroundColor: colors.cardBg,
-    borderColor: colors.borderDark,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(229, 193, 88, 0.3)',
     borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -479,31 +489,30 @@ const styles = StyleSheet.create({
   refreshBtnText: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   tabsRow: {
     gap: 8,
-    marginBottom: 12,
     flexWrap: 'wrap',
   },
   tabPill: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: layout.borderRadius.full,
-    backgroundColor: colors.cardBg,
-    borderColor: colors.border,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(229, 193, 88, 0.25)',
     borderWidth: 1,
   },
   tabPillActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.accent,
+    borderColor: colors.accentLight,
   },
   tabPillText: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: colors.textLight,
   },
   tabPillTextActive: {
-    color: colors.textLight,
+    color: colors.primaryDark,
     fontWeight: typography.fontWeight.bold,
   },
   searchInput: {
@@ -512,9 +521,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderDark,
     fontSize: typography.fontSize.sm,
-    marginBottom: 12,
+    color: colors.textPrimary,
   },
   ordersList: {
     flex: 1,
@@ -526,14 +535,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   orderCard: {
-    backgroundColor: colors.cardBg,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: layout.borderRadius.md,
     padding: 14,
     marginBottom: 12,
     gap: 10,
-    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.25)',
   },
   cardHeader: {
     justifyContent: 'space-between',
@@ -542,7 +548,7 @@ const styles = StyleSheet.create({
   refText: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
   dateText: {
     fontSize: typography.fontSize.xs,
@@ -558,19 +564,21 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold,
   },
   customerInfoBox: {
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     padding: 10,
     borderRadius: layout.borderRadius.sm,
     gap: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 193, 88, 0.15)',
   },
   customerName: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   customerDetail: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.75)',
   },
   rejectionBox: {
     backgroundColor: '#FFEBEE',
@@ -585,24 +593,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: 'rgba(229, 193, 88, 0.2)',
     paddingTop: 8,
   },
   totalLabel: {
     fontSize: typography.fontSize.xs,
-    color: colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.75)',
   },
   totalVal: {
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
   },
   actionBtns: {
     gap: 8,
   },
   detailsBtn: {
-    backgroundColor: colors.background,
-    borderColor: colors.borderDark,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(229, 193, 88, 0.3)',
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -611,6 +619,7 @@ const styles = StyleSheet.create({
   detailsBtnText: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
+    color: colors.textLight,
   },
   deliverBtn: {
     backgroundColor: '#D1FAE5',
@@ -643,12 +652,13 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   textArea: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.cardBg,
     borderColor: colors.borderDark,
     borderWidth: 1,
     borderRadius: layout.borderRadius.sm,
     padding: 10,
     fontSize: typography.fontSize.sm,
+    color: colors.textPrimary,
   },
   errorText: {
     color: colors.error,
@@ -658,7 +668,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   detailBox: {
-    backgroundColor: colors.background,
     padding: 12,
     borderRadius: layout.borderRadius.sm,
     gap: 4,
@@ -666,12 +675,12 @@ const styles = StyleSheet.create({
   detailTitle: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
-    color: colors.primary,
+    color: colors.accentLight,
     marginBottom: 4,
   },
   detailLine: {
     fontSize: typography.fontSize.xs,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   itemRow: {
     justifyContent: 'space-between',
@@ -680,10 +689,11 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: typography.fontSize.xs,
-    color: colors.textPrimary,
+    color: colors.textLight,
   },
   itemVal: {
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.bold,
+    color: colors.accentLight,
   },
 });
