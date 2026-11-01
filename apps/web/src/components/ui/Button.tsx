@@ -7,14 +7,15 @@ import {
   ViewStyle,
   TextStyle,
   View,
+  Platform,
 } from 'react-native';
-import { colors, layout, typography } from '../../theme/tokens';
+import { colors, layout, typography, shadows } from '../../theme/tokens';
 import { Tooltip } from './Tooltip';
 
-interface ButtonProps {
+export interface ButtonProps {
   title?: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost' | 'glass';
   size?: 'sm' | 'md' | 'lg' | 'icon';
   loading?: boolean;
   disabled?: boolean;
@@ -38,28 +39,41 @@ export const Button: React.FC<ButtonProps> = ({
   textStyle,
   accessibilityLabel,
 }) => {
-  const getVariantStyle = () => {
+  const getVariantStyle = (): ViewStyle => {
     switch (variant) {
       case 'secondary':
-        return { backgroundColor: colors.secondary };
+        return { backgroundColor: colors.secondary, ...shadows.sm };
       case 'accent':
-        return { backgroundColor: colors.accent };
+        return { backgroundColor: colors.accent, ...shadows.sm };
       case 'outline':
         return {
           backgroundColor: 'transparent',
           borderWidth: 1,
-          borderColor: colors.primary,
+          borderColor: colors.accentLight,
         };
       case 'ghost':
         return { backgroundColor: 'transparent' };
+      case 'glass':
+        return {
+          backgroundColor: 'rgba(255, 255, 255, 0.12)',
+          borderWidth: 1,
+          borderColor: 'rgba(255, 255, 255, 0.25)',
+          ...shadows.sm,
+        };
       case 'primary':
       default:
-        return { backgroundColor: colors.primary };
+        return { backgroundColor: colors.primary, ...shadows.sm };
     }
   };
 
   const getTextColor = () => {
-    if (variant === 'outline' || variant === 'ghost') {
+    if (variant === 'glass') {
+      return colors.textLight;
+    }
+    if (variant === 'outline') {
+      return colors.accentLight;
+    }
+    if (variant === 'ghost') {
       return colors.primary;
     }
     if (variant === 'accent') {
@@ -68,7 +82,7 @@ export const Button: React.FC<ButtonProps> = ({
     return colors.textLight;
   };
 
-  const getSizeStyle = () => {
+  const getSizeStyle = (): ViewStyle => {
     switch (size) {
       case 'icon':
         return { padding: 8, borderRadius: layout.borderRadius.md };
@@ -84,6 +98,11 @@ export const Button: React.FC<ButtonProps> = ({
 
   const accessibleText = accessibilityLabel || title || tooltip || 'button';
 
+  const webButtonStyle = Platform.OS === 'web' ? ({
+    transition: 'all 0.2s ease',
+    cursor: 'pointer',
+  } as any) : undefined;
+
   const buttonElement = (
     <TouchableOpacity
       onPress={onPress}
@@ -96,6 +115,7 @@ export const Button: React.FC<ButtonProps> = ({
         styles.button,
         getVariantStyle(),
         getSizeStyle(),
+        webButtonStyle,
         disabled && styles.disabled,
         style,
       ]}

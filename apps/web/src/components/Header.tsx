@@ -32,6 +32,8 @@ interface HeaderProps {
   onSearchChange?: (query: string) => void;
   isAdminMode?: boolean;
   onToggleAdminMode?: () => void;
+  onToggle3DPreview?: () => void;
+  is3DPreviewActive?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -45,6 +47,8 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchChange,
   isAdminMode = false,
   onToggleAdminMode,
+  onToggle3DPreview,
+  is3DPreviewActive = false,
 }) => {
   const { language, setLanguage, isRTL, t } = useLanguage();
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -94,6 +98,25 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Action Controls & Language Selector */}
         <View style={[styles.actionsRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          {/* 3D Preview Toggle */}
+          {onToggle3DPreview && (
+            <Tooltip content={is3DPreviewActive ? t('app.storefront') : '3D'}>
+              <TouchableOpacity
+                style={[
+                  styles.actionBtn,
+                  is3DPreviewActive ? styles.adminActiveBtn : styles.adminBtn,
+                ]}
+                onPress={onToggle3DPreview}
+                activeOpacity={0.8}
+                accessibilityLabel="3D Preview"
+              >
+                <Text style={[styles.cartLabel, is3DPreviewActive ? { color: colors.accentLight } : { color: colors.textLight }]}>
+                  {is3DPreviewActive ? (language === 'ar' ? 'المتجر' : 'Store') : '3D'}
+                </Text>
+              </TouchableOpacity>
+            </Tooltip>
+          )}
+
           {/* Admin Toggle Button */}
           {onToggleAdminMode && (
             <Tooltip content={isAdminMode ? t('app.storefront') : t('app.administrator')}>
